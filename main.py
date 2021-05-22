@@ -180,4 +180,4 @@ async def genDowntime(ctx, name, imageUrl):
     await ctx.send(embed=emb)
 
 
-bot.run(os.getenv('TOKEN'))
+bot.run(os.environ.get('TOKEN'))
