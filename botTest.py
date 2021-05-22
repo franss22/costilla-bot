@@ -2,6 +2,7 @@ from discord.ext import commands
 import discord
 import dndice
 import dice
+import os
 
 bot = commands.Bot(command_prefix='$')
 
@@ -179,4 +180,4 @@ async def genDowntime(ctx, name, imageUrl):
     await ctx.send(embed=emb)
 
 
-bot.run('ODQyOTMyNjEzMjc0MTQwNzQ0.YJ8gKw.iM8SEbSSy22PW5KBKTN9EPmoFMU')
+bot.run(os.environ('TOKEN'))
