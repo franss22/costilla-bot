@@ -3,6 +3,8 @@ import discord
 import dndice
 import dice
 import os
+import sqlite3
+import datetime
 
 bot = commands.Bot(command_prefix='$')
 
@@ -178,6 +180,22 @@ async def genDowntime(ctx, name, imageUrl):
     emb = discord.Embed(title=f'Downtime Activities: {name}')
     emb.set_image(url=imageUrl)
     await ctx.send(embed=emb)
+
+
+def saveFish(fishName:str, fisherName:str):
+    con = sqlite3.connect("data.db")
+    cur = con.cursor()
+    date = str(datetime.datetime.now())
+    cur.execute("insert into fish values (?, ?, ?)", (date, fishName, fisherName))
+    con.commit()
+    con.close()
+
+@bot.command()
+async def PersonajePescaPez(ctx, nombrePJ:str, nombrePez:str):
+    saveFish(nombrePez, nombrePJ)
+    await ctx.send(f"`{nombrePJ} pescó un {nombrePez}!`");
+
+
 
 
 bot.run(os.environ.get('TOKEN'))
