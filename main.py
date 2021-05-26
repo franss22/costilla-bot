@@ -200,7 +200,7 @@ async def tablonPesca(ctx):
     con = sqlite3.connect("data.db")
     cur = con.cursor()
     fish = cur.execute("select * from fish").fetchall()
-    msg = "```**Tablón de Pesca:\n"
+    msg = "```**Tablón de Pesca:**\n"
     fishers = {}
     for row in fish:
         date = row[0]
@@ -208,12 +208,12 @@ async def tablonPesca(ctx):
         fishName = row[2]
         add = f"-{fisherman} pescó un {fishName}\n"
         if (len(msg) <(2000-len(add)-3)):
-            msg.append(add)
+            msg += add
         else:
             await ctx.send("La cantidad de pescado en el anuncio sobrepasa el limite de caracteres de Discord, diganel al Pancho que arregle el bot xd.")
             break
-    msg.append("```")
-    ctx.send(msg)
+    msg+="```"
+    await ctx.send(msg)
 
     
 
@@ -229,6 +229,6 @@ async def tablonPesca(ctx):
 #     '''
 #     emb.add_field("Commands", st, inline=True)
 #     await ctx.send(emb)
+token = os.environ.get('TOKEN')
 
-
-bot.run(os.environ.get('TOKEN'))
+bot.run(token)
