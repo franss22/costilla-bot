@@ -1,3 +1,4 @@
+from math import ceil
 from discord.ext import commands
 import discord
 import dndice
@@ -182,53 +183,63 @@ async def genDowntime(ctx, name, imageUrl):
     await ctx.send(embed=emb)
 
 
-def saveFish(fishName:str, fisherName:str):
+def saveFish(fishName: str, fisherName: str):
     con = sqlite3.connect("data.db")
     cur = con.cursor()
-    date = str(datetime.datetime.now())
-    cur.execute("insert into fish values (?, ?, ?)", (date, fishName, fisherName))
+    cur.execute("insert into fish(pez, pescador) values (?, ?)",
+                (fishName, fisherName))
     con.commit()
     con.close()
 
-@bot.command()
-async def personajePescaPez(ctx, nombrePJ:str, nombrePez:str):
-    saveFish(nombrePez, nombrePJ)
-    await ctx.send(f"`{nombrePJ} pescó un {nombrePez}!`");
 
 @bot.command()
-async def tablonPesca(ctx):
+async def personajePescaPez(ctx, nombrePJ: str, nombrePez: str):
+    saveFish(nombrePez, nombrePJ)
+    await ctx.send(f"`{nombrePJ} pescó un {nombrePez}!`")
+
+
+@bot.command()
+async def tablonPesca(ctx, amt: int = 1):
+    if amt < 1:
+        await ctx.senc("la página debe ser un entero partiendo en 1")
     con = sqlite3.connect("data.db")
     cur = con.cursor()
     fish = cur.execute("select * from fish").fetchall()
+    con.close()
     msg = "```**Tablón de Pesca:**\n"
-    fishers = {}
-    for row in fish:
-        date = row[0]
-        fisherman = row[1]
-        fishName = row[2]
-        add = f"-{fisherman} pescó un {fishName}\n"
-        if (len(msg) <(2000-len(add)-3)):
+    totalRow = len(fish)
+    pageTotal = ceil(totalRow / 20)
+
+    for row in fish[20*(amt-1):20*amt]:
+        id = row[0]
+        fisherman = row[2]
+        fishName = row[1]
+        add = f"{id}-{fisherman} pescó un {fishName}\n"
+        if (len(msg) < (2000-len(add)-3)):
             msg += add
         else:
             await ctx.send("La cantidad de pescado en el anuncio sobrepasa el limite de caracteres de Discord, diganel al Pancho que arregle el bot xd.")
             break
-    msg+="```"
+    msg += f"\n Pag {amt} de {pageTotal}```"
     await ctx.send(msg)
 
-    
-
-    
-
+@bot.command()
+async def deletePez(ctx, id:int):
+    con = sqlite3.connect("data.db")
+    cur = con.cursor()
+    cur.execute("DELETE FROM fish WHERE id= ?", (id,))
+    con.commit()
+    con.close()
+    await ctx.send(f"Elemento id {id} eliminado.")
 
 # @bot.command()
 # async def help(ctx):
 #     emb = discord.Embed(title= 'Help')
 #     st = '''$downtime: comandos de downtime
 #     $personajePescaPez: pescar
-#     $tablonPesca: 
+#     $tablonPesca:
 #     '''
 #     emb.add_field("Commands", st, inline=True)
 #     await ctx.send(emb)
 token = os.environ.get('TOKEN')
-
 bot.run(token)
