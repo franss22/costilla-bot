@@ -208,7 +208,7 @@ async def tablonPesca(ctx):
         fishName = row[2]
         add = f"-{fisherman} pescó un {fishName}\n"
         if (len(msg) <(2000-len(add)-3)):
-            msg.append()
+            msg.append(add)
         else:
             await ctx.send("La cantidad de pescado en el anuncio sobrepasa el limite de caracteres de Discord, diganel al Pancho que arregle el bot xd.")
             break
