@@ -231,4 +231,4 @@ async def tablonPesca(ctx):
 #     await ctx.send(emb)
 
 
-#bot.run(os.environ.get('TOKEN'))
+bot.run(os.environ.get('TOKEN'))
