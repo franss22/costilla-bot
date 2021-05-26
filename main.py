@@ -191,11 +191,44 @@ def saveFish(fishName:str, fisherName:str):
     con.close()
 
 @bot.command()
-async def PersonajePescaPez(ctx, nombrePJ:str, nombrePez:str):
+async def personajePescaPez(ctx, nombrePJ:str, nombrePez:str):
     saveFish(nombrePez, nombrePJ)
     await ctx.send(f"`{nombrePJ} pescó un {nombrePez}!`");
 
+@bot.command()
+async def tablonPesca(ctx):
+    con = sqlite3.connect("data.db")
+    cur = con.cursor()
+    fish = cur.execute("select * from fish").fetchall()
+    msg = "```**Tablón de Pesca:\n"
+    fishers = {}
+    for row in fish:
+        date = row[0]
+        fisherman = row[1]
+        fishName = row[2]
+        add = f"-{fisherman} pescó un {fishName}\n"
+        if (len(msg) <(2000-len(add)-3)):
+            msg.append()
+        else:
+            await ctx.send("La cantidad de pescado en el anuncio sobrepasa el limite de caracteres de Discord, diganel al Pancho que arregle el bot xd.")
+            break
+    msg.append("```")
+    ctx.send(msg)
+
+    
+
+    
 
 
+# @bot.command()
+# async def help(ctx):
+#     emb = discord.Embed(title= 'Help')
+#     st = '''$downtime: comandos de downtime
+#     $personajePescaPez: pescar
+#     $tablonPesca: 
+#     '''
+#     emb.add_field("Commands", st, inline=True)
+#     await ctx.send(emb)
 
-bot.run(os.environ.get('TOKEN'))
+
+#bot.run(os.environ.get('TOKEN'))
