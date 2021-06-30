@@ -21,7 +21,7 @@ async def test(ctx, *args):
 
 
 @bot.command()
-async def massroll(ctx, amt: int, atk: str, dmg: str = '0', ac: int = 0):
+async def massroll(ctx, amt: int, atk: str, dmg: str = '0', ac: int = 0, short: str = ''):
     text = f'''```Massroll: {amt} rolls against AC {ac}'''
     textEnd = ''
     #emb = discord.Embed(title=f'Mass roll: {amt} rolls against AC {ac}')
@@ -41,14 +41,14 @@ async def massroll(ctx, amt: int, atk: str, dmg: str = '0', ac: int = 0):
         dmgRoll = dndice.basic(dmg)
 
         if atkRoll == dice.roll_max(atk):
-            critical = 'Critical! '
+            critical = ', Critical!'
             sumCrits += 1
             dmgRoll = dndice.basic(dmg.replace('d', 'dc'))
         else:
             critical = ''
 
         if dmg != '0':
-            textEnd += f"Attack {x}: {critical}{atkRoll}, damage: {dmgRoll}\n"
+            textEnd += f"Attack n°{x}: {atkRoll}, damage: {dmgRoll}{critical}\n"
             #emb.add_field(name=f'Attack {x}', value=f'{critical}{atkRoll}, damage: {dmgRoll}')
         else:
             textEnd += f"Attack {x}: {critical}{atkRoll}\n"
@@ -57,8 +57,13 @@ async def massroll(ctx, amt: int, atk: str, dmg: str = '0', ac: int = 0):
         if (atkRoll >= ac or critical == 'Critical Attack!: '):
             sumNum += dmgRoll
     text += f'''\n Sum of the Damage: {sumNum} damage'''
-    text += f"\n Amount of critical attacks: {sumCrits}\n"
-    text += textEnd
+    text += f"\n Amount of critical attacks: {sumCrits}\n\n"
+    if short == "short":
+        pass
+    elif (len(text)+len(textEnd) <= 1997):
+        text += textEnd
+    else:
+        text += "Text is too long, detail doesnt fit."
     #emb.add_field(name=f'Sum of the Damage', value=f'{sumNum} damage')
 
     text += "```"
