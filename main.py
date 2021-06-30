@@ -22,9 +22,7 @@ async def test(ctx, *args):
 
 @bot.command()
 async def massroll(ctx, amt: int, atk: str, dmg: str = '0', ac: int = 0):
-    text = f'''```**Massroll: {amt} rolls against AC {ac}
-    
-    '''
+    text = f'''```**Massroll: {amt} rolls against AC {ac}**'''
     #emb = discord.Embed(title=f'Mass roll: {amt} rolls against AC {ac}')
     sumNum = 0
     sumCrits = 0
@@ -42,11 +40,11 @@ async def massroll(ctx, amt: int, atk: str, dmg: str = '0', ac: int = 0):
         dmgRoll = dndice.basic(dmg)
 
         if atkRoll == dice.roll_max(atk):
-            critical = 'Critical Attack!: '
+            critical = 'Critical! '
             sumCrits += 1
             dmgRoll = dndice.basic(dmg.replace('d', 'dc'))
         else:
-            critical = 'Attack: '
+            critical = ''
 
         if dmg != '0':
             text += f"Attack {x}: {critical}{atkRoll}, damage: {dmgRoll}\n"
