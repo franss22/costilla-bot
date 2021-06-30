@@ -22,8 +22,12 @@ async def test(ctx, *args):
 
 @bot.command()
 async def massroll(ctx, amt: int, atk: str, dmg: str = '0', ac: int = 0):
-    emb = discord.Embed(title=f'Mass roll: {amt} rolls against AC {ac}')
+    text = f'''```**Massroll: {amt} rolls against AC {ac}
+    
+    '''
+    #emb = discord.Embed(title=f'Mass roll: {amt} rolls against AC {ac}')
     sumNum = 0
+    sumCrits = 0
     try:
         dndice.basic(atk)
     except:
@@ -31,7 +35,7 @@ async def massroll(ctx, amt: int, atk: str, dmg: str = '0', ac: int = 0):
     try:
         dndice.basic(dmg)
     except:
-        ctx.send(f'{atk} is not valid roll syntax')
+        ctx.send(f'{dmg} is not valid roll syntax')
 
     for x in range(amt):
         atkRoll = dndice.basic(atk)
@@ -39,21 +43,27 @@ async def massroll(ctx, amt: int, atk: str, dmg: str = '0', ac: int = 0):
 
         if atkRoll == dice.roll_max(atk):
             critical = 'Critical Attack!: '
+            sumCrits += 1
             dmgRoll = dndice.basic(dmg.replace('d', 'dc'))
         else:
             critical = 'Attack: '
 
         if dmg != '0':
-            emb.add_field(
-                name=f'Attack {x}', value=f'{critical}{atkRoll}, damage: {dmgRoll}')
+            text += f"Attack {x}: {critical}{atkRoll}, damage: {dmgRoll}\n"
+            #emb.add_field(name=f'Attack {x}', value=f'{critical}{atkRoll}, damage: {dmgRoll}')
         else:
-            emb.add_field(name=f'Attack {x}', value=f'{critical}{atkRoll}')
+            text += f"Attack {x}: {critical}{atkRoll}\n"
+            #emb.add_field(name=f'Attack {x}', value=f'{critical}{atkRoll}')
 
         if (atkRoll >= ac or critical == 'Critical Attack!: '):
             sumNum += dmgRoll
+    text += f'''\n **Sum of the Damage: {sumNum} damage**'''
+    text += f"\n Amount of critical attacks: **{sumCrits}**"
 
-    emb.add_field(name=f'Sum of the Damage', value=f'{sumNum} damage')
-    await ctx.send(embed=emb)
+    #emb.add_field(name=f'Sum of the Damage', value=f'{sumNum} damage')
+
+    text += "```"
+    await ctx.send(text)
 
 
 @bot.command()
@@ -223,8 +233,9 @@ async def tablonPesca(ctx, amt: int = 1):
     msg += f"\n Pag {amt} de {pageTotal}```"
     await ctx.send(msg)
 
+
 @bot.command()
-async def deletePez(ctx, id:int):
+async def deletePez(ctx, id: int):
     con = sqlite3.connect("data.db")
     cur = con.cursor()
     cur.execute("DELETE FROM fish WHERE id= ?", (id,))
