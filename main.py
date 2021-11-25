@@ -8,6 +8,146 @@ import sqlite3
 import datetime
 
 bot = commands.Bot(command_prefix='$')
+downtime_images = {
+"Trabajar un Oficio":"https://cdn.discordapp.com/attachments/763955185679597580/913226000014389298/unknown.png",
+"Comprar un Objeto Magico":"https://cdn.discordapp.com/attachments/763955185679597580/913225616835375114/unknown.png",
+"Irse de Juerga":"https://cdn.discordapp.com/attachments/763955185679597580/913220637458329600/unknown.png",
+"Construir un Objeto Mundano":"https://cdn.discordapp.com/attachments/763955185679597580/913220888911028234/unknown.png",
+"Crear un Plano de Objeto Magico":"https://cdn.discordapp.com/attachments/763955185679597580/913220985396797460/unknown.png",
+"Crear un Objeto Magico":"https://cdn.discordapp.com/attachments/763955185679597580/913221095224659988/unknown.png",
+"Fermentar Pociones":"https://cdn.discordapp.com/attachments/763955185679597580/913225171928768512/unknown.png",
+"Replicar Pocion":"https://cdn.discordapp.com/attachments/763955185679597580/913221315459182642/unknown.png",
+"Crimen":"https://cdn.discordapp.com/attachments/763955185679597580/913221558686863370/unknown.png",
+"Apostar":"https://cdn.discordapp.com/attachments/763955185679597580/913221964007624734/unknown.png",
+"Pelear por dinero":"https://cdn.discordapp.com/attachments/763955185679597580/913222037047222272/unknown.png",
+"Servicio Religioso":"https://cdn.discordapp.com/attachments/763955185679597580/913224919398088744/unknown.png",
+"Fijacion de Hechizo Preparado":"https://cdn.discordapp.com/attachments/763955185679597580/913222207038177340/unknown.png",
+"Aprender Hechizo":"https://cdn.discordapp.com/attachments/763955185679597580/913222207038177340/unknown.png",
+"Buscar Hechizo":"https://cdn.discordapp.com/attachments/763955185679597580/913222840730402846/unknown.png",
+"Investigar":"https://cdn.discordapp.com/attachments/763955185679597580/913223055545880617/unknown.png",
+"Entrenar":"https://cdn.discordapp.com/attachments/763955185679597580/913235361797378128/unknown.png",
+"Cuidado de Animales":"https://cdn.discordapp.com/attachments/763955185679597580/913223352255131668/unknown.png",
+"Rito Tribu Kaeglashita":"https://cdn.discordapp.com/attachments/763955185679597580/913223546715660348/unknown.png",
+"Construcción de un Edificio":"https://cdn.discordapp.com/attachments/763955185679597580/913223949419167825/unknown.png",
+"Llevar el Negocio":"https://cdn.discordapp.com/attachments/763955185679597580/913224128088145920/unknown.png",
+"Contruir una Casa":"https://cdn.discordapp.com/attachments/763955185679597580/913224444338647090/unknown.png",
+"Aportar a la Construccion de la Peninsula":"https://cdn.discordapp.com/attachments/763955185679597580/913224564698411068/unknown.png",
+"Reaprender Hechizos":"https://cdn.discordapp.com/attachments/763955185679597580/913224522394652682/unknown.png"
+}
+@bot.command()
+async def reaprender(ctx):
+    name = "Reaprender Hechizos"
+    await genDowntime(ctx, name)
+
+@bot.command()
+async def pc(ctx):
+    name = "Aportar a la Construccion de la Peninsula"
+    await genDowntime(ctx, name)
+
+@bot.command()
+async def casa(ctx):
+    name = "Contruir una Casa"
+    await genDowntime(ctx, name)
+
+@bot.command()
+async def negocio(ctx):
+    name = "Llevar el Negocio"
+    await genDowntime(ctx, name)
+
+@bot.command()
+async def construir(ctx):
+    name = "Construcción de un Edificio"
+    await genDowntime(ctx, name)
+
+@bot.command()
+async def rito(ctx):
+    name = "Rito Tribu Kaeglashita"
+    await genDowntime(ctx, name)
+
+@bot.command()
+async def cuidar(ctx):
+    name = "Cuidado de Animales"
+    await genDowntime(ctx, name)
+
+@bot.command()
+async def investigar(ctx):
+    name = "Investigar"
+    await genDowntime(ctx, name)
+
+@bot.command()
+async def buscar(ctx):
+    name = "Buscar Hechizo"
+    await genDowntime(ctx, name)
+
+@bot.command()
+async def aprender(ctx):
+    name = "Aprender Hechizo"
+    await genDowntime(ctx, name)
+
+@bot.command()
+async def fijar(ctx):
+    name = "Fijacion de Hechizo Preparado"
+    await genDowntime(ctx, name)
+
+@bot.command()
+async def rezar(ctx):
+    name = "Servicio Religioso"
+    await genDowntime(ctx, name)
+
+@bot.command()
+async def pelear(ctx):
+    name = "Pelear por dinero"
+    await genDowntime(ctx, name)
+
+@bot.command()
+async def apostar(ctx):
+    name = "Apostar"
+    await genDowntime(ctx, name)
+
+@bot.command()
+async def crimen(ctx):
+    name = "Crimen"
+    await genDowntime(ctx, name)
+
+@bot.command()
+async def replicar(ctx):
+    name = "Replicar Pocion"
+    await genDowntime(ctx, name)
+
+@bot.command()
+async def pociones(ctx):
+    name = "Fermentar Pociones"
+    await genDowntime(ctx, name)
+
+@bot.command()
+async def craftear(ctx):
+    name = "Crear un Objeto Magico"
+    await genDowntime(ctx, name)
+
+@bot.command()
+async def plano(ctx):
+    name = "Crear un Plano de Objeto Magico"
+    await genDowntime(ctx, name)
+
+@bot.command()
+async def fabricar(ctx):
+    name = "Construir un Objeto Mundano"
+    await genDowntime(ctx, name)
+
+@bot.command()
+async def juerga(ctx):
+    name = "Irse de Juerga"
+    await genDowntime(ctx, name)
+
+@bot.command()
+async def gacha(ctx):
+    name = "Comprar un Objeto Magico"
+    await genDowntime(ctx, name)
+
+@bot.command()
+async def trabajar(ctx):
+    name = "Trabajar un Oficio"
+    await genDowntime(ctx, name)
 
 
 @bot.event
@@ -74,126 +214,36 @@ async def massroll(ctx, amt: int, atk: str, dmg: str = '0', ac: int = 0, short: 
 async def downtime(ctx):
     emb = discord.Embed(title='Actividades de Downtime:')
     text = '''
-    Construir un Objeto Mundano: $mundano 
-    Crear Plano de Objeto Mágico: $plano
-    Crimen: $crimen
-    Fermentar Pociones: $fermentar
-    Fijar Hechizo: $fijar
-    Investigar: $investigar
-    Irse de Juerga: $juerga
-    Pelear por Dinero: $pelear
-    Replicar Poción: $replicar
-    Servicio Religioso: $religioso
-    Apostar: $apostar
     Trabajar un Oficio: $trabajar
-    Aprender Hechizo: $aprender
-    Buscar Hechizo: $buscar
-    Comprar Objeto mágico: $compra
-    Construir un objeto mágico: $artificiar
+    Comprar un Objeto Magico: $gacha
+    Irse de Juerga: $juerga
+    Construir un Objeto Mundano: $fabricar
+    Crear un Plano de Objeto Magico: $plano
+    Crear un Objeto Magico: $craftear
+    Replicar Pocion: $replicar
+    Crimen: $crimen
+    Apostar: $apostar
+    Pelear por dinero: $pelear
+    Servicio Religioso: $rezar
+    Fijacion de Hechizo Preparado: $fijar
+    Investigar: $investigar
+    Cuidado de Animales: $cuidar
+    Rito Tribu Kaeglashita: $rito
+    Construcción de un Edificio: $construir
+    Llevar el Negocio: $negocio
+    Contruir una Casa: $casa
+    Aportar a la Construccion de la Peninsula: $pc
+    Reaprender Hechizos: $reaprender
     '''
     emb.add_field(name='Comandos', value=text)
     await ctx.send(embed=emb)
 
 
-@bot.command()
-async def artificiar(ctx):
-    url = 'https://media.discordapp.net/attachments/763955185679597580/843323160400887848/ConstObjetoMagico.png'
-    await genDowntime(ctx, 'Construir un Objeto Mágico', url)
 
 
-@bot.command()
-async def compra(ctx):
-    url = 'https://media.discordapp.net/attachments/763955185679597580/843323157191983126/ComprarObjetoMagico.png'
-    await genDowntime(ctx, 'Comprar Objeto Mágico', url)
-
-
-@bot.command()
-async def buscar(ctx):
-    url = 'https://media.discordapp.net/attachments/763955185679597580/843323152468541450/BuscarHechizo.png?width=550&height=675'
-    await genDowntime(ctx, 'Buscar Hechizo', url)
-
-
-@bot.command()
-async def aprender(ctx):
-    url = 'https://media.discordapp.net/attachments/763955185679597580/843323148229017620/AprenderHechizo.png'
-    await genDowntime(ctx, 'Aprender Hechizo', url)
-
-
-@bot.command()
-async def trabajar(ctx):
-    url = 'https://media.discordapp.net/attachments/763955185679597580/843323140683857930/TrabajarUnOficio.png'
-    await genDowntime(ctx, 'Trabajar un Oficio', url)
-
-
-@bot.command()
-async def apostar(ctx):
-    url = 'https://media.discordapp.net/attachments/763955185679597580/843323138489319444/Apostar.png?width=245&height=675'
-    await genDowntime(ctx, 'Apostar', url)
-
-
-@bot.command()
-async def religioso(ctx):
-    url = 'https://media.discordapp.net/attachments/763955185679597580/843323114205216778/ServicioReligioso.png?width=592&height=675'
-    await genDowntime(ctx, 'Servicio Religioso', url)
-
-
-@bot.command()
-async def replicar(ctx):
-    url = 'https://media.discordapp.net/attachments/763955185679597580/843323110073303090/ReplicarPocion.png'
-    await genDowntime(ctx, 'Replicar Poción', url)
-
-
-@bot.command()
-async def pelear(ctx):
-    url = 'https://media.discordapp.net/attachments/763955185679597580/843323107565764648/PelearPorDinero.png?width=333&height=675'
-    await genDowntime(ctx, 'Pelear por Dinero', url)
-
-
-@bot.command()
-async def juerga(ctx):
-    url = 'https://media.discordapp.net/attachments/763955185679597580/843323105694842910/IrseDeJuerga.png?width=279&height=676'
-    await genDowntime(ctx, 'Irse de Juerga', url)
-
-
-@bot.command()
-async def investigar(ctx):
-    url = 'https://media.discordapp.net/attachments/763955185679597580/843323103114559518/Investigar.png'
-    await genDowntime(ctx, 'Investigar', url)
-
-
-@bot.command()
-async def fijar(ctx):
-    url = 'https://media.discordapp.net/attachments/763955185679597580/843323099650981909/FijarHechizo.png'
-    await genDowntime(ctx, 'Fijar Hechizo', url)
-
-
-@bot.command()
-async def fermentar(ctx):
-    url = 'https://media.discordapp.net/attachments/763955185679597580/843323096672763914/Fermentar.png'
-    await genDowntime(ctx, 'Fermentar Pociones', url)
-
-
-@bot.command()
-async def crimen(ctx):
-    url = 'https://media.discordapp.net/attachments/763955185679597580/843323096055808050/Crimen.png'
-    await genDowntime(ctx, 'Crimen', url)
-
-
-@bot.command()
-async def plano(ctx):
-    url = 'https://media.discordapp.net/attachments/763955185679597580/843323093182578728/ConsturirPLano.png'
-    await genDowntime(ctx, 'Crear Plano de Objeto Mágico', url)
-
-
-@bot.command()
-async def mundano(ctx):
-    url = 'https://media.discordapp.net/attachments/763955185679597580/843323092402962492/ConstruirObjetoMundano.png'
-    await genDowntime(ctx, 'Construir un Objeto Mundano', url)
-
-
-async def genDowntime(ctx, name, imageUrl):
+async def genDowntime(ctx, name):
     emb = discord.Embed(title=f'Downtime Activities: {name}')
-    emb.set_image(url=imageUrl)
+    emb.set_image(url=downtime_images[name])
     await ctx.send(embed=emb)
 
 
