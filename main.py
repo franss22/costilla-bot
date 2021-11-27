@@ -30,7 +30,6 @@ async def state(ctx, pj_id:str):
         return
     
     money_val = sht.money_value(row)
-    money_total_value = float(old_val[5])
     dt_val = sht.dt_value(row)
     xp_val = sht.xp_value(row)
     ren_val = sht.renown_value(row)
