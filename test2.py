@@ -1,3 +1,4 @@
-from sheetTest import *
+import sheetTest as sht
 
-print(get_reward_info(1))
+
+print(sht.check_principado_level(77))

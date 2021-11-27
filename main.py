@@ -177,8 +177,7 @@ async def piedad(ctx, pj_id: str, value: int):
         return
 
     old_val = sht.piety_value(row)
-    old_form = sht.piety_formula(row)
-    success = sht.update_piety(row, old_form, value)
+    success = sht.add_piety(row, value)
 
     old_total_value = int(old_val)
 
