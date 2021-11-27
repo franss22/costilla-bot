@@ -31,7 +31,7 @@ async def state(ctx, pj_id:str):
     
     money_val = sht.money_value(row)
     dt_val = sht.dt_value(row)
-    xp_val = sht.xp_value(row)
+    xp_val = sht.experience_value(row)
     ren_val = sht.renown_value(row)
     piety_val = sht.piety_value(row)
     name = sht.get_pj_name(row)
