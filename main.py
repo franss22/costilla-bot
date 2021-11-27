@@ -23,7 +23,7 @@ async def try_pj_row(ctx, pj_id):
     return row
 
 @bot.command()
-async def mission_reward(tier, pj_id, type = None):
+async def missioncomplete(tier, pj_id, type = None):
     #type: 0 = estrella, 1 = calavera
     if tier >10 or tier <1:
         await ctx.send(f"No existen misiones de tier {tier}")
