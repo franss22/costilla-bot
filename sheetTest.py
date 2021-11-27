@@ -65,6 +65,7 @@ def update_money(row, new_money):
     
 
 def pay_priority(coins, paid_amt):
+    #calcula la diferencia (lo que hay que restarle al dinero original) para pagar paid_amt
     separate_price = num_to_coin_list(paid_amt)
     #pagamos de las monedas mas caras a las mas baratas
     oldpp= int(coins[0])

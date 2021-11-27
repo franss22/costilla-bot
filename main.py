@@ -19,7 +19,7 @@ async def try_pj_row(ctx, pj_id):
     return row
 
 @bot.command()
-async def money(ctx, pj_id:str, value:float, force = None):
+async def addmoney(ctx, pj_id:str, value:float, force = None):
     
     row = await try_pj_row(ctx, pj_id)
     if row is None: return
@@ -45,7 +45,7 @@ async def money(ctx, pj_id:str, value:float, force = None):
         return
 
 @bot.command()
-async def pay(ctx, pj_id:str, value:float):
+async def spend(ctx, pj_id:str, value:float):
     
     row = await try_pj_row(ctx, pj_id)
     if row is None: return
