@@ -2,7 +2,8 @@ from googleapiclient.discovery import build
 from google.auth.transport.requests import Request
 from google.oauth2 import service_account
 from urllib.error import HTTPError
-
+from math import ceil
+import decimal as dec
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 SERVICE_ACCOUNT_FILE = "keys.json"
 
@@ -46,10 +47,20 @@ def valid_num(appnd):
 def sign(num):
     return 1 if num>= 0 else -1
 
-def num_to_coin_list(num):
-    anum = abs(float(num))
 
-    return [int(anum)//10*sign(num), int(anum)//1%10*sign(num), 0, int(anum*10)//1%10*sign(num), int(anum*100)//1%10*sign(num)]
+
+
+def num_to_coin_list(num):
+
+    anum = int(round(abs(float(num))*100))
+    # #print(anum)
+    pp = sign(num)*anum//1000
+    gp = sign(num)*anum%1000//100
+    sp = sign(num)*anum%100//10
+    cp = sign(num)*anum%10
+
+    return [pp, gp, 0, sp, cp]
+
 
 
 def new_money_list(old_money, add_list):
@@ -70,44 +81,84 @@ def pay_priority(coins, paid_amt):
     #pagamos de las monedas mas caras a las mas baratas
     oldpp= int(coins[0])
     oldgp= int(coins[1])
-    oldep= int(coins[3])
+    oldep= int(coins[2])
     oldsp= int(coins[3])
     oldcp= int(coins[4])
 
     pp= separate_price[0]
     gp= separate_price[1]
-    ep= separate_price[3]//5
-    sp= separate_price[3]%5
+    ep= abs(separate_price[3])//5*sign(separate_price[3])
+    sp= abs(separate_price[3])%5*sign(separate_price[3])
     cp= separate_price[4]
-    fpp= 0
-    fgp= 0
-    fep= 0
-    fsp= 0
-    fcp= 0
-    #vemos que nos alcanzen las monedas mas caras, y vamos bajando
+    #print(separate_price)
+
+    # rpp = max(0, oldpp-pp)
+    # rgp = max(0, oldgp-gp) + min(0, (oldpp-pp)*10)
+    # rep = max(0, oldep-ep) + min(0, (oldgp-gp)*2)
+    # rsp = max(0, oldsp-sp) + min(0, (oldep-ep)*5)
+    # rcp = oldcp-cp + min(0, (oldsp-sp)*10)
+
+    rpp = oldpp-pp
+    rgp = oldgp-gp
+    rep = oldep-ep
+    rsp = oldsp-sp
+    rcp = oldcp-cp
+    #print([rpp, rgp, rep, rsp, rcp])
+
+    if rpp<0:
+        rgp += rpp*10
+        #print("changed rgp to", rgp)
+        rpp = 0
+    if rgp<0:
+        rep += rgp*2
+        #print("changed rep to", rep)
+        rgp = 0
+    if rep<0:
+        rsp += rep*5
+        #print("changed rsp to", rsp)
+        rep = 0
+    if rsp<0:
+        rcp += rsp*10
+        #print("changed rcp to", rcp)
+        rsp = 0
+
+    #print([rpp, rgp, rep, rsp, rcp])
+
+    if rcp <0:
+        cambio = ceil(-rcp/10)
+        #print("cambio de cp a sp)", cambio)
+        rcp += cambio*10
+        rsp -= cambio
+        #print(rcp, rsp)
+
+    if rsp <0:
+        cambio = ceil(-rsp/5)
+        #print("cambio de sp a ep)", cambio)
+        rsp += cambio*5
+        rep -= cambio
+        #print(rsp, rep)
     
-    fpp = max(0, oldpp-pp)-oldpp
-    pp = max(0, pp-oldpp)
-    gp += pp*10
-
-    fgp = max(0, oldgp-gp)-oldgp
-    gp = max(0, gp-oldgp)
-    ep += gp*2
-
-    fep = max(0, oldep-ep)-oldep
-    ep = max(0, ep-oldep)
-    sp += ep*5
-
-    fsp = max(0, oldsp-sp)-oldsp
-    sp = max(0, sp-oldsp)
-    cp += sp*10
-
-    fcp = -cp
-
-    return [fpp, fgp, fep, fsp, fcp]
+    if rep <0:
+        cambio = ceil(-rep/2)
+        #print("cambio de ep a gp)", cambio)
+        rep += cambio*2
+        rgp -= cambio
+        #print(rep, rgp)
+    
+    if rgp <0:
+        cambio = ceil(-rgp/10)
+        #print("cambio de gp a pp)", cambio)
+        rgp += cambio*10
+        rpp -= cambio
+        #print(rgp, rpp)
 
 
+    return [rpp-oldpp, rgp-oldgp, rep-oldep, rsp-oldsp, rcp-oldcp]
 
+
+print("dinero al final", pay_priority([1,0,0,0,0], 0.01))
+
+# #print(num_to_coin_list(9.12))
 
 
 def money_formula(row):
@@ -146,5 +197,5 @@ def get_pj_name(row):
         return "ERROR recuperando nombre"
 
     
-# print(get_dt(5))
-# print(get_pj_name(5))
+# #print(get_dt(5))
+# #print(get_pj_name(5))
