@@ -21,7 +21,7 @@ async def try_pj_row(ctx, pj_id):
 @bot.command()
 async def money(ctx, pj_id:str, value:float, force = None):
     
-    row = try_pj_row(ctx, pj_id)
+    row = await try_pj_row(ctx, pj_id)
     if row is None: return
 
     old_val = sht.money_value(row)
@@ -47,7 +47,7 @@ async def money(ctx, pj_id:str, value:float, force = None):
 @bot.command()
 async def pay(ctx, pj_id:str, value:float):
     
-    row = try_pj_row(pj_id)
+    row = await try_pj_row(pj_id)
     if row is None: return
 
     old_val = sht.money_value(row)
@@ -73,7 +73,7 @@ async def pay(ctx, pj_id:str, value:float):
 @bot.command()
 async def updatedt(ctx, pj_id:str, value:float, force = None):
     
-    row = try_pj_row(ctx, pj_id)
+    row = await try_pj_row(ctx, pj_id)
     if row is None: return
 
     old_val = sht.dt_value(row)
