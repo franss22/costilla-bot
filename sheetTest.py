@@ -186,21 +186,21 @@ def dt_formula(row):
 def dt_value(row):
     return get_single_val("S", row, "FORMATTED_VALUE")
 def update_dt(row, old_value, value):
-    return update_single_val("S", row, oldvalue, value)
+    return update_single_val("S", row, old_value, value)
 
 def renown_formula(row):
     return get_single_val("U", row, "FORMULA")
 def renown_value(row):
     return get_single_val("U", row, "FORMATTED_VALUE")
 def update_renown(row, old_value, value):
-    return update_single_val("U", row, oldvalue, value)
+    return update_single_val("U", row, old_value, value)
 
 def piety_formula(row):
     return get_single_val("W", row, "FORMULA")
 def piety_value(row):
     return get_single_val("W", row, "FORMATTED_VALUE")
 def update_piety(row, old_value, value):
-    return update_single_val("W", row, oldvalue, value)
+    return update_single_val("W", row, old_value, value)
 
 
 
