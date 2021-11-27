@@ -261,3 +261,10 @@ def get_pj_name(row):
 def clean_money(row):
     new_money = money_value(row)[:6]
     return update_money(row, new_money)
+
+
+def get_reward_info(tier:int):
+    xp_gold = sheet.values().get(spreadsheetId=SPREADSHEET_ID, range=f'💰Rwrds!H{tier*2}:L{tier*2}', valueRenderOption="FORMATTED_VALUE").execute().get('values', [])[0]
+    dt = sheet.values().get(spreadsheetId=SPREADSHEET_ID, range=f'💰Rwrds!O2', valueRenderOption="FORMATTED_VALUE").execute().get('values', [[]])[0][0]
+    
+    return (xp_gold, dt)

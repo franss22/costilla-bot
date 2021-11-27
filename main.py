@@ -22,6 +22,27 @@ async def try_pj_row(ctx, pj_id):
         await ctx.send(error)
     return row
 
+def tier_message(tier:int, type:int):
+    #type: 0 = estrella, 1 = calavera
+    if tier >10 or tier <1:
+        return f"No existen misiones de tier {tier}"
+    else:
+        xp_gold, dt = get_reward_info(tier)
+        xp = int(xp_gold[type])
+        gold = float(xp_gold[3+type])
+        dt = float(dt)
+        message = f"""La recompensa de una misión de tier {tier} es:
+        {xp}xp, {gold}gp, {dt}dt, 1 de piedad, 1 de renombre. 
+        El que hace el informe gana {int(xp*1.1)}xp.
+        La gente del principado, dependiendo de su renombre, gana {dt+1}dt y {gold*2}gp."""
+        return message
+
+async def reward(ctx, tier:int, type = None):
+    if type is not None:
+        type = 1
+    else: type = 0
+    await ctx.send(tier_message(tier, type))
+
 
 @bot.command()
 async def state(ctx, pj_id:str):
@@ -204,7 +225,6 @@ async def cleanmoney(ctx, pj_id: str):
         return
     success = sht.clean_money(row)
     if success:
-        new_val = old_total_value + value
         message = f"Dinero de {sht.get_pj_name(row)} limpiado"
         await ctx.send(message)
         return
