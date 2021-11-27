@@ -75,7 +75,7 @@ async def spend(ctx, pj_id:str, value:float):
 
 
 @bot.command()
-async def adddt(ctx, pj_id:str, value:float, force = None):
+async def dt(ctx, pj_id:str, value:float, force = None):
     
     row = await try_pj_row(ctx, pj_id)
     if row is None: return
