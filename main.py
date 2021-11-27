@@ -27,7 +27,7 @@ def tier_message(tier:int, type:int):
     if tier >10 or tier <1:
         return f"No existen misiones de tier {tier}"
     else:
-        xp_gold, dt = get_reward_info(tier)
+        xp_gold, dt = sht.get_reward_info(tier)
         xp = int(xp_gold[type])
         gold = float(xp_gold[3+type])
         dt = float(dt)
