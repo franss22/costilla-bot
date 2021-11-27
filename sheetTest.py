@@ -187,10 +187,10 @@ def update_single_val(col, row, old_value, value):
     except:
         return False
 
+
 def add_single_val(col, row, value):
     old_value = get_single_val(col, row, "FORMULA")
     return update_single_val(col, row, old_value, value)
-
 
 
 def dt_formula(row):
@@ -203,6 +203,7 @@ def dt_value(row):
 
 def update_dt(row, old_value, value):
     return update_single_val("S", row, old_value, value)
+
 
 def add_dt(row, value):
     return add_single_val("S", row, value)
@@ -219,8 +220,10 @@ def renown_value(row):
 def update_renown(row, old_value, value):
     return update_single_val("U", row, old_value, value)
 
+
 def add_renown(row, value):
     return add_single_val("U", row, value)
+
 
 def piety_formula(row):
     return get_single_val("W", row, "FORMULA")
@@ -233,8 +236,10 @@ def piety_value(row):
 def update_piety(row, old_value, value):
     return update_single_val("W", row, old_value, value)
 
+
 def add_piety(row, value):
     return add_single_val("W", row, value)
+
 
 def experience_formula(row):
     return get_single_val("E", row, "FORMULA")
@@ -247,8 +252,10 @@ def experience_value(row):
 def update_experience(row, old_value, value):
     return update_single_val("E", row, old_value, value)
 
+
 def add_experience(row, value):
     return add_single_val("E", row, value)
+
 
 def change_money(row, old_money_list, new_money_amount):
     new_money = new_money_list(
@@ -272,16 +279,20 @@ def get_pj_name(row):
 # #print(get_dt(5))
 # #print(get_pj_name(5))
 
+
 def clean_money(row):
-    new_money = money_value(row)[:6]
+    new_money = money_value(row)[:5]
     return update_money(row, new_money)
 
 
-def get_reward_info(tier:int):
-    xp_gold = sheet.values().get(spreadsheetId=SPREADSHEET_ID, range=f'💰Rwrds!H{tier*2}:L{tier*2}', valueRenderOption="FORMATTED_VALUE").execute().get('values', [])[0]
-    dt = sheet.values().get(spreadsheetId=SPREADSHEET_ID, range=f'💰Rwrds!O2', valueRenderOption="FORMATTED_VALUE").execute().get('values', [[]])[0][0]
-    
+def get_reward_info(tier: int):
+    xp_gold = sheet.values().get(spreadsheetId=SPREADSHEET_ID,
+                                 range=f'💰Rwrds!H{tier*2}:L{tier*2}', valueRenderOption="FORMATTED_VALUE").execute().get('values', [])[0]
+    dt = sheet.values().get(spreadsheetId=SPREADSHEET_ID, range=f'💰Rwrds!O2',
+                            valueRenderOption="FORMATTED_VALUE").execute().get('values', [[]])[0][0]
+
     return (xp_gold, dt)
+
 
 def check_principado_level(row):
     ren_val = int(renown_value(row))
@@ -294,7 +305,7 @@ def check_principado_level(row):
             return 3
         elif ren_val >= 10:
             return 2
-        elif ren_val >=3:
+        elif ren_val >= 3:
             return 1
-        
+
     return 0
