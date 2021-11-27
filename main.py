@@ -31,12 +31,13 @@ def tier_message(tier:int, type:int):
         xp = int(xp_gold[type])
         gold = float(xp_gold[3+type])
         dt = float(dt)
-        message = f"""La recompensa de una misión de tier {tier} es:
+        message = f"""La recompensa de una misión de tier {tier} {"estrellas" if type == 1 else "calaveras"} es:
         {xp}xp, {gold}gp, {dt}dt, 1 de piedad, 1 de renombre. 
         El que hace el informe gana {int(xp*1.1)}xp.
         La gente del principado, dependiendo de su renombre, gana {dt+1}dt y {gold*2}gp."""
         return message
 
+@bot.command()
 async def reward(ctx, tier:int, type = None):
     if type is not None:
         type = 1
