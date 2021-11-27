@@ -172,7 +172,7 @@ def get_single_val(col, row, valOption):
     print("result", result)
     return result.get('values', [[]])[0][0]
 
-def update_single_val(col, row, oldvalue, value):
+def update_single_val(col, row, old_value, value):
     new_value = append_to_formula(old_value, value)
     try:
         result2= sheet.values().update(spreadsheetId=SPREADSHEET_ID, range=f'👨‍👨‍👧‍👧PJs!{col}{row}', valueInputOption="USER_ENTERED", body={'values':[[new_value]]}).execute()
