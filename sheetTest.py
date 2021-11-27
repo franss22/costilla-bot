@@ -169,8 +169,8 @@ def money_value(row):
 
 def get_single_val(col, row, valOption):
     result = sheet.values().get(spreadsheetId=SPREADSHEET_ID, range=f'👨‍👨‍👧‍👧PJs!{col}{row}', valueRenderOption=valOption).execute()
-    print(result)
-    return result.get('values', [])[0][0]
+    print("result", result)
+    return result.get('values', [[]])[0][0]
 
 def update_single_val(col, row, oldvalue, value):
     new_value = append_to_formula(old_value, value)
