@@ -101,7 +101,7 @@ def pay_priority(coins, paid_amt):
     sp = max(0, sp-oldsp)
     cp += sp*10
 
-    fcp = max(0, oldcp-cp)-oldcp
+    fcp = oldcp-cp
 
     return [fpp, fgp, fep, fsp, fcp]
 
