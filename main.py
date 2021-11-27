@@ -22,11 +22,33 @@ async def try_pj_row(ctx, pj_id):
         await ctx.send(error)
     return row
 
+
 @bot.command()
-async def addmoney(ctx, pj_id:str, value:float, force = None):
-    
+async def state(ctx, pj_id:str):
     row = await try_pj_row(ctx, pj_id)
-    if row is None: return
+    if row is None:
+        return
+    
+    money_val = sht.money_value(row)
+    money_total_value = float(old_val[5])
+    dt_val = sht.dt_value(row)
+    xp_val = sht.xp_value(row)
+    ren_val = sht.renown_value(row)
+    piety_val = sht.piety_value(row)
+    name = sht.get_pj_name(row)
+
+    message = f"""Resumen de {name}:
+        {money_val[0]}pp, {money_val[1]}gp, {money_val[2]}ep, {money_val[3]}sp, {money_val[4]}cp, **{money_val[5]}gp** totales.
+        XP: {xp_val}, DT: {dt_val}, Renombre: {ren_val}, Piedad: {piety_val}."""
+    await ctx.send(message)
+
+
+@bot.command()
+async def addmoney(ctx, pj_id: str, value: float, force=None):
+
+    row = await try_pj_row(ctx, pj_id)
+    if row is None:
+        return
 
     old_val = sht.money_value(row)
     old_total_value = float(old_val[5])
@@ -48,11 +70,13 @@ async def addmoney(ctx, pj_id:str, value:float, force = None):
         await ctx.send(error)
         return
 
+
 @bot.command()
-async def spend(ctx, pj_id:str, value:float):
-    
+async def spend(ctx, pj_id: str, value: float):
+
     row = await try_pj_row(ctx, pj_id)
-    if row is None: return
+    if row is None:
+        return
 
     old_val = sht.money_value(row)
     old_total_value = float(old_val[5])
@@ -75,10 +99,11 @@ async def spend(ctx, pj_id:str, value:float):
 
 
 @bot.command()
-async def dt(ctx, pj_id:str, value:float, force = None):
-    
+async def dt(ctx, pj_id: str, value: float, force=None):
+
     row = await try_pj_row(ctx, pj_id)
-    if row is None: return
+    if row is None:
+        return
 
     old_val = sht.dt_value(row)
     old_total_value = float(old_val)
@@ -100,11 +125,13 @@ async def dt(ctx, pj_id:str, value:float, force = None):
         await ctx.send(error)
         return
 
+
 @bot.command()
-async def renombre(ctx, pj_id:str, value:int):
-    
+async def renombre(ctx, pj_id: str, value: int):
+
     row = await try_pj_row(ctx, pj_id)
-    if row is None: return
+    if row is None:
+        return
 
     old_val = sht.renown_value(row)
     old_form = sht.renown_formula(row)
@@ -122,11 +149,13 @@ async def renombre(ctx, pj_id:str, value:int):
         await ctx.send(error)
         return
 
+
 @bot.command()
-async def piedad(ctx, pj_id:str, value:int):
-    
+async def piedad(ctx, pj_id: str, value: int):
+
     row = await try_pj_row(ctx, pj_id)
-    if row is None: return
+    if row is None:
+        return
 
     old_val = sht.piety_value(row)
     old_form = sht.piety_formula(row)
@@ -146,10 +175,11 @@ async def piedad(ctx, pj_id:str, value:int):
 
 
 @bot.command()
-async def xp(ctx, pj_id:str, value:int):
-    
+async def xp(ctx, pj_id: str, value: int):
+
     row = await try_pj_row(ctx, pj_id)
-    if row is None: return
+    if row is None:
+        return
 
     old_val = sht.experience_value(row)
     old_form = sht.experience_formula(row)
@@ -169,9 +199,10 @@ async def xp(ctx, pj_id:str, value:int):
 
 
 @bot.command()
-async def cleanmoney(ctx, pj_id:str):
+async def cleanmoney(ctx, pj_id: str):
     row = await try_pj_row(ctx, pj_id)
-    if row is None: return
+    if row is None:
+        return
     success = sht.clean_money(row)
     if success:
         new_val = old_total_value + value
@@ -184,157 +215,165 @@ async def cleanmoney(ctx, pj_id:str):
         return
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 downtime_images = {
-"Trabajar un Oficio":"https://cdn.discordapp.com/attachments/763955185679597580/913226000014389298/unknown.png",
-"Comprar un Objeto Magico":"https://cdn.discordapp.com/attachments/763955185679597580/913225616835375114/unknown.png",
-"Irse de Juerga":"https://cdn.discordapp.com/attachments/763955185679597580/913220637458329600/unknown.png",
-"Construir un Objeto Mundano":"https://cdn.discordapp.com/attachments/763955185679597580/913220888911028234/unknown.png",
-"Crear un Plano de Objeto Magico":"https://cdn.discordapp.com/attachments/763955185679597580/913220985396797460/unknown.png",
-"Crear un Objeto Magico":"https://cdn.discordapp.com/attachments/763955185679597580/913221095224659988/unknown.png",
-"Fermentar Pociones":"https://cdn.discordapp.com/attachments/763955185679597580/913225171928768512/unknown.png",
-"Replicar Pocion":"https://cdn.discordapp.com/attachments/763955185679597580/913221315459182642/unknown.png",
-"Crimen":"https://cdn.discordapp.com/attachments/763955185679597580/913221558686863370/unknown.png",
-"Apostar":"https://cdn.discordapp.com/attachments/763955185679597580/913221964007624734/unknown.png",
-"Pelear por dinero":"https://cdn.discordapp.com/attachments/763955185679597580/913222037047222272/unknown.png",
-"Servicio Religioso":"https://cdn.discordapp.com/attachments/763955185679597580/913224919398088744/unknown.png",
-"Fijacion de Hechizo Preparado":"https://cdn.discordapp.com/attachments/763955185679597580/913222207038177340/unknown.png",
-"Aprender Hechizo":"https://cdn.discordapp.com/attachments/763955185679597580/913222207038177340/unknown.png",
-"Buscar Hechizo":"https://cdn.discordapp.com/attachments/763955185679597580/913222840730402846/unknown.png",
-"Investigar":"https://cdn.discordapp.com/attachments/763955185679597580/913223055545880617/unknown.png",
-"Entrenar":"https://cdn.discordapp.com/attachments/763955185679597580/913235361797378128/unknown.png",
-"Cuidado de Animales":"https://cdn.discordapp.com/attachments/763955185679597580/913223352255131668/unknown.png",
-"Rito Tribu Kaeglashita":"https://cdn.discordapp.com/attachments/763955185679597580/913223546715660348/unknown.png",
-"Construcción de un Edificio":"https://cdn.discordapp.com/attachments/763955185679597580/913223949419167825/unknown.png",
-"Llevar el Negocio":"https://cdn.discordapp.com/attachments/763955185679597580/913224128088145920/unknown.png",
-"Contruir una Casa":"https://cdn.discordapp.com/attachments/763955185679597580/913224444338647090/unknown.png",
-"Aportar a la Construccion de la Peninsula":"https://cdn.discordapp.com/attachments/763955185679597580/913224564698411068/unknown.png",
-"Reaprender Hechizos":"https://cdn.discordapp.com/attachments/763955185679597580/913224522394652682/unknown.png"
+    "Trabajar un Oficio": "https://cdn.discordapp.com/attachments/763955185679597580/913226000014389298/unknown.png",
+    "Comprar un Objeto Magico": "https://cdn.discordapp.com/attachments/763955185679597580/913225616835375114/unknown.png",
+    "Irse de Juerga": "https://cdn.discordapp.com/attachments/763955185679597580/913220637458329600/unknown.png",
+    "Construir un Objeto Mundano": "https://cdn.discordapp.com/attachments/763955185679597580/913220888911028234/unknown.png",
+    "Crear un Plano de Objeto Magico": "https://cdn.discordapp.com/attachments/763955185679597580/913220985396797460/unknown.png",
+    "Crear un Objeto Magico": "https://cdn.discordapp.com/attachments/763955185679597580/913221095224659988/unknown.png",
+    "Fermentar Pociones": "https://cdn.discordapp.com/attachments/763955185679597580/913225171928768512/unknown.png",
+    "Replicar Pocion": "https://cdn.discordapp.com/attachments/763955185679597580/913221315459182642/unknown.png",
+    "Crimen": "https://cdn.discordapp.com/attachments/763955185679597580/913221558686863370/unknown.png",
+    "Apostar": "https://cdn.discordapp.com/attachments/763955185679597580/913221964007624734/unknown.png",
+    "Pelear por dinero": "https://cdn.discordapp.com/attachments/763955185679597580/913222037047222272/unknown.png",
+    "Servicio Religioso": "https://cdn.discordapp.com/attachments/763955185679597580/913224919398088744/unknown.png",
+    "Fijacion de Hechizo Preparado": "https://cdn.discordapp.com/attachments/763955185679597580/913222207038177340/unknown.png",
+    "Aprender Hechizo": "https://cdn.discordapp.com/attachments/763955185679597580/913222207038177340/unknown.png",
+    "Buscar Hechizo": "https://cdn.discordapp.com/attachments/763955185679597580/913222840730402846/unknown.png",
+    "Investigar": "https://cdn.discordapp.com/attachments/763955185679597580/913223055545880617/unknown.png",
+    "Entrenar": "https://cdn.discordapp.com/attachments/763955185679597580/913235361797378128/unknown.png",
+    "Cuidado de Animales": "https://cdn.discordapp.com/attachments/763955185679597580/913223352255131668/unknown.png",
+    "Rito Tribu Kaeglashita": "https://cdn.discordapp.com/attachments/763955185679597580/913223546715660348/unknown.png",
+    "Construcción de un Edificio": "https://cdn.discordapp.com/attachments/763955185679597580/913223949419167825/unknown.png",
+    "Llevar el Negocio": "https://cdn.discordapp.com/attachments/763955185679597580/913224128088145920/unknown.png",
+    "Contruir una Casa": "https://cdn.discordapp.com/attachments/763955185679597580/913224444338647090/unknown.png",
+    "Aportar a la Construccion de la Peninsula": "https://cdn.discordapp.com/attachments/763955185679597580/913224564698411068/unknown.png",
+    "Reaprender Hechizos": "https://cdn.discordapp.com/attachments/763955185679597580/913224522394652682/unknown.png"
 }
+
+
 @bot.command()
 async def reaprender(ctx):
     name = "Reaprender Hechizos"
     await genDowntime(ctx, name)
+
 
 @bot.command()
 async def pc(ctx):
     name = "Aportar a la Construccion de la Peninsula"
     await genDowntime(ctx, name)
 
+
 @bot.command()
 async def casa(ctx):
     name = "Contruir una Casa"
     await genDowntime(ctx, name)
+
 
 @bot.command()
 async def negocio(ctx):
     name = "Llevar el Negocio"
     await genDowntime(ctx, name)
 
+
 @bot.command()
 async def construir(ctx):
     name = "Construcción de un Edificio"
     await genDowntime(ctx, name)
+
 
 @bot.command()
 async def rito(ctx):
     name = "Rito Tribu Kaeglashita"
     await genDowntime(ctx, name)
 
+
 @bot.command()
 async def cuidar(ctx):
     name = "Cuidado de Animales"
     await genDowntime(ctx, name)
+
 
 @bot.command()
 async def investigar(ctx):
     name = "Investigar"
     await genDowntime(ctx, name)
 
+
 @bot.command()
 async def buscar(ctx):
     name = "Buscar Hechizo"
     await genDowntime(ctx, name)
+
 
 @bot.command()
 async def aprender(ctx):
     name = "Aprender Hechizo"
     await genDowntime(ctx, name)
 
+
 @bot.command()
 async def fijar(ctx):
     name = "Fijacion de Hechizo Preparado"
     await genDowntime(ctx, name)
+
 
 @bot.command()
 async def rezar(ctx):
     name = "Servicio Religioso"
     await genDowntime(ctx, name)
 
+
 @bot.command()
 async def pelear(ctx):
     name = "Pelear por dinero"
     await genDowntime(ctx, name)
+
 
 @bot.command()
 async def apostar(ctx):
     name = "Apostar"
     await genDowntime(ctx, name)
 
+
 @bot.command()
 async def crimen(ctx):
     name = "Crimen"
     await genDowntime(ctx, name)
+
 
 @bot.command()
 async def replicar(ctx):
     name = "Replicar Pocion"
     await genDowntime(ctx, name)
 
+
 @bot.command()
 async def pociones(ctx):
     name = "Fermentar Pociones"
     await genDowntime(ctx, name)
+
 
 @bot.command()
 async def craftear(ctx):
     name = "Crear un Objeto Magico"
     await genDowntime(ctx, name)
 
+
 @bot.command()
 async def plano(ctx):
     name = "Crear un Plano de Objeto Magico"
     await genDowntime(ctx, name)
+
 
 @bot.command()
 async def fabricar(ctx):
     name = "Construir un Objeto Mundano"
     await genDowntime(ctx, name)
 
+
 @bot.command()
 async def juerga(ctx):
     name = "Irse de Juerga"
     await genDowntime(ctx, name)
 
+
 @bot.command()
 async def gacha(ctx):
     name = "Comprar un Objeto Magico"
     await genDowntime(ctx, name)
+
 
 @bot.command()
 async def trabajar(ctx):
@@ -429,8 +468,6 @@ async def downtime(ctx):
     '''
     emb.add_field(name='Comandos', value=text)
     await ctx.send(embed=emb)
-
-
 
 
 async def genDowntime(ctx, name):
