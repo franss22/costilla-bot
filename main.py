@@ -69,9 +69,9 @@ async def pay(ctx, pj_id:str, value:float):
 
 
 @bot.command()
-async def updatedt(pj_id:str, value:float, force = None):
+async def updatedt(ctx, pj_id:str, value:float, force = None):
     
-    row = try_pj_row(pj_id)
+    row = try_pj_row(ctx, pj_id)
     if row is None: return
 
     old_val = sht.dt_value(row)
