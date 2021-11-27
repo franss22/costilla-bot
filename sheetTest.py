@@ -156,7 +156,7 @@ def pay_priority(coins, paid_amt):
     return [rpp-oldpp, rgp-oldgp, rep-oldep, rsp-oldsp, rcp-oldcp]
 
 
-print("dinero al final", pay_priority([1,0,0,0,0], 0.01))
+# print("dinero al final", pay_priority([1,0,0,0,0], 0.01))
 
 # #print(num_to_coin_list(9.12))
 
@@ -167,20 +167,40 @@ def money_value(row):
     return sheet.values().get(spreadsheetId=SPREADSHEET_ID, range=f'👨‍👨‍👧‍👧PJs!M{row}:R{row}', valueRenderOption="FORMATTED_VALUE").execute().get('values', [])[0]
 
 
+def get_single_val(col, row, valOption):
+    return sheet.values().get(spreadsheetId=SPREADSHEET_ID, range=f'👨‍👨‍👧‍👧PJs!{col}{row}', valueRenderOption=valOption).execute().get('values', [])[0][0]
 
-def dt_formula(row):
-    return sheet.values().get(spreadsheetId=SPREADSHEET_ID, range=f'👨‍👨‍👧‍👧PJs!S{row}', valueRenderOption="FORMULA").execute().get('values', [])[0][0]
-def dt_value(row):
-    return sheet.values().get(spreadsheetId=SPREADSHEET_ID, range=f'👨‍👨‍👧‍👧PJs!S{row}', valueRenderOption="FORMATTED_VALUE").execute().get('values', [])[0][0]
-
-
-def update_dt(row, old_value, value):
+def update_single_val(col, row, oldvalue, value):
     new_value = append_to_formula(old_value, value)
     try:
-        result2= sheet.values().update(spreadsheetId=SPREADSHEET_ID, range=f'👨‍👨‍👧‍👧PJs!S{row}', valueInputOption="USER_ENTERED", body={'values':[[new_value]]}).execute()
+        result2= sheet.values().update(spreadsheetId=SPREADSHEET_ID, range=f'👨‍👨‍👧‍👧PJs!{col}{row}', valueInputOption="USER_ENTERED", body={'values':[[new_value]]}).execute()
         return True
     except:
         return False
+
+
+def dt_formula(row):
+    return get_single_val("S", row, "FORMULA")
+def dt_value(row):
+    return get_single_val("S", row, "FORMATTED_VALUE")
+def update_dt(row, old_value, value):
+    return update_single_val("S", row, oldvalue, value)
+
+def renown_formula(row):
+    return get_single_val("U", row, "FORMULA")
+def renown_value(row):
+    return get_single_val("U", row, "FORMATTED_VALUE")
+def update_renown(row, old_value, value):
+    return update_single_val("U", row, oldvalue, value)
+
+def piety_formula(row):
+    return get_single_val("W", row, "FORMULA")
+def piety_value(row):
+    return get_single_val("W", row, "FORMATTED_VALUE")
+def update_piety(row, old_value, value):
+    return update_single_val("W", row, oldvalue, value)
+
+
 
 def change_money(row, old_money_list, new_money_amount):
     new_money = new_money_list(old_money_list, num_to_coin_list(new_money_amount))
@@ -199,3 +219,8 @@ def get_pj_name(row):
     
 # #print(get_dt(5))
 # #print(get_pj_name(5))
+
+def clean_money(row):
+    new_money = money_value(row)[:6]
+    return update_money(row, new_money)
+

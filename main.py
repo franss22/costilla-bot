@@ -96,11 +96,69 @@ async def dt(ctx, pj_id:str, value:float, force = None):
         await ctx.send(message)
         return
     else:
-        error = "Hubo un error actualizando tu dinero, si persiste preguntale a Pancho"
+        error = "Hubo un error actualizando tu downtime, si persiste preguntale a Pancho"
+        await ctx.send(error)
+        return
+
+@bot.command()
+async def renombre(ctx, pj_id:str, value:int):
+    
+    row = await try_pj_row(ctx, pj_id)
+    if row is None: return
+
+    old_val = sht.renown_value(row)
+    old_form = sht.renown_formula(row)
+    success = sht.update_renown(row, old_form, value)
+
+    old_total_value = int(old_val)
+
+    if success:
+        new_val = old_total_value + value
+        message = f"Renombre de {sht.get_pj_name(row)} actualizado: {old_total_value} -> {new_val}"
+        await ctx.send(message)
+        return
+    else:
+        error = "Hubo un error actualizando tu renombre, si persiste preguntale a Pancho"
+        await ctx.send(error)
+        return
+
+@bot.command()
+async def piedad(ctx, pj_id:str, value:float):
+    
+    row = await try_pj_row(ctx, pj_id)
+    if row is None: return
+
+    old_val = sht.piety_value(row)
+    old_form = sht.piety_formula(row)
+    success = sht.update_piety(row, old_form, value)
+
+    old_total_value = float(old_val)
+
+    if success:
+        new_val = old_total_value + value
+        message = f"Renombre de {sht.get_pj_name(row)} actualizado: {old_total_value} -> {new_val}"
+        await ctx.send(message)
+        return
+    else:
+        error = "Hubo un error actualizando tu renombre, si persiste preguntale a Pancho"
         await ctx.send(error)
         return
 
 
+@bot.command()
+async def cleanmoney(ctx, pj_id:str):
+    row = await try_pj_row(ctx, pj_id)
+    if row is None: return
+    success = sht.clean_money(row)
+    if success:
+        new_val = old_total_value + value
+        message = f"Dinero de {sht.get_pj_name(row)} limpiado"
+        await ctx.send(message)
+        return
+    else:
+        error = "Hubo un error actualizando tu dinero, si persiste preguntale a Pancho"
+        await ctx.send(error)
+        return
 
 
 
