@@ -123,7 +123,7 @@ async def renombre(ctx, pj_id:str, value:int):
         return
 
 @bot.command()
-async def piedad(ctx, pj_id:str, value:float):
+async def piedad(ctx, pj_id:str, value:int):
     
     row = await try_pj_row(ctx, pj_id)
     if row is None: return
