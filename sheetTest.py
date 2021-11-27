@@ -288,8 +288,13 @@ def check_principado_level(row):
     principado = "Principado Infernal"
     faction = get_single_val("T", row, "FORMATTED_VALUE")
     if faction == principado:
-        if ren_val >= 10:
+        if ren_val >= 50:
+            return 4
+        elif ren_val >= 25:
+            return 3
+        elif ren_val >= 10:
             return 2
         elif ren_val >=3:
             return 1
+        
     return 0
