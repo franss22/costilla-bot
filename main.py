@@ -132,7 +132,7 @@ async def piedad(ctx, pj_id:str, value:int):
     old_form = sht.piety_formula(row)
     success = sht.update_piety(row, old_form, value)
 
-    old_total_value = float(old_val)
+    old_total_value = int(old_val)
 
     if success:
         new_val = old_total_value + value
@@ -141,6 +141,29 @@ async def piedad(ctx, pj_id:str, value:int):
         return
     else:
         error = "Hubo un error actualizando tu renombre, si persiste preguntale a Pancho"
+        await ctx.send(error)
+        return
+
+
+@bot.command()
+async def xp(ctx, pj_id:str, value:int):
+    
+    row = await try_pj_row(ctx, pj_id)
+    if row is None: return
+
+    old_val = sht.experience_value(row)
+    old_form = sht.experience_formula(row)
+    success = sht.update_experience(row, old_form, value)
+
+    old_total_value = int(old_val)
+
+    if success:
+        new_val = old_total_value + value
+        message = f"XP de {sht.get_pj_name(row)} actualizado: {old_total_value} -> {new_val}"
+        await ctx.send(message)
+        return
+    else:
+        error = "Hubo un error actualizando tu XP, si persiste preguntale a Pancho"
         await ctx.send(error)
         return
 

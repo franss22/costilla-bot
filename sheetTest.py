@@ -202,6 +202,13 @@ def piety_value(row):
 def update_piety(row, old_value, value):
     return update_single_val("W", row, old_value, value)
 
+def experience_formula(row):
+    return get_single_val("E", row, "FORMULA")
+def experience_value(row):
+    return get_single_val("E", row, "FORMATTED_VALUE")
+def update_experience(row, old_value, value):
+    return update_single_val("E", row, old_value, value)
+
 
 
 def change_money(row, old_money_list, new_money_amount):
