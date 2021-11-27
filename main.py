@@ -8,6 +8,8 @@ import sqlite3
 import datetime
 import sheetTest as sht
 
+bot = commands.Bot(command_prefix='$')
+
 
 async def try_pj_row(ctx, pj_id):
     row = sht.search_pj_row(pj_id)
@@ -112,7 +114,7 @@ async def updatedt(ctx, pj_id:str, value:float, force = None):
 
 
 
-bot = commands.Bot(command_prefix='$')
+
 downtime_images = {
 "Trabajar un Oficio":"https://cdn.discordapp.com/attachments/763955185679597580/913226000014389298/unknown.png",
 "Comprar un Objeto Magico":"https://cdn.discordapp.com/attachments/763955185679597580/913225616835375114/unknown.png",
