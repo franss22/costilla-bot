@@ -39,9 +39,7 @@ def tier_message(tier:int, type:int):
 
 @bot.command()
 async def reward(ctx, tier:int, type = None):
-    if type is not None:
-        type = 1
-    else: type = 0
+    type = 1 if type is None else 0
     await ctx.send(tier_message(tier, type))
 
 
