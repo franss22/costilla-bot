@@ -12,7 +12,11 @@ bot = commands.Bot(command_prefix='$')
 
 
 async def try_pj_row(ctx, pj_id):
-    row = sht.search_pj_row(pj_id)
+    row = None
+    try:
+        row = sht.search_pj_row(pj_id)
+    except:
+        pass
     if row is None:
         error = f"El personaje de código {pj_id} no existe"
         await ctx.send(error)
