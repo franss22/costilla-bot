@@ -47,7 +47,7 @@ async def money(ctx, pj_id:str, value:float, force = None):
 @bot.command()
 async def pay(ctx, pj_id:str, value:float):
     
-    row = await try_pj_row(pj_id)
+    row = await try_pj_row(ctx, pj_id)
     if row is None: return
 
     old_val = sht.money_value(row)
