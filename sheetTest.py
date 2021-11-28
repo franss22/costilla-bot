@@ -13,17 +13,20 @@ if os.path.exists(SERVICE_ACCOUNT_FILE):
     creds = service_account.Credentials.from_service_account_file(
     SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 else:
-    creds = service_account.Credentials.from_service_account_info({ 
+    info = { 
     "type": "service_account",
-  "project_id": "sheets-333321",
-  "private_key_id": os.environ.get('private_key_id'),
-  "private_key": os.environ.get('private_key_id'),
-  "client_email": "costillabot@sheets-333321.iam.gserviceaccount.com",
-  "client_id": os.environ.get('client_id'),
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/costillabot%40sheets-333321.iam.gserviceaccount.com"})
+    "project_id": "sheets-333321",
+    "private_key_id": os.environ.get('private_key_id'),
+    "private_key": os.environ.get('private_key_id'),
+    "client_email": "costillabot@sheets-333321.iam.gserviceaccount.com",
+    "client_id": os.environ.get('client_id'),
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/costillabot%40sheets-333321.iam.gserviceaccount.com"
+    }
+    print(info)
+    creds = service_account.Credentials.from_service_account_info(info)
 
 
 
