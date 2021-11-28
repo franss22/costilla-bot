@@ -10,6 +10,7 @@ SERVICE_ACCOUNT_FILE = "keys.json"
 creds = None
 
 if os.path.exists(SERVICE_ACCOUNT_FILE):
+    parint("generating creds from file")
     creds = service_account.Credentials.from_service_account_file(
     SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 else:
