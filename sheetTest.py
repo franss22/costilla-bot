@@ -22,7 +22,7 @@ else:
     "type": "service_account",
     "project_id": "sheets-333321",
     "private_key_id": os.environ.get('private_key_id'),
-    "private_key": os.environ.get('private_key_id'),
+    "private_key": os.environ.get('private_key'),
     "client_email": "costillabot@sheets-333321.iam.gserviceaccount.com",
     "client_id": os.environ.get('client_id'),
     "auth_uri": "https://accounts.google.com/o/oauth2/auth",
