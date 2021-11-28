@@ -19,7 +19,7 @@ if os.path.exists(SERVICE_ACCOUNT_FILE):
     SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 else:
     print("generating creds from config vars")
-    info = json.load(str({ 
+    info = json.loads(str({ 
     "type": "service_account",
     "project_id": "sheets-333321",
     "private_key_id": os.environ.get('private_key_id'),
