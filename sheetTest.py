@@ -19,7 +19,7 @@ if os.path.exists(SERVICE_ACCOUNT_FILE):
     SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 else:
     print("generating creds from config vars")
-    info = { 
+    info = json.load(str({ 
     "type": "service_account",
     "project_id": "sheets-333321",
     "private_key_id": os.environ.get('private_key_id'),
@@ -30,7 +30,7 @@ else:
     "token_uri": "https://oauth2.googleapis.com/token",
     "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
     "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/costillabot%40sheets-333321.iam.gserviceaccount.com"
-    }
+    }))
     print(info)
     creds = service_account.Credentials.from_service_account_info(info)
 
