@@ -13,6 +13,7 @@ if os.path.exists(SERVICE_ACCOUNT_FILE):
     creds = service_account.Credentials.from_service_account_file(
     SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 else:
+    print("generating creds from config vars")
     info = { 
     "type": "service_account",
     "project_id": "sheets-333321",
