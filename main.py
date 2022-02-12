@@ -313,7 +313,11 @@ async def pc(ctx):
 async def casa(ctx):
     name = "Contruir una Casa"
     await genDowntime(ctx, name)
-
+    
+@bot.command()
+async def entrenar(ctx):
+    name = "Entrenar"
+    await genDowntime(ctx, name)
 
 @bot.command()
 async def negocio(ctx):
