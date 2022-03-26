@@ -43,7 +43,7 @@ async def missioncomplete(ctx, pj_id:str, tier:int, type = None):
         principado_message = "Dado que eres tier 1 del Principado, se aumentó tu recompensa de DT en 1"
     if principado_tier >= 2:
         gold *= 2
-        principado_message = f"Dado que eres tier {principado_tier} del Principado, se aumentó tu recompensa de DT en 1 y se duplicó tu reompensa de oro"
+        principado_message = f"Dado que eres tier {principado_tier} del Principado, se aumentó tu recompensa de DT en 1 y se duplicó tu recompensa de oro"
     success_xp = sht.add_experience(row, xp)
     # old_money_val = sht.money_value(row)
     old_money_form = sht.money_formula(row)
@@ -221,7 +221,7 @@ async def piedad(ctx, pj_id: str, value: int):
 
     if success:
         new_val = old_total_value + value
-        message = f"Renombre de {sht.get_pj_name(row)} actualizado: {old_total_value} -> {new_val}"
+        message = f"Piedad de {sht.get_pj_name(row)} actualizado: {old_total_value} -> {new_val}"
         await ctx.send(message)
         return
     else:
