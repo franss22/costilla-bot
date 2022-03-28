@@ -83,7 +83,7 @@ async def reward(ctx, tier:int, type = None):
 
 
 @bot.command()
-async def state(ctx, pj_id:str):
+async def status(ctx, pj_id:str):
     row = await try_pj_row(ctx, pj_id)
     if row is None:
         return
