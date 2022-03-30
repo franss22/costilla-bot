@@ -99,7 +99,9 @@ async def status(ctx, pj_id:str):
         {money_val[0]}pp, {money_val[1]}gp, {money_val[2]}ep, {money_val[3]}sp, {money_val[4]}cp, **{money_val[5]}gp** totales.
         XP: {xp_val}, DT: {dt_val}, Renombre: {ren_val}, Piedad: {piety_val}."""
     await ctx.send(message)
-
+@bot.command()
+async def state(ctx, pj_id:str):
+    await status(ctx, pj_id)
 
 @bot.command()
 async def addmoney(ctx, pj_id: str, value: float, force=None):
