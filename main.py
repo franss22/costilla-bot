@@ -205,8 +205,35 @@ async def turnDT(ctx, pj_id: str, value: float, turn: int, force= None):
         return
     col = numToColumn(40+turn)
 
-    value = sht.get_single_val(col, row, "FORMATTED_VALUE")
-    print(value)
+    old_val = sht.get_single_val(col, row, "FORMATTED_VALUE")
+    old_total_value = float(old_val)
+
+    if force is None:
+        if -value > old_total_value:
+            error = f'Restarle {-value} a tu downtime total {old_total_value} te dejaría en numeros negativos, si quieres hacerlo igual, repite el comando añadiendo "force" al final'
+            await ctx.send(error)
+            return
+    old_form = get_single_val(col, row, "FORMULA")
+    success = sht.update_single_val(col, row, old_form, value)
+    if success:
+        if turn < 3:
+            range = [1, 5]
+        else:
+            range = [turn-3, turn +2]
+
+        result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,
+                                range=f'👨‍👨‍👧‍👧PJs!{range[0]}{row}:{range[1]}{row}', valueRenderOption="FORMATTED_VALUE").execute()
+        print(result)
+
+        new_val = old_total_value + value
+        message = f"Downtime de {sht.get_pj_name(row)} actualizado: {old_total_value} -> {new_val}"
+        await ctx.send(message)
+        return
+    else:
+        error = "Hubo un error actualizando tu downtime, si persiste preguntale a Pancho"
+        await ctx.send(error)
+        return
+
 
 
     
