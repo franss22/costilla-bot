@@ -186,6 +186,31 @@ async def dt(ctx, pj_id: str, value: float, force=None):
         return
 
 
+
+def numToColumn(column_int):
+    start_index = 1   #  it can start either at 0 or at 1
+    letter = ''
+    while column_int > 25 + start_index:   
+        letter += chr(65 + int((column_int-start_index)/26) - 1)
+        column_int = column_int - (int((column_int-start_index)/26))*26
+    letter += chr(65 - start_index + (int(column_int)))
+    return letter
+
+async def turnDT(ctx, pj_id: str, value: float, turn: int, force= None):
+    row = await try_pj_row(ctx, pj_id)
+    if row is None:
+        print("No PJ")
+        return
+    col = numToColumn(40+turn)
+
+    value = get_single_val(col, row, "FORMATTED_VALUE")
+    print(value)
+
+
+    
+
+
+
 @bot.command()
 async def renombre(ctx, pj_id: str, value: int):
 
