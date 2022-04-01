@@ -28,6 +28,12 @@ SPREADSHEET_ID = '1gPknOWaAWmaeUAs6UTG6yC_ad8f5RT85Y72-hWHbuqM'
 service = build('sheets', 'v4', credentials=creds)
 sheet = service.spreadsheets()
 
+def get_big_range(range, row):
+    result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,
+                                range=f'👨‍👨‍👧‍👧PJs!{range[0]}{row}:{range[1]}{row}', valueRenderOption="FORMATTED_VALUE").execute()
+    return result
+
+
 
 def search_pj_row(pj_id):
     item = [pj_id]

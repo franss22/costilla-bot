@@ -210,7 +210,7 @@ async def turnDT(ctx, pj_id: str, value: float, turn: int, force= None):
 
     if force is None:
         if -value > old_total_value:
-            error = f'Restarle {-value} a tu downtime total {old_total_value} te dejaría en numeros negativos, si quieres hacerlo igual, repite el comando añadiendo "force" al final'
+            error = f'Restarle {-value} a tu downtime total  {old_total_value} (del turno {turn} te dejaría en numeros negativos, si quieres hacerlo igual, repite el comando añadiendo "force" al final'
             await ctx.send(error)
             return
     old_form = sht.get_single_val(col, row, "FORMULA")
@@ -221,8 +221,7 @@ async def turnDT(ctx, pj_id: str, value: float, turn: int, force= None):
         else:
             range = [turn-3, turn +2]
 
-        result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,
-                                range=f'👨‍👨‍👧‍👧PJs!{range[0]}{row}:{range[1]}{row}', valueRenderOption="FORMATTED_VALUE").execute()
+        result = sht.get_big_range(range, row)
         print(resultS)
 
         new_val = old_total_value + value
