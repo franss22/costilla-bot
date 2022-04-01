@@ -221,7 +221,7 @@ async def turnDT(ctx, pj_id: str, value: float, turn: int, force= None):
         else:
             range = [numToColumn(40+ turn-2), numToColumn(40+ turn +2)]
 
-        result = sht.get_big_range(range, row)["values"]
+        result = sht.get_big_range(range, row)["values"][0]
         print(result)
 
         new_val = old_total_value + value
