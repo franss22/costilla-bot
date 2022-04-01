@@ -219,7 +219,7 @@ async def turnDT(ctx, pj_id: str, value: float, turn: int, force= None):
         if turn < 3:
             range = [numToColumn(41), numToColumn(45)]
         else:
-            range = [numToColumn(turn-2), numToColumn(turn +2)]
+            range = [numToColumn(40+ turn-2), numToColumn(40+ turn +2)]
 
         result = sht.get_big_range(range, row)["values"]
         print(result)
