@@ -222,7 +222,7 @@ async def turnDT(ctx, pj_id: str, value: float, turn: int, force= None):
             range = [numToColumn(turn-3), numToColumn(turn +2)]
 
         result = sht.get_big_range(range, row)
-        print(resultS)
+        print(result)
 
         new_val = old_total_value + value
         message = f"Downtime de {sht.get_pj_name(row)} actualizado: {old_total_value} -> {new_val}"
