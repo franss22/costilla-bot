@@ -205,7 +205,7 @@ async def turnDT(ctx, pj_id: str, value: float, turn: int, force= None):
         return
     col = numToColumn(40+turn)
 
-    value = get_single_val(col, row, "FORMATTED_VALUE")
+    value = sht.get_single_val(col, row, "FORMATTED_VALUE")
     print(value)
 
 
