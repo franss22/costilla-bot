@@ -217,9 +217,9 @@ async def turnDT(ctx, pj_id: str, value: float, turn: int, force= None):
     success = sht.update_single_val(col, row, old_form, value)
     if success:
         if turn < 3:
-            range = [41, 45]
+            range = [numToColumn(41), numToColumn(45)]
         else:
-            range = [turn-3, turn +2]
+            range = [numToColumn(turn-3), numToColumn(turn +2)]
 
         result = sht.get_big_range(range, row)
         print(resultS)
