@@ -219,13 +219,23 @@ async def turnDT(ctx, pj_id: str, value: float, turn: int, force= None):
         if turn < 3:
             range = [numToColumn(41), numToColumn(45)]
         else:
-            range = [numToColumn(turn-3), numToColumn(turn +2)]
+            range = [numToColumn(turn-2), numToColumn(turn +2)]
 
-        result = sht.get_big_range(range, row)
+        result = sht.get_big_range(range, row)["values"]
         print(result)
 
         new_val = old_total_value + value
-        message = f"Downtime de {sht.get_pj_name(row)} actualizado: {old_total_value} -> {new_val}"
+
+        min_turn = 0
+        if turn > 2:
+            min_turn = turn -2
+        message = f"""```Downtime del turno {turn} de {sht.get_pj_name(row)} actualizado: {old_total_value} -> {new_val}
+        Dt de turnos cercanos:
+        Turno {min_turn  }: {result[0]}
+        Turno {min_turn+1}: {result[1]}
+        Turno {min_turn+2}: {result[2]}
+        Turno {min_turn+3}: {result[3]}
+        Turno {min_turn+4}: {result[4]}```"""
         await ctx.send(message)
         return
     else:
