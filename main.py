@@ -217,7 +217,7 @@ async def turnDT(ctx, pj_id: str, value: float, turn: int, force= None):
     success = sht.update_single_val(col, row, old_form, value)
     if success:
         if turn < 3:
-            range = [1, 5]
+            range = [41, 45]
         else:
             range = [turn-3, turn +2]
 
