@@ -327,3 +327,18 @@ def check_principado_level(row):
             return 1
 
     return 0
+
+def check_is_faction(row, faction_type):
+    faction_full_names = {
+        "principado":"Principado Infernal",
+        "dinastia":"Dinastía Li Hei",
+        "conclave":"Conclave de la Raiz",
+        "corona":"Corona de la Orden"
+    }
+    if faction_type not in faction_full_names.keys():
+        return False
+
+
+    row_faction = get_single_val("T", row, "FORMATTED_VALUE")
+    return row_faction == faction_full_names(faction_type)
+

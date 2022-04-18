@@ -23,6 +23,14 @@ async def try_pj_row(ctx, pj_id):
     return row
 
 @bot.command()
+@commands.has_role("Mod")
+async def massrenombre(ctx, faccion, amt):
+    ctx.send(f"Subiendo en {amt}renombre de todos los PJs de la facción: {faccion}")
+    return
+
+
+
+@bot.command()
 async def missioncomplete(ctx, pj_id:str, tier:int, type = None):
     #type: 0 = estrella, 1 = calavera
     if tier >10 or tier <1:
