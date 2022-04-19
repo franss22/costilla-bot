@@ -1,7 +1,6 @@
 from googleapiclient.discovery import build
 from google.auth.transport.requests import Request
 from google.oauth2 import service_account
-from urllib.error import HTTPError
 from math import ceil
 import decimal as dec
 import os
@@ -290,7 +289,8 @@ def pay_money(row, old_money_formulas, old_money_values, new_money_amount):
 def get_pj_name(row):
     try:
         return sheet.values().get(spreadsheetId=SPREADSHEET_ID, range=f'👨‍👨‍👧‍👧PJs!A{row}', valueRenderOption="FORMATTED_VALUE").execute().get('values', [])[0][0]
-    except HttpError:
+    except Exception as e:
+        print(e)
         return "ERROR recuperando nombre"
 
 
