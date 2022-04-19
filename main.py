@@ -23,7 +23,7 @@ async def try_pj_row(ctx, pj_id):
     return row
 
 @bot.command()
-@commands.has_role("Mod")
+# @commands.has_role("Mod")
 async def massrenombre(ctx, faccion, amt):
     ctx.send(f"Subiendo en {amt}renombre de todos los PJs de la facción: {faccion}")
     return
