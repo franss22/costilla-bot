@@ -23,7 +23,7 @@ async def try_pj_row(ctx, pj_id):
     return row
 
 @bot.command()
-# @commands.has_role("Mod")
+@commands.has_role("Mod")
 async def massrenombre(ctx, faccion, amt):
     ctx.send(f"Subiendo en {amt}renombre de todos los PJs de la facción: {faccion}")
     return
@@ -343,32 +343,38 @@ async def cleanmoney(ctx, pj_id: str):
 
 
 downtime_images = {
-    "Trabajar un Oficio": "https://cdn.discordapp.com/attachments/763955185679597580/913226000014389298/unknown.png",
-    "Comprar un Objeto Magico": "https://cdn.discordapp.com/attachments/763955185679597580/913225616835375114/unknown.png",
-    "Irse de Juerga": "https://cdn.discordapp.com/attachments/763955185679597580/913220637458329600/unknown.png",
-    "Construir un Objeto Mundano": "https://cdn.discordapp.com/attachments/763955185679597580/913220888911028234/unknown.png",
-    "Crear un Plano de Objeto Magico": "https://cdn.discordapp.com/attachments/763955185679597580/913220985396797460/unknown.png",
-    "Crear un Objeto Magico": "https://cdn.discordapp.com/attachments/763955185679597580/913221095224659988/unknown.png",
+    "Trabajar un Oficio": "https://cdn.discordapp.com/attachments/841351175735476277/970817188611117086/Trabajar.png",
+    "Comprar un Objeto Magico": "https://cdn.discordapp.com/attachments/841351175735476277/970817192591519774/Comprar_Artefacto.png",
+    "Irse de Juerga": "https://cdn.discordapp.com/attachments/841351175735476277/970817284065071104/Irse_de_Juerga.png",
+    "Construir un Objeto Mundano": "https://cdn.discordapp.com/attachments/841351175735476277/970817190150406154/Fabricar_Objeto.png",
+    "Crear un Plano de Objeto Magico": "https://cdn.discordapp.com/attachments/841351175735476277/970817360896327740/Crear_Plano.png",
+    "Crear un Objeto Magico": "https://cdn.discordapp.com/attachments/841351175735476277/970817284526465054/Fabricar_Artefacto.png",
     "Fermentar Pociones": "https://cdn.discordapp.com/attachments/763955185679597580/913225171928768512/unknown.png",
-    "Replicar Pocion": "https://cdn.discordapp.com/attachments/763955185679597580/913221315459182642/unknown.png",
-    "Crimen": "https://cdn.discordapp.com/attachments/763955185679597580/913221558686863370/unknown.png",
-    "Apostar": "https://cdn.discordapp.com/attachments/763955185679597580/913221964007624734/unknown.png",
-    "Pelear por dinero": "https://cdn.discordapp.com/attachments/763955185679597580/913222037047222272/unknown.png",
-    "Servicio Religioso": "https://cdn.discordapp.com/attachments/763955185679597580/913224919398088744/unknown.png",
-    "Fijacion de Hechizo Preparado": "https://cdn.discordapp.com/attachments/763955185679597580/913222207038177340/unknown.png",
-    "Aprender Hechizo": "https://cdn.discordapp.com/attachments/763955185679597580/913222207038177340/unknown.png",
-    "Buscar Hechizo": "https://cdn.discordapp.com/attachments/763955185679597580/913222840730402846/unknown.png",
-    "Investigar": "https://cdn.discordapp.com/attachments/763955185679597580/913223055545880617/unknown.png",
-    "Entrenar": "https://cdn.discordapp.com/attachments/763955185679597580/913235361797378128/unknown.png",
-    "Cuidado de Animales": "https://cdn.discordapp.com/attachments/763955185679597580/913223352255131668/unknown.png",
-    "Rito Tribu Kaeglashita": "https://cdn.discordapp.com/attachments/763955185679597580/913223546715660348/unknown.png",
-    "Construcción de un Edificio": "https://cdn.discordapp.com/attachments/763955185679597580/913223949419167825/unknown.png",
-    "Llevar el Negocio": "https://cdn.discordapp.com/attachments/763955185679597580/913224128088145920/unknown.png",
-    "Contruir una Casa": "https://cdn.discordapp.com/attachments/763955185679597580/913224444338647090/unknown.png",
-    "Aportar a la Construccion de la Peninsula": "https://cdn.discordapp.com/attachments/763955185679597580/913224564698411068/unknown.png",
-    "Reaprender Hechizos": "https://cdn.discordapp.com/attachments/763955185679597580/913224522394652682/unknown.png"
+    "Replicar Pocion": "https://cdn.discordapp.com/attachments/841351175735476277/970817283238817812/Replicar_Pocion.png",
+    "Crimen": "https://cdn.discordapp.com/attachments/841351175735476277/970817360384647168/Crimen.png",
+    "Apostar": "https://cdn.discordapp.com/attachments/841351175735476277/970817282295078962/Apostar.png",
+    "Pelear por dinero": "https://cdn.discordapp.com/attachments/841351175735476277/970817283624673340/Pelear.png",
+    "Servicio Religioso": "https://cdn.discordapp.com/attachments/841351175735476277/970817188908892230/Servicio_Religioso.png",
+    "Fijacion de Hechizo Preparado": "https://cdn.discordapp.com/attachments/841351175735476277/970817284329308181/Fijar_Hechizo.png",
+    "Aprender Hechizo": "https://cdn.discordapp.com/attachments/841351175735476277/970817361336750090/Aprender_Hechizo.png",
+    "Buscar Hechizo": "https://cdn.discordapp.com/attachments/841351175735476277/970817281972134029/Buscar_Hechizo.png",
+    "Investigar": "https://cdn.discordapp.com/attachments/841351175735476277/970817189877796884/Investigar.png",
+    "Entrenar": "https://cdn.discordapp.com/attachments/841351175735476277/970817285835071518/Entrenar.png",
+    "Cuidado de Animales": "https://cdn.discordapp.com/attachments/841351175735476277/970817190469189662/Cuidar_Animales.png",
+    "Rito Tribu Kaeglashita": "https://cdn.discordapp.com/attachments/841351175735476277/970817189265436702/Rito_Kaeglashita.png",
+    "ConstrucciÃ³n de un Edificio": "https://cdn.discordapp.com/attachments/841351175735476277/970817190813126677/Construir_Edificio.png",
+    "Llevar el Negocio": "https://cdn.discordapp.com/attachments/841351175735476277/970817282580295740/Llevar_Negocio.png",
+    "Contruir una Casa": "https://cdn.discordapp.com/attachments/841351175735476277/970817191136100402/Comprar_Casa.png",
+    "Aportar a la Construccion de la Peninsula": "https://cdn.discordapp.com/attachments/841351175735476277/970817361684865034/Aportar_a_la_construccion.png",
+    "Reaprender Hechizos": "https://cdn.discordapp.com/attachments/841351175735476277/970817189584199710/Reaprender_Hechizos.png",
+    "Transcribir Pergaminos": "https://cdn.discordapp.com/attachments/841351175735476277/970817282987130940/Transcribir_Pergamino.png"
 }
 
+
+@bot.command()
+async def transcribirscroll(ctx):
+    name = "Transcribir Pergaminos"
+    await genDowntime(ctx, name)
 
 @bot.command()
 async def reaprender(ctx):
