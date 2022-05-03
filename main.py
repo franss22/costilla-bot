@@ -25,7 +25,7 @@ async def try_pj_row(ctx, pj_id):
 @bot.command()
 @commands.has_role("Mod")
 async def massrenombre(ctx, faccion, amt):
-    await ctx.send(f"Subiendo en {amt}renombre de todos los PJs de la facción: {faccion}")
+    await ctx.send(f"Aumentando en {amt} el renombre de todos los PJs de la facción: {faccion}")
     return
 
 
