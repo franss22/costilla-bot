@@ -7,8 +7,15 @@ import os
 import sqlite3
 import datetime
 import sheetTest as sht
+from downtime_activities import generateDowntimeCommands
 
 bot = commands.Bot(command_prefix='$')
+
+@bot.event
+async def on_ready():
+    print('Logged on as {0}!'.format(bot.user))
+    print("Generating downtime commands")
+    generateDowntimeCommands(bot)
 
 
 async def try_pj_row(ctx, pj_id):
@@ -205,51 +212,51 @@ def numToColumn(column_int):
     return letter
 
 
-@bot.command()
-async def turnDT(ctx, pj_id: str, value: float, turn: int, force= None):
-    row = await try_pj_row(ctx, pj_id)
-    if row is None:
-        print("No PJ")
-        return
-    col = numToColumn(40+turn)
+# @bot.command()
+# async def turnDT(ctx, pj_id: str, value: float, turn: int, force= None):
+#     row = await try_pj_row(ctx, pj_id)
+#     if row is None:
+#         print("No PJ")
+#         return
+#     col = numToColumn(40+turn)
 
-    old_val = sht.get_single_val(col, row, "FORMATTED_VALUE")
-    old_total_value = float(old_val)
+#     old_val = sht.get_single_val(col, row, "FORMATTED_VALUE")
+#     old_total_value = float(old_val)
 
-    if force is None:
-        if -value > old_total_value:
-            error = f'Restarle {-value} a tu downtime total  {old_total_value} (del turno {turn} te dejaría en numeros negativos, si quieres hacerlo igual, repite el comando añadiendo "force" al final'
-            await ctx.send(error)
-            return
-    old_form = sht.get_single_val(col, row, "FORMULA")
-    success = sht.update_single_val(col, row, old_form, value)
-    if success:
-        if turn < 3:
-            range = [numToColumn(41), numToColumn(45)]
-        else:
-            range = [numToColumn(40+ turn-2), numToColumn(40+ turn +2)]
+#     if force is None:
+#         if -value > old_total_value:
+#             error = f'Restarle {-value} a tu downtime total  {old_total_value} (del turno {turn} te dejaría en numeros negativos, si quieres hacerlo igual, repite el comando añadiendo "force" al final'
+#             await ctx.send(error)
+#             return
+#     old_form = sht.get_single_val(col, row, "FORMULA")
+#     success = sht.update_single_val(col, row, old_form, value)
+#     if success:
+#         if turn < 3:
+#             range = [numToColumn(41), numToColumn(45)]
+#         else:
+#             range = [numToColumn(40+ turn-2), numToColumn(40+ turn +2)]
 
-        result = sht.get_big_range(range, row)["values"][0]
-        print(result)
+#         result = sht.get_big_range(range, row)["values"][0]
+#         print(result)
 
-        new_val = old_total_value + value
+#         new_val = old_total_value + value
 
-        min_turn = 0
-        if turn > 2:
-            min_turn = turn -2
-        message = f"""```Downtime del turno {turn} de {sht.get_pj_name(row)} actualizado: {old_total_value} -> {new_val}
-        Dt de turnos cercanos:
-        Turno {min_turn  }: {result[0]}
-        Turno {min_turn+1}: {result[1]}
-        Turno {min_turn+2}: {result[2]}
-        Turno {min_turn+3}: {result[3]}
-        Turno {min_turn+4}: {result[4]}```"""
-        await ctx.send(message)
-        return
-    else:
-        error = "Hubo un error actualizando tu downtime, si persiste preguntale a Pancho"
-        await ctx.send(error)
-        return
+#         min_turn = 0
+#         if turn > 2:
+#             min_turn = turn -2
+#         message = f"""```Downtime del turno {turn} de {sht.get_pj_name(row)} actualizado: {old_total_value} -> {new_val}
+#         Dt de turnos cercanos:
+#         Turno {min_turn  }: {result[0]}
+#         Turno {min_turn+1}: {result[1]}
+#         Turno {min_turn+2}: {result[2]}
+#         Turno {min_turn+3}: {result[3]}
+#         Turno {min_turn+4}: {result[4]}```"""
+#         await ctx.send(message)
+#         return
+#     else:
+#         error = "Hubo un error actualizando tu downtime, si persiste preguntale a Pancho"
+#         await ctx.send(error)
+#         return
 
 
 
@@ -342,185 +349,10 @@ async def cleanmoney(ctx, pj_id: str):
         return
 
 
-downtime_images = {
-    "Trabajar un Oficio": "https://cdn.discordapp.com/attachments/841351175735476277/970817188611117086/Trabajar.png",
-    "Comprar un Objeto Magico": "https://cdn.discordapp.com/attachments/841351175735476277/970817192591519774/Comprar_Artefacto.png",
-    "Irse de Juerga": "https://cdn.discordapp.com/attachments/841351175735476277/970817284065071104/Irse_de_Juerga.png",
-    "Construir un Objeto Mundano": "https://cdn.discordapp.com/attachments/841351175735476277/970817190150406154/Fabricar_Objeto.png",
-    "Crear un Plano de Objeto Magico": "https://cdn.discordapp.com/attachments/841351175735476277/970817360896327740/Crear_Plano.png",
-    "Crear un Objeto Magico": "https://cdn.discordapp.com/attachments/841351175735476277/970817284526465054/Fabricar_Artefacto.png",
-    "Fermentar Pociones": "https://cdn.discordapp.com/attachments/763955185679597580/913225171928768512/unknown.png",
-    "Replicar Pocion": "https://cdn.discordapp.com/attachments/841351175735476277/970817283238817812/Replicar_Pocion.png",
-    "Crimen": "https://cdn.discordapp.com/attachments/841351175735476277/970817360384647168/Crimen.png",
-    "Apostar": "https://cdn.discordapp.com/attachments/841351175735476277/970817282295078962/Apostar.png",
-    "Pelear por dinero": "https://cdn.discordapp.com/attachments/841351175735476277/970817283624673340/Pelear.png",
-    "Servicio Religioso": "https://cdn.discordapp.com/attachments/841351175735476277/970817188908892230/Servicio_Religioso.png",
-    "Fijacion de Hechizo Preparado": "https://cdn.discordapp.com/attachments/841351175735476277/970817284329308181/Fijar_Hechizo.png",
-    "Aprender Hechizo": "https://cdn.discordapp.com/attachments/841351175735476277/970817361336750090/Aprender_Hechizo.png",
-    "Buscar Hechizo": "https://cdn.discordapp.com/attachments/841351175735476277/970817281972134029/Buscar_Hechizo.png",
-    "Investigar": "https://cdn.discordapp.com/attachments/841351175735476277/970817189877796884/Investigar.png",
-    "Entrenar": "https://cdn.discordapp.com/attachments/841351175735476277/970817285835071518/Entrenar.png",
-    "Cuidado de Animales": "https://cdn.discordapp.com/attachments/841351175735476277/970817190469189662/Cuidar_Animales.png",
-    "Rito Tribu Kaeglashita": "https://cdn.discordapp.com/attachments/841351175735476277/970817189265436702/Rito_Kaeglashita.png",
-    "ConstrucciÃ³n de un Edificio": "https://cdn.discordapp.com/attachments/841351175735476277/970817190813126677/Construir_Edificio.png",
-    "Llevar el Negocio": "https://cdn.discordapp.com/attachments/841351175735476277/970817282580295740/Llevar_Negocio.png",
-    "Contruir una Casa": "https://cdn.discordapp.com/attachments/841351175735476277/970817191136100402/Comprar_Casa.png",
-    "Aportar a la Construccion de la Peninsula": "https://cdn.discordapp.com/attachments/841351175735476277/970817361684865034/Aportar_a_la_construccion.png",
-    "Reaprender Hechizos": "https://cdn.discordapp.com/attachments/841351175735476277/970817189584199710/Reaprender_Hechizos.png",
-    "Transcribir Pergaminos": "https://cdn.discordapp.com/attachments/841351175735476277/970817282987130940/Transcribir_Pergamino.png"
-}
 
 
-@bot.command()
-async def transcribirscroll(ctx):
-    name = "Transcribir Pergaminos"
-    await genDowntime(ctx, name)
-
-@bot.command()
-async def reaprender(ctx):
-    name = "Reaprender Hechizos"
-    await genDowntime(ctx, name)
 
 
-@bot.command()
-async def pc(ctx):
-    name = "Aportar a la Construccion de la Peninsula"
-    await genDowntime(ctx, name)
-
-
-@bot.command()
-async def casa(ctx):
-    name = "Contruir una Casa"
-    await genDowntime(ctx, name)
-    
-@bot.command()
-async def entrenar(ctx):
-    name = "Entrenar"
-    await genDowntime(ctx, name)
-
-@bot.command()
-async def negocio(ctx):
-    name = "Llevar el Negocio"
-    await genDowntime(ctx, name)
-
-
-@bot.command()
-async def construir(ctx):
-    name = "Construcción de un Edificio"
-    await genDowntime(ctx, name)
-
-
-@bot.command()
-async def rito(ctx):
-    name = "Rito Tribu Kaeglashita"
-    await genDowntime(ctx, name)
-
-
-@bot.command()
-async def cuidar(ctx):
-    name = "Cuidado de Animales"
-    await genDowntime(ctx, name)
-
-
-@bot.command()
-async def investigar(ctx):
-    name = "Investigar"
-    await genDowntime(ctx, name)
-
-
-@bot.command()
-async def buscar(ctx):
-    name = "Buscar Hechizo"
-    await genDowntime(ctx, name)
-
-
-@bot.command()
-async def aprender(ctx):
-    name = "Aprender Hechizo"
-    await genDowntime(ctx, name)
-
-
-@bot.command()
-async def fijar(ctx):
-    name = "Fijacion de Hechizo Preparado"
-    await genDowntime(ctx, name)
-
-
-@bot.command()
-async def rezar(ctx):
-    name = "Servicio Religioso"
-    await genDowntime(ctx, name)
-
-
-@bot.command()
-async def pelear(ctx):
-    name = "Pelear por dinero"
-    await genDowntime(ctx, name)
-
-
-@bot.command()
-async def apostar(ctx):
-    name = "Apostar"
-    await genDowntime(ctx, name)
-
-
-@bot.command()
-async def crimen(ctx):
-    name = "Crimen"
-    await genDowntime(ctx, name)
-
-
-@bot.command()
-async def replicar(ctx):
-    name = "Replicar Pocion"
-    await genDowntime(ctx, name)
-
-
-@bot.command()
-async def pociones(ctx):
-    name = "Fermentar Pociones"
-    await genDowntime(ctx, name)
-
-
-@bot.command()
-async def craftear(ctx):
-    name = "Crear un Objeto Magico"
-    await genDowntime(ctx, name)
-
-
-@bot.command()
-async def plano(ctx):
-    name = "Crear un Plano de Objeto Magico"
-    await genDowntime(ctx, name)
-
-
-@bot.command()
-async def fabricar(ctx):
-    name = "Construir un Objeto Mundano"
-    await genDowntime(ctx, name)
-
-
-@bot.command()
-async def juerga(ctx):
-    name = "Irse de Juerga"
-    await genDowntime(ctx, name)
-
-
-@bot.command()
-async def gacha(ctx):
-    name = "Comprar un Objeto Magico"
-    await genDowntime(ctx, name)
-
-
-@bot.command()
-async def trabajar(ctx):
-    name = "Trabajar un Oficio"
-    await genDowntime(ctx, name)
-
-
-@bot.event
-async def on_ready():
-    print('Logged on as {0}!'.format(bot.user))
 
 
 @bot.command()
@@ -578,39 +410,10 @@ async def massroll(ctx, amt: int, atk: str, dmg: str = '0', ac: int = 0, short: 
     await ctx.send(text)
 
 
-@bot.command()
-async def downtime(ctx):
-    emb = discord.Embed(title='Actividades de Downtime:')
-    text = '''
-    Trabajar un Oficio: $trabajar
-    Comprar un Objeto Magico: $gacha
-    Irse de Juerga: $juerga
-    Construir un Objeto Mundano: $fabricar
-    Crear un Plano de Objeto Magico: $plano
-    Crear un Objeto Magico: $craftear
-    Replicar Pocion: $replicar
-    Crimen: $crimen
-    Apostar: $apostar
-    Pelear por dinero: $pelear
-    Servicio Religioso: $rezar
-    Fijacion de Hechizo Preparado: $fijar
-    Investigar: $investigar
-    Cuidado de Animales: $cuidar
-    Rito Tribu Kaeglashita: $rito
-    Construcción de un Edificio: $construir
-    Llevar el Negocio: $negocio
-    Contruir una Casa: $casa
-    Aportar a la Construccion de la Peninsula: $pc
-    Reaprender Hechizos: $reaprender
-    '''
-    emb.add_field(name='Comandos', value=text)
-    await ctx.send(embed=emb)
 
 
-async def genDowntime(ctx, name):
-    emb = discord.Embed(title=f'Downtime Activities: {name}')
-    emb.set_image(url=downtime_images[name])
-    await ctx.send(embed=emb)
+
+
 
 
 def saveFish(fishName: str, fisherName: str):
