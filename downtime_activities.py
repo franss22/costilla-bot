@@ -44,4 +44,5 @@ def generateDowntimeCommands(bot:commands.Bot):
         dt_name = i[1]
         image_url = i[2]
         comm = genDowntime(command_name, dt_name, image_url)
+        print(comm)
         bot.add_command(comm)
