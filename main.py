@@ -7,15 +7,17 @@ import os
 import sqlite3
 import datetime
 import sheetTest as sht
-from downtime_activities import generateDowntimeCommands
+from downtime_activities import downtimeCog
 
 bot = commands.Bot(command_prefix='$')
+
 
 @bot.event
 async def on_ready():
     print('Logged on as {0}!'.format(bot.user))
     print("Generating downtime commands")
-    generateDowntimeCommands(bot)
+    bot.add_cog(downtimeCog)
+    print("Finished generating downtime commands")
 
 
 async def try_pj_row(ctx, pj_id):
@@ -29,6 +31,7 @@ async def try_pj_row(ctx, pj_id):
         await ctx.send(error)
     return row
 
+
 @bot.command()
 @commands.has_role("Mod")
 async def massrenombre(ctx, faccion, amt):
@@ -36,11 +39,10 @@ async def massrenombre(ctx, faccion, amt):
     return
 
 
-
 @bot.command()
-async def missioncomplete(ctx, pj_id:str, tier:int, type = None):
-    #type: 0 = estrella, 1 = calavera
-    if tier >10 or tier <1:
+async def missioncomplete(ctx, pj_id: str, tier: int, type=None):
+    # type: 0 = estrella, 1 = calavera
+    if tier > 10 or tier < 1:
         await ctx.send(f"No existen misiones de tier {tier}")
         return
     row = await try_pj_row(ctx, pj_id)
@@ -76,9 +78,9 @@ async def missioncomplete(ctx, pj_id:str, tier:int, type = None):
     await ctx.send(message)
 
 
-def tier_message(tier:int, type:int):
-    #type: 0 = estrella, 1 = calavera
-    if tier >10 or tier <1:
+def tier_message(tier: int, type: int):
+    # type: 0 = estrella, 1 = calavera
+    if tier > 10 or tier < 1:
         return f"No existen misiones de tier {tier}"
     else:
         xp_gold, dt = sht.get_reward_info(tier)
@@ -91,18 +93,19 @@ def tier_message(tier:int, type:int):
         La gente del principado, dependiendo de su renombre, gana {dt+1}dt y {gold*2}gp."""
         return message
 
+
 @bot.command()
-async def reward(ctx, tier:int, type = None):
+async def reward(ctx, tier: int, type=None):
     type = 0 if type is None else 1
     await ctx.send(tier_message(tier, type))
 
 
 @bot.command()
-async def status(ctx, pj_id:str):
+async def status(ctx, pj_id: str):
     row = await try_pj_row(ctx, pj_id)
     if row is None:
         return
-    
+
     money_val = sht.money_value(row)
     dt_val = sht.dt_value(row)
     xp_val = sht.experience_value(row)
@@ -114,9 +117,12 @@ async def status(ctx, pj_id:str):
         {money_val[0]}pp, {money_val[1]}gp, {money_val[2]}ep, {money_val[3]}sp, {money_val[4]}cp, **{money_val[5]}gp** totales.
         XP: {xp_val}, DT: {dt_val}, Renombre: {ren_val}, Piedad: {piety_val}."""
     await ctx.send(message)
+
+
 @bot.command()
-async def state(ctx, pj_id:str):
+async def state(ctx, pj_id: str):
     await status(ctx, pj_id)
+
 
 @bot.command()
 async def addmoney(ctx, pj_id: str, value: float, force=None):
@@ -201,11 +207,10 @@ async def dt(ctx, pj_id: str, value: float, force=None):
         return
 
 
-
 def numToColumn(column_int):
-    start_index = 1   #  it can start either at 0 or at 1
+    start_index = 1  # it can start either at 0 or at 1
     letter = ''
-    while column_int > 25 + start_index:   
+    while column_int > 25 + start_index:
         letter += chr(65 + int((column_int-start_index)/26) - 1)
         column_int = column_int - (int((column_int-start_index)/26))*26
     letter += chr(65 - start_index + (int(column_int)))
@@ -257,11 +262,6 @@ def numToColumn(column_int):
 #         error = "Hubo un error actualizando tu downtime, si persiste preguntale a Pancho"
 #         await ctx.send(error)
 #         return
-
-
-
-    
-
 
 
 @bot.command()
@@ -349,12 +349,6 @@ async def cleanmoney(ctx, pj_id: str):
         return
 
 
-
-
-
-
-
-
 @bot.command()
 async def test(ctx, *args):
     await ctx.send('{} arguments: {}'.format(len(args), ', '.join(args)))
@@ -408,12 +402,6 @@ async def massroll(ctx, amt: int, atk: str, dmg: str = '0', ac: int = 0, short: 
 
     text += "```"
     await ctx.send(text)
-
-
-
-
-
-
 
 
 def saveFish(fishName: str, fisherName: str):

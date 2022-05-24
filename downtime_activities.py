@@ -2,6 +2,7 @@ from discord.ext import commands
 import discord
 
 __downtime = [
+    # command_name           dt_name                                          image_url
     ["trabajar"         , "Trabajar un Oficio"                          , "https://cdn.discordapp.com/attachments/841351175735476277/970817188611117086/Trabajar.png"],
     ["gacha"            , "Comprar un Objeto Magico"                    , "https://cdn.discordapp.com/attachments/841351175735476277/970817192591519774/Comprar_Artefacto.png"],
     ["juerga"           , "Irse de Juerga"                              , "https://cdn.discordapp.com/attachments/841351175735476277/970817284065071104/Irse_de_Juerga.png"],
@@ -31,7 +32,7 @@ __downtime = [
 
 def genDowntime(command_name, dt_name, image_url):
     @commands.command(name=command_name, brief=dt_name)
-    async def f(ctx):
+    async def f(self, ctx):
         f"""{dt_name}"""
         emb = discord.Embed(title=f'Downtime Activities: {dt_name}')
         emb.set_image(url=image_url)
@@ -46,3 +47,12 @@ def generateDowntimeCommands(bot:commands.Bot):
         comm = genDowntime(command_name, dt_name, image_url)
         print(comm)
         bot.add_command(comm)
+
+
+class downtimeCog(commands.Cog, name="Actividades de Downtime" ):
+    def __init__(self, *args, **kwargs):
+        super(downtimeCog, self).__init__(*args, **kwargs)
+        for i in __downtime:
+            command_name, dt_name, image_url = i
+            comm = genDowntime(command_name, dt_name, image_url)
+            setattr(self, command_name, comm)
