@@ -94,7 +94,7 @@ def pay_priority(coins, paid_amt):
     price = gp_to_coin_list(paid_amt)
     # pagamos de las monedas mas caras a las mas baratas
 
-    old = [int(x) for x in coins]
+    old = [int(float(x)) for x in coins]
 
     pp = price[0]
     gp = price[1]
