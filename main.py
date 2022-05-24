@@ -16,8 +16,10 @@ bot = commands.Bot(command_prefix='$')
 async def on_ready():
     print('Logged on as {0}!'.format(bot.user))
     print("Generating downtime commands")
-    bot.add_cog(downtimeCog(bot))
-    print("Finished generating downtime commands")
+    try:
+        bot.add_cog(downtimeCog())
+        print("Finished generating downtime commands")
+    except Exception as e: print(e)
 
 
 async def try_pj_row(ctx, pj_id):

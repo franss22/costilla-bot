@@ -61,5 +61,6 @@ class downtimeCog(commands.Cog):
 
 
 if __name__ == "__main__":
-    a = downtimeCog()
-    print(super(type(a)))
+    a = downtimeCog(1)
+    commands = a.get_commands()
+    print([c.name for c in commands])
