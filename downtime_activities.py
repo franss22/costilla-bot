@@ -51,7 +51,8 @@ def generateDowntimeCommands(bot:commands.Bot):
 
 class downtimeCog(commands.Cog):
     #, name="Actividades de Downtime" 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, bot, *args, **kwargs):
+        self.bot = bot
         super(downtimeCog, self).__init__(*args, **kwargs)
         for i in downtime:
             command_name, dt_name, image_url = i
