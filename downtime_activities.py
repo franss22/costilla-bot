@@ -53,14 +53,28 @@ class downtimeCog(commands.Cog):
     #, name="Actividades de Downtime" 
     def __init__(self, bot, *args, **kwargs):
         self.bot = bot
-        super(downtimeCog, self).__init__(*args, **kwargs)
+        commands = []
         for i in downtime:
             command_name, dt_name, image_url = i
             comm = genDowntime(command_name, dt_name, image_url)
+            commands.append(comm)
             setattr(self, command_name, comm)
+        self.__cog_commands__ = tuple(commands)
+        for command in self.__cog_commands__:
+            setattr(self, command.callback.__name__, command)
+            parent = command.parent
+            if parent is not None:
+                # Get the latest parent reference
+                parent = lookup[parent.qualified_name]
+
+                # Update our parent's reference to our self
+                parent.remove_command(command.name)
+                parent.add_command(command)
+        super(downtimeCog, self).__init__(*args, **kwargs)
 
 
 if __name__ == "__main__":
     a = downtimeCog(1)
     commands = a.get_commands()
+    print(type(a.trabajar))
     print([c.name for c in commands])

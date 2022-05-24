@@ -28,8 +28,8 @@ async def try_pj_row(ctx, pj_id):
         print(f"buscando pj: {pj_id}")
         row = sht.search_pj_row(pj_id)
         print("Success")
-    except:
-        pass
+    except Exception as e: print(e)
+
     if row is None:
         error = f"El personaje de código {pj_id} no existe"
         await ctx.send(error)
