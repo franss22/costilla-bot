@@ -38,6 +38,7 @@ def pay_priority(coins, paid_amt):
     # calcula la diferencia (lo que hay que restarle al dinero original) para pagar paid_amt
     price = gp_to_coin_list(paid_amt, with_electrum=True)
     # pagamos de las monedas mas caras a las mas baratas
+    print("old", old)
     old = [int(x) for x in coins]
     vals = [10, 2, 5, 10]
 

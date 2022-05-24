@@ -59,6 +59,8 @@ class downtimeCog(commands.Cog, name="Actividades de Downtime" ):
             comm = genDowntime(command_name, dt_name, image_url)
             commands.append(comm)
             setattr(self, command_name, comm)
+        
+        #Sobreescribo a la mala la lista de comandos
         self.__cog_commands__ = tuple(commands)
         for command in self.__cog_commands__:
             setattr(self, command.callback.__name__, command)

@@ -164,6 +164,7 @@ async def spend(ctx, pj_id: str, value: float):
         return
 
     old_val = sht.money_value(row)
+    print(old_val, value)
     old_total_value = float(old_val[5])
 
     if value > old_total_value:
