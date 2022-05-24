@@ -49,8 +49,8 @@ def generateDowntimeCommands(bot:commands.Bot):
         bot.add_command(comm)
 
 
-class downtimeCog(commands.Cog):
-    #, name="Actividades de Downtime" 
+class downtimeCog(commands.Cog, name="Actividades de Downtime" ):
+    #
     def __init__(self, bot, *args, **kwargs):
         self.bot = bot
         commands = []
