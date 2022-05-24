@@ -1,7 +1,7 @@
 from discord.ext import commands
 import discord
 
-__downtime = [
+downtime = [
     # command_name           dt_name                                          image_url
     ["trabajar"         , "Trabajar un Oficio"                          , "https://cdn.discordapp.com/attachments/841351175735476277/970817188611117086/Trabajar.png"],
     ["gacha"            , "Comprar un Objeto Magico"                    , "https://cdn.discordapp.com/attachments/841351175735476277/970817192591519774/Comprar_Artefacto.png"],
@@ -52,7 +52,12 @@ def generateDowntimeCommands(bot:commands.Bot):
 class downtimeCog(commands.Cog, name="Actividades de Downtime" ):
     def __init__(self, *args, **kwargs):
         super(downtimeCog, self).__init__(*args, **kwargs)
-        for i in __downtime:
+        for i in downtime:
             command_name, dt_name, image_url = i
             comm = genDowntime(command_name, dt_name, image_url)
             setattr(self, command_name, comm)
+
+
+if __name__ == "__main__":
+    a = downtimeCog()
+    print(super(type(a)))
