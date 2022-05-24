@@ -24,15 +24,15 @@ sheet = service.spreadsheets()
 
 
 
-# def search_pj_row(pj_id):
-#     item = [pj_id]
-#     id_row = None
-#     try:
-#         id_row = sheet.values().get(spreadsheetId=SPREADSHEET_ID,
-#                                     range='👨‍👨‍👧‍👧PJs!B:B').execute().get('values').index(item)+1
-#     except ValueError as e:
-#         pass
-#     return id_row
+def search_pj_row(pj_id):
+    item = [pj_id]
+    id_row = None
+    try:
+        id_row = sheet.values().get(spreadsheetId=SPREADSHEET_ID,
+                                    range='👨‍👨‍👧‍👧PJs!B:B').execute().get('values').index(item)+1
+    except ValueError as e:
+        pass
+    return id_row
 
 
 def append_to_formula(formula, appnd):
