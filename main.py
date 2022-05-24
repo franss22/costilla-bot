@@ -17,7 +17,7 @@ async def on_ready():
     print('Logged on as {0}!'.format(bot.user))
     print("Generating downtime commands")
     try:
-        bot.add_cog(downtimeCog())
+        bot.add_cog(downtimeCog(bot))
         print("Finished generating downtime commands")
     except Exception as e: print(e)
 
@@ -25,7 +25,9 @@ async def on_ready():
 async def try_pj_row(ctx, pj_id):
     row = None
     try:
+        print(f"buscando pj: {pj_id}")
         row = sht.search_pj_row(pj_id)
+        print("Success")
     except:
         pass
     if row is None:
