@@ -4,7 +4,7 @@ import discord
 downtime = [
     # command_name           dt_name                                          image_url
     ["trabajar"         , "Trabajar un Oficio"                          , "https://cdn.discordapp.com/attachments/841351175735476277/970817188611117086/Trabajar.png"],
-    ["gacha"            , "Comprar un Objeto Magico"                    , "https://cdn.discordapp.com/attachments/841351175735476277/970817192591519774/Comprar_Artefacto.png"],
+    ["gacha"            , "Comprar un Objeto Magico"                    , "https://i.imgur.com/nsZPCRA.png"],
     ["juerga"           , "Irse de Juerga"                              , "https://cdn.discordapp.com/attachments/841351175735476277/970817284065071104/Irse_de_Juerga.png"],
     ["fabricar"         , "Construir un Objeto Mundano"                 , "https://cdn.discordapp.com/attachments/841351175735476277/970817190150406154/Fabricar_Objeto.png"],
     ["plano"            , "Crear un Plano de Objeto Magico"             , "https://cdn.discordapp.com/attachments/841351175735476277/970817360896327740/Crear_Plano.png"],
@@ -40,7 +40,7 @@ def genDowntime(command_name, dt_name, image_url):
     return f
 
 def generateDowntimeCommands(bot:commands.Bot):
-    for i in __downtime:
+    for i in downtime:
         command_name= i[0]
         dt_name = i[1]
         image_url = i[2]
@@ -64,16 +64,6 @@ class downtimeCog(commands.Cog, name="Actividades de Downtime" ):
         self.__cog_commands__ = tuple(commands)
         for command in self.__cog_commands__:
             setattr(self, command.callback.__name__, command)
-            parent = command.parent
-            if parent is not None:
-                # Get the latest parent reference
-                parent = lookup[parent.qualified_name]
-
-                # Update our parent's reference to our self
-                parent.remove_command(command.name)
-                parent.add_command(command)
-        super(downtimeCog, self).__init__(*args, **kwargs)
-
 
 if __name__ == "__main__":
     a = downtimeCog(1)

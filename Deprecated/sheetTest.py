@@ -1,9 +1,8 @@
+from email import utils
 from googleapiclient.discovery import build
-from google.auth.transport.requests import Request
 from google.oauth2 import service_account
 from math import ceil
-import os
-import json
+
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 SERVICE_ACCOUNT_FILE = "google-credentials.json"
 SPREADSHEET_ID = '1gPknOWaAWmaeUAs6UTG6yC_ad8f5RT85Y72-hWHbuqM'
@@ -11,17 +10,6 @@ SPREADSHEET_ID = '1gPknOWaAWmaeUAs6UTG6yC_ad8f5RT85Y72-hWHbuqM'
 creds = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 service = build('sheets', 'v4', credentials=creds)
 sheet = service.spreadsheets()
-
-
-
-
-
-
-# def get_big_range(range, row):
-#     result = sheet.values().get(spreadsheetId=SPREADSHEET_ID,
-#                                 range=f'👨‍👨‍👧‍👧PJs!{range[0]}{row}:{range[1]}{row}', valueRenderOption="FORMATTED_VALUE").execute()
-#     return result
-
 
 
 def search_pj_row(pj_id):
@@ -46,14 +34,6 @@ def append_to_formula(formula, appnd):
     if appnd[0].isnumeric():
         appnd = "+"+appnd
     return formula+appnd
-
-
-# def valid_num(appnd):
-#     try:
-#         float(appnd)
-#         return True
-#     except:
-#         return False
 
 
 def sign(num):
@@ -82,7 +62,7 @@ def new_money_list(old_money, add_list):
 
 def update_money(row, new_money):
     try:
-        result2 = sheet.values().update(spreadsheetId=SPREADSHEET_ID,
+        sheet.values().update(spreadsheetId=SPREADSHEET_ID,
                                         range=f'👨‍👨‍👧‍👧PJs!M{row}', valueInputOption="USER_ENTERED", body={'values': [new_money]}).execute()
         return True
     except:
@@ -145,60 +125,6 @@ def pay_priority(coins, paid_amt):
 
 
     return [rpp-old[0], rgp-old[1], rep-old[2], rsp-old[3], rcp-old[4]]
-
-def pay_priority2(coins, paid_amt):
-    # calcula la diferencia (lo que hay que restarle al dinero original) para pagar paid_amt
-    price = gp_to_coin_list(paid_amt, with_electrum=True)
-    # pagamos de las monedas mas caras a las mas baratas
-
-    old = [int(x) for x in coins]
-
-
-
-    rpp = old[0]-price[0]
-    rgp = old[1]-price[1]
-    rep = old[2]-price[2]
-    rsp = old[3]-price[3]
-    rcp = old[4]-price[4]
-
-    if rpp < 0:
-        rgp += rpp*10
-        rpp = 0
-    if rgp < 0:
-        rep += rgp*2
-        rgp = 0
-    if rep < 0:
-        rsp += rep*5
-        rep = 0
-    if rsp < 0:
-        rcp += rsp*10
-        rsp = 0
-
-
-    if rcp < 0:
-        cambio = ceil(-rcp/10)
-        rcp += cambio*10
-        rsp -= cambio
-
-    if rsp < 0:
-        cambio = ceil(-rsp/5)
-        rsp += cambio*5
-        rep -= cambio
-
-    if rep < 0:
-        cambio = ceil(-rep/2)
-        rep += cambio*2
-        rgp -= cambio
-
-
-    if rgp < 0:
-        cambio = ceil(-rgp/10)
-        rgp += cambio*10
-        rpp -= cambio
-
-
-    return [rpp-old[0], rgp-old[1], rep-old[2], rsp-old[3], rcp-old[4]]
-
 
 
 
@@ -329,25 +255,10 @@ def get_reward_info(tier: int):
                                  range=f'💰Rwrds!H{tier*2}:L{tier*2}', valueRenderOption="FORMATTED_VALUE").execute().get('values', [])[0]
     dt = sheet.values().get(spreadsheetId=SPREADSHEET_ID, range=f'💰Rwrds!O2',
                             valueRenderOption="FORMATTED_VALUE").execute().get('values', [[]])[0][0]
-
+    
     return (xp_gold, dt)
 
 
-def check_principado_level(row):
-    ren_val = int(renown_value(row))
-    principado = "Principado Infernal"
-    faction = get_single_val("T", row, "FORMATTED_VALUE")
-    if faction == principado:
-        if ren_val >= 50:
-            return 4
-        elif ren_val >= 25:
-            return 3
-        elif ren_val >= 10:
-            return 2
-        elif ren_val >= 3:
-            return 1
-
-    return 0
 
 def check_is_faction(row, faction_type):
     faction_full_names = {
@@ -356,10 +267,10 @@ def check_is_faction(row, faction_type):
         "conclave":"Conclave de la Raiz",
         "corona":"Corona de la Orden"
     }
-    if faction_type not in faction_full_names.keys():
+    if faction_type not in faction_full_names:
         return False
 
 
     row_faction = get_single_val("T", row, "FORMATTED_VALUE")
-    return row_faction == faction_full_names(faction_type)
+    return row_faction == faction_full_names[faction_type]
 
