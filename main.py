@@ -1,5 +1,4 @@
 from math import ceil
-from msilib.schema import tables
 from nextcord.ext import commands
 from nextcord.ui import Button, View
 from nextcord import ButtonStyle
