@@ -1,9 +1,12 @@
 from math import ceil
-from discord.ext import commands
+from msilib.schema import tables
+from nextcord.ext import commands
+from nextcord.ui import Button, View
+from nextcord import ButtonStyle
 import dndice
 import dice
 import sqlite3
-
+import random
 from downtime_activities import downtimeCog
 
 from varenv import getVar
@@ -15,9 +18,11 @@ import utils
 
 
 from functools import wraps
+import nextcord 
+intents = nextcord.Intents.default()
+intents.message_content = True
 
-
-bot = commands.Bot(command_prefix='$')
+bot = commands.Bot(command_prefix='$', intents=intents)
 
 
 def pj_wrap(func):
@@ -273,6 +278,110 @@ async def massroll(ctx, amt: int, atk: str, dmg: str = '0', ac: int = 0, short: 
 
     text += "```"
     await ctx.send(text)
+
+import gachaControl as Gacha
+from gachaControl import GACHACOL
+
+@bot.command()
+@pj_wrap
+async def gacharoll(ctx:commands.Context, pj_id:str, pers_check:int):
+    
+    user = ctx.author
+    row = Sheet.get_pj_row(pj_id)
+    money, dt = Sheet.get_batch_data(row, [COL.money_total, COL.downtime])
+    if float(money)<100 or float(dt) < 1:
+        return await ctx.send("No tienes suficiente oro o dt praa el coste base de la subasta.")
+    
+    descuento, complicacion, bono = Gacha.gacha_info()
+    
+    total_roll= pers_check+int(bono)
+    
+    controller = Gacha.GachaController(descuento, complicacion, row, user)
+    
+    rolled_table = controller.DMG_table_options(total_roll)
+    
+    view = View()
+    
+    for table in controller.table_options:
+        b = Button(label=table)
+        b.callback = button_choose_table(controller, table)
+        view.add_item(b)
+        
+    msg = f'''**Casa de Subastas**
+Con una tirada de {total_roll}, puedes acceder a la tabla {rolled_table}.
+Puedes elegir una tabla menor, tirando 1d4 por cada tabla que bajes. La cantidad de objetos para elegir es el mayor d4 entre los que tiraste.
+Tienes {money}gp disponibles.
+
+*Elige el botón con la tabla en la que quieres tirar.*
+    '''
+    await ctx.send(msg, view=view)        
+
+def button_choose_table(controller:Gacha.GachaController, chosen_table:str):
+    async def callback(interaction):
+        if interaction.user != controller.user:
+            return
+        
+        d4_amount = controller.d4_amount(chosen_table)
+        item_amount = dndice.basic(f'{d4_amount}d4h1')
+        controller.roll_items(item_amount, chosen_table)
+        msg = f'''**Casa de Subastas**
+Lanzando {d4_amount}d4, obtienes {item_amount} ofertas de objeto de la tabla {chosen_table}:
+```{controller.items_for_sale_message()}```
+
+*Apreta los botones de los items que desees comprar. Azul si es un item normal, verde si es consumible.*
+'''
+        view = View()
+        for item in controller.items_for_sale():
+            butt_norm = Button(label=item['letter'], style=ButtonStyle.blurple, row=0, disabled=item['bought'])
+            butt_cons = Button(label=item['letter'], style=ButtonStyle.green,   row=1, disabled=item['bought'])
+            
+            butt_norm.callback = button_choose_item(controller, item, False, chosen_table, item_amount, d4_amount, "")
+            butt_cons.callback = button_choose_item(controller, item, True, chosen_table, item_amount, d4_amount, "")
+
+            view.add_item(butt_norm)
+            view.add_item(butt_cons)
+        await interaction.response.edit_message(content=msg, view=view)
+    return callback
+
+def button_choose_item(controller:Gacha.GachaController, chosen_item:dict, consumable:bool, chosen_table:str, item_amount:int, d4_amount:int, logs:str):
+    async def callback(interaction:nextcord.Interaction):
+        if interaction.user != controller.user:
+            return
+        
+        await interaction.response.defer()
+        
+        
+        activity = logs + controller.buy(chosen_item, consumable)
+        
+        
+        msg = f'''**Casa de Subastas**
+Lanzando {d4_amount}d4, obtienes {item_amount} ofertas de objeto de la tabla {chosen_table}:
+```{controller.items_for_sale_message()}```
+
+*Apreta los botones de los items que desees comprar. Azul si es un item normal, verde si es consumible.*
+{activity}
+'''
+        view = View(timeout=180)
+        for item in controller.items_for_sale():
+            butt_norm = Button(label=item['letter'], style=ButtonStyle.blurple, row=0, disabled=item['bought'])
+            butt_cons = Button(label=item['letter'], style=ButtonStyle.green,   row=1, disabled=item['bought'])
+            
+            butt_norm.callback = button_choose_item(controller, item, False, chosen_table, item_amount, d4_amount, activity)
+            butt_cons.callback = button_choose_item(controller, item, True, chosen_table, item_amount, d4_amount, activity)
+            
+            view.add_item(butt_norm)
+            view.add_item(butt_cons)
+        
+        await interaction.followup.edit_message(content=msg, view=view, message_id=interaction.message.id)
+    return callback
+        
+@bot.command()
+async def playmission(ctx, pj:str):
+    if pj == "Samsir":
+        await ctx.send("Samsir murió.")
+    else:
+        await ctx.send(f"{pj} ganó.")
+
 
 
 token = getVar("TOKEN")

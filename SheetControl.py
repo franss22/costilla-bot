@@ -36,6 +36,10 @@ class COL:
     renown = "U"
     piety_god = "V"
     piety = "W"
+    very_rare_1 = "X"
+    very_rare_2 = "Y"
+    legendary = "Z"
+    
     
     @classmethod
     def has_value(cls, value):
@@ -99,9 +103,15 @@ def get_data(range:str, formula=False, single=True):
     
     return data[0][0] if single else data
 
-def get_batch_data(row:int, cols:list, formula=False):
+def get_batch_data(row:int, cols:list, formula=False, single=True):
     render = "FORMULA" if formula else "FORMATTED_VALUE"
     ranges = [simple_cell(row, col) for col in cols]
+    batch = sheet.values().batchGet(spreadsheetId=SPREADSHEET_ID, ranges=ranges, valueRenderOption=render).execute().get("valueRanges", [])
+    data = [val.get("values")[0][0] for val in batch] if single else [val.get("values") for val in batch]
+    return data
+
+def get_batch_data_anywhere(ranges, formula=False):
+    render = "FORMULA" if formula else "FORMATTED_VALUE"
     batch = sheet.values().batchGet(spreadsheetId=SPREADSHEET_ID, ranges=ranges, valueRenderOption=render).execute().get("valueRanges", [])
     data = [val.get("values")[0][0] for val in batch]
     return data
@@ -142,7 +152,6 @@ def edit_batch_data(row:int, cols:list, data:list, formula = True, edit_func=add
 def get_reward_info(tier: int, skull=False):
     xp_gold = get_data(f'💰Rwrds!H{tier*2}:L{tier*2}', single=False)[0]
     dt = float(get_data(f'💰Rwrds!O2'))
-    print(xp_gold)
     xp = int(xp_gold[1 if skull else 0])
     gold = int(xp_gold[4 if skull else 3])
     
@@ -164,7 +173,6 @@ def pay(row:int, cost:float):
     else:
         def edit_func(old_coin_amt, costo):
             delta = utils.pay_priority(coin_values[:5], costo)
-            print(old_coin_amt)
             new_range_val = [add_to_formula(old_coin_amt[0][i], delta[i]) for i in range(5)]
             return [new_range_val]
         

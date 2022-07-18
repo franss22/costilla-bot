@@ -1,5 +1,5 @@
-from discord.ext import commands
-import discord
+from nextcord.ext import commands
+import nextcord
 
 downtime = [
     # command_name           dt_name                                          image_url
@@ -34,7 +34,7 @@ def genDowntime(command_name, dt_name, image_url):
     @commands.command(name=command_name, brief=dt_name)
     async def f(self, ctx):
         f"""{dt_name}"""
-        emb = discord.Embed(title=f'Downtime Activities: {dt_name}')
+        emb = nextcord.Embed(title=f'Downtime Activities: {dt_name}')
         emb.set_image(url=image_url)
         await ctx.send(embed=emb)
     return f
