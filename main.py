@@ -11,7 +11,7 @@ from downtime_activities import downtimeCog
 from varenv import getVar
 
 import SheetControl as Sheet
-from SheetControl import COL, get_pj_row
+from SheetControl import COL, get_pj_row, simple_cell
 from utils import FACTION
 import utils
 
@@ -290,7 +290,9 @@ async def gacharoll(ctx:commands.Context, pj_id:str, pers_check:int):
     money, dt = Sheet.get_batch_data(row, [COL.money_total, COL.downtime])
     if float(money)<100 or float(dt) < 1:
         return await ctx.send("No tienes suficiente oro o dt praa el coste base de la subasta.")
-    
+    else:
+        Sheet.pay(row, 100)
+        Sheet.edit_data(Sheet.simple_cell(row, COL.downtime), -1)
     descuento, complicacion, bono = Gacha.gacha_info()
     
     total_roll= pers_check+int(bono)
@@ -307,6 +309,7 @@ async def gacharoll(ctx:commands.Context, pj_id:str, pers_check:int):
         view.add_item(b)
         
     msg = f'''**Casa de Subastas**
+Se gastó los 100 gp y 1 dt necsarios del coste base de la subasta.
 Con una tirada de {total_roll}, puedes acceder a la tabla {rolled_table}.
 Puedes elegir una tabla menor, tirando 1d4 por cada tabla que bajes. La cantidad de objetos para elegir es el mayor d4 entre los que tiraste.
 Tienes {money}gp disponibles.
@@ -334,15 +337,15 @@ Lanzando {d4_amount}d4, obtienes {item_amount} ofertas de objeto de la tabla {ch
             butt_norm = Button(label=item['letter'], style=ButtonStyle.blurple, row=0, disabled=item['bought'])
             butt_cons = Button(label=item['letter'], style=ButtonStyle.green,   row=1, disabled=item['bought'])
             
-            butt_norm.callback = button_choose_item(controller, item, False, chosen_table, item_amount, d4_amount, "")
-            butt_cons.callback = button_choose_item(controller, item, True, chosen_table, item_amount, d4_amount, "")
+            butt_norm.callback = button_choose_item(controller, item, False, chosen_table, item_amount, d4_amount)
+            butt_cons.callback = button_choose_item(controller, item, True, chosen_table, item_amount, d4_amount)
 
             view.add_item(butt_norm)
             view.add_item(butt_cons)
         await interaction.response.edit_message(content=msg, view=view)
     return callback
 
-def button_choose_item(controller:Gacha.GachaController, chosen_item:dict, consumable:bool, chosen_table:str, item_amount:int, d4_amount:int, logs:str):
+def button_choose_item(controller:Gacha.GachaController, chosen_item:dict, consumable:bool, chosen_table:str, item_amount:int, d4_amount:int, logs:str=""):
     async def callback(interaction:nextcord.Interaction):
         if interaction.user != controller.user:
             return
