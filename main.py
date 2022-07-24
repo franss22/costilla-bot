@@ -1,5 +1,4 @@
 from math import ceil
-from tkinter.font import names
 from discord import Interaction
 from nextcord.ext import commands
 from nextcord.ui import Button, View
