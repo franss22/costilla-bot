@@ -1,4 +1,6 @@
 from math import ceil
+from tkinter.font import names
+from discord import Interaction
 from nextcord.ext import commands
 from nextcord.ui import Button, View
 from nextcord import ButtonStyle
@@ -64,7 +66,6 @@ async def missioncomplete(ctx, pj_id: str, tier: int, type=None):
     type = 0 if type is None else 1
 
     xp_add, gold_add, dt_add = Sheet.get_reward_info(tier, skull=(type == 1))
-
     renown, faction = Sheet.get_batch_data(
         row, [COL.renown, COL.renown_faction])
 
@@ -88,7 +89,58 @@ async def missioncomplete(ctx, pj_id: str, tier: int, type=None):
     {xp_add}xp, {gold_add}gp, {dt_add}dt, 1 de piedad, 1 de renombre.
     Si haces el informe, ganas {int(xp_add*0.1)}xp extra ($xp {pj_id} {int(xp_add*0.1)})
     """+principado_message
-    await ctx.send(message)
+    
+    view = View()
+    try:
+        other_pj = Sheet.detect_other_PJ(row)
+        if other_pj is not None:
+            b =  Button(label="+")
+            b.callback = button_add_mission_rewards_to_secondary_pj(other_pj, ctx.author)
+            message += f"\nSe detectó otro PJ a tu nombre, si quieres añadirle la xp y el dt a {other_pj['name']}, apreta el botón."
+            view.add_item(b)
+    except ValueError as e:
+        message += "\n"+str(e)
+    
+    
+    
+    await ctx.send(message, view=view)
+
+def button_add_mission_rewards_to_secondary_pj(pj:dict, user):
+    async def callback(interaction:Interaction):
+        
+        if interaction.user != user:
+            return
+        
+        row = pj["row"]
+        name = pj["name"]
+        
+        renown, faction, tier = Sheet.get_batch_data(
+        row, [COL.renown, COL.renown_faction, COL.tier])
+        
+        print(tier)
+        xp_add, gold_add, dt_add = Sheet.get_reward_info(int(tier))
+        
+        principado_tier = utils.renown_tier(
+        renown) if faction == FACTION.principado else 0
+
+        principado_message = ""
+        if principado_tier >= 1:
+            dt_add += 1
+            principado_message = " Se añadió el bono de DT del principado."
+            
+        Sheet.edit_batch_data(row, [COL.xp, COL.downtime], [xp_add, dt_add])
+            
+        await interaction.response.send_message(f"Se le sumó {xp_add}gp y {dt_add}dt a {name}.{principado_message}")
+    
+    return callback
+        
+        
+        
+        
+        
+        
+        
+        
 
 
 @bot.command()

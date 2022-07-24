@@ -110,10 +110,10 @@ def get_batch_data(row:int, cols:list, formula=False, single=True):
     data = [val.get("values")[0][0] for val in batch] if single else [val.get("values") for val in batch]
     return data
 
-def get_batch_data_anywhere(ranges, formula=False):
+def get_batch_data_anywhere(ranges, formula=False, single=True):
     render = "FORMULA" if formula else "FORMATTED_VALUE"
     batch = sheet.values().batchGet(spreadsheetId=SPREADSHEET_ID, ranges=ranges, valueRenderOption=render).execute().get("valueRanges", [])
-    data = [val.get("values")[0][0] for val in batch]
+    data = [val.get("values")[0][0] for val in batch] if single else [val.get("values") for val in batch]
     return data
 
 def get_pj_data_with_name(pj_id:str, col:str, formula=False):
@@ -189,8 +189,27 @@ def add_money(row:int, add_amt:float):
     return edit_data(edit_range, adding_list, edit_func=edit_func, single=False)
 
 
+def detect_other_PJ(row:int):
+
+    player, all_players, all_names, all_IDs = get_batch_data_anywhere([f"{PJ_SHEET}{COL.player}{row}", f"{PJ_SHEET}{COL.player}:{COL.player}", f"{PJ_SHEET}{COL.name}:{COL.name}", f"{PJ_SHEET}{COL.pj_id}:{COL.pj_id}"], single=False)
+    # print(player, players, PJs, IDs)
+    indexes = [i for i, val in enumerate(all_players) if val == player[0]]
+    if len(indexes) > 2:
+        raise ValueError("Este jugador tiene mas de 2 PJs activos")
+    if len(indexes) == 1:
+        return None
+    
+    PJs = [{"name":all_names[i][0], "ID":all_IDs[i][0], "row":i+1} for i in indexes]
+    
+    other_PJ = [pj for pj in PJs if pj["row"] != row][0]
+    
+    return other_PJ
+
+    
+
 
 
 if __name__ == "__main__":
-    print(COL.name)
-    print(get_pj_data_with_name("test", COL.money_total))
+    # print(COL.name)
+    # print(get_pj_data_with_name("test", COL.money_total))
+    print(detect_other_PJ(15))
