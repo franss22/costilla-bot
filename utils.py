@@ -56,6 +56,7 @@ def numToColumn(column_int):
 
 
 def renown_tier(renown_val: int):
+    renown_val = int(renown_val)
     if renown_val >= 50:
         return 4
     elif renown_val >= 25:

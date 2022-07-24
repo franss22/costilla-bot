@@ -69,7 +69,7 @@ async def missioncomplete(ctx, pj_id: str, tier: int, type=None):
         row, [COL.renown, COL.renown_faction])
 
     principado_tier = utils.renown_tier(
-        renown) if faction == FACTION.principado_short else 0
+        renown) if faction == FACTION.principado else 0
 
     principado_message = ""
     if principado_tier >= 1:
