@@ -128,7 +128,7 @@ def button_add_mission_rewards_to_secondary_pj(pj:dict, user):
             
         Sheet.edit_batch_data(row, [COL.xp, COL.downtime], [xp_add, dt_add])
             
-        await interaction.response.send_message(f"Se le sumó {xp_add}gp y {dt_add}dt a {name}.{principado_message}")
+        await interaction.response.send_message(f"Se le sumó {xp_add}xp y {dt_add}dt a {name}.{principado_message}")
     
     return callback
         
