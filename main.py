@@ -117,7 +117,7 @@ def button_add_mission_rewards_to_secondary_pj(pj:dict, user):
         row, [COL.renown, COL.renown_faction, COL.tier])
         
         xp_add, gold_add, dt_add = Sheet.get_reward_info(int(tier))
-        
+        dt_add += 1
         principado_tier = utils.renown_tier(
         renown) if faction == FACTION.principado else 0
 
