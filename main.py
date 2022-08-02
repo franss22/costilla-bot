@@ -374,7 +374,7 @@ def button_choose_table(controller:Gacha.GachaController, chosen_table:str):
             return
         
         d4_amount = controller.d4_amount(chosen_table)
-        item_amount = dndice.basic(f'{d4_amount}d4h1')
+        item_amount = dndice.basic(f'{d4_amount}d4h1')+1
         controller.roll_items(item_amount, chosen_table)
         msg = f'''**Casa de Subastas**
 Lanzando {d4_amount}d4, obtienes {item_amount} ofertas de objeto de la tabla {chosen_table}:
