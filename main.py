@@ -86,7 +86,7 @@ async def missioncomplete(ctx, pj_id: str, tier: int, type=None):
 
     message = f"""Misión de tier {tier} {"estrellas" if type == 0 else "calaveras"}: {Sheet.get_pj_data(row, COL.name)}
     {xp_add}xp, {gold_add}gp, {dt_add}dt, 1 de piedad, 1 de renombre.
-    Si haces el informe, ganas {int(xp_add*0.1)}xp extra ($xp {pj_id} {int(xp_add*0.1)})
+    Si haces el informe, ganas {int(xp_add*0.2)}xp extra y 0.2 dt ($xp {pj_id} {int(xp_add*0.2)})
     """+principado_message
     
     view = View()
@@ -374,7 +374,7 @@ def button_choose_table(controller:Gacha.GachaController, chosen_table:str):
             return
         
         d4_amount = controller.d4_amount(chosen_table)
-        item_amount = dndice.basic(f'{d4_amount}d4h1')
+        item_amount = dndice.basic(f'{d4_amount}d4h1')+1
         controller.roll_items(item_amount, chosen_table)
         msg = f'''**Casa de Subastas**
 Lanzando {d4_amount}d4, obtienes {item_amount} ofertas de objeto de la tabla {chosen_table}:
