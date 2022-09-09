@@ -65,6 +65,8 @@ def renown_tier(renown_val: int):
         return 2
     elif renown_val >= 3:
         return 1
+    else:
+        return 0
 
 
 class FACTION:
