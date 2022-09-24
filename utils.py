@@ -30,17 +30,17 @@ def pay_priority(coins, paid_amt: float):
 
     resta = [old[i]-price[i] for i in range(5)]
 
-    # magia negra
+    # convierte monedas pequeñas en moedas grandes
     for i in range(4):
         if resta[i] < 0:
             resta[i+1] += resta[i]*vals[i]
             resta[i] = 0
 
-    for j in range(1, 5, -1):
-        if resta[i] < 0:
-            cambio = ceil(-resta[i])
-            resta[i] += cambio*10
-            resta[i-1] -= cambio
+    for j in range(4, 0, -1):
+        if resta[j] < 0:
+            cambio = ceil(-resta[j]/vals[j-1])
+            resta[j] += cambio*vals[j-1]
+            resta[j-1] -= cambio
 
     return [resta[i]-old[i] for i in range(5)]
 
