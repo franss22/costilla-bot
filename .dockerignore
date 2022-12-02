@@ -1,0 +1,6 @@
+# flyctl launch added from .gitignore
+**/.env
+**/.vscode
+**/__pycache__
+**/local_vars.json
+**/google-credentials.json

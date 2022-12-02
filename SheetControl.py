@@ -1,12 +1,18 @@
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
 import utils
+import varenv
+import json
 
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 SERVICE_ACCOUNT_FILE = "google-credentials.json"
 SPREADSHEET_ID = '1gPknOWaAWmaeUAs6UTG6yC_ad8f5RT85Y72-hWHbuqM'
 
-creds = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+keyEnvVar = varenv.getVar("GOOGLE_CREDENTIALS")
+print(keyEnvVar)
+keys = json.loads(keyEnvVar)
+
+creds = service_account.Credentials.from_service_account_info(keys, scopes=SCOPES) #from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 service = build('sheets', 'v4', credentials=creds)
 sheet = service.spreadsheets()
 
