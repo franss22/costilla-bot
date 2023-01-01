@@ -156,12 +156,13 @@ def edit_batch_data(row:int, cols:list, data:list, formula = True, edit_func=add
     return old_data
 
 def get_reward_info(tier: int, skull=False):
-    xp_gold = get_data(f'💰Rwrds!H{tier*2}:L{tier*2}', single=False)[0]
+    xp_gold = get_data(f'💰Rwrds!H{tier*2}:M{tier*2}', single=False)[0]
     dt = float(get_data(f'💰Rwrds!O2'))
     xp = int(xp_gold[1 if skull else 0])
     gold = int(xp_gold[4 if skull else 3])
+    princ_bonus = int(xp_gold[5])
     
-    return (xp, gold, dt)
+    return (xp, gold, dt, princ_bonus)
 
 def pay(row:int, cost:float):
 

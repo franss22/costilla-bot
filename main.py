@@ -64,7 +64,7 @@ async def missioncomplete(ctx, pj_id: str, tier: int, type=None):
     row = get_pj_row(pj_id)
     type = 0 if type is None else 1
 
-    xp_add, gold_add, dt_add = Sheet.get_reward_info(tier, skull=(type == 1))
+    xp_add, gold_add, dt_add, princ_bonus = Sheet.get_reward_info(tier, skull=(type == 1))
     renown, faction = Sheet.get_batch_data(
         row, [COL.renown, COL.renown_faction])
 
@@ -76,8 +76,8 @@ async def missioncomplete(ctx, pj_id: str, tier: int, type=None):
         dt_add += 1
         principado_message = "Dado que eres tier 1 del Principado, se aumentó tu recompensa de DT en 1"
     if principado_tier >= 2:
-        gold_add *= 2
-        principado_message = f"Dado que eres tier {principado_tier} del Principado, se aumentó tu recompensa de DT en 1 y se duplicó tu recompensa de oro"
+        gold_add += princ_bonus
+        principado_message = f"Dado que eres tier {principado_tier} del Principado, se aumentó tu recompensa de DT en 1 y tu recopmensa de oro aumenta en {princ_bonus}"
 
     Sheet.add_money(row, gold_add)
 
