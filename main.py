@@ -150,11 +150,11 @@ async def reward(ctx, tier: int, type=None):
         if tier > 10 or tier < 1:
             return f"No existen misiones de tier {tier}"
         else:
-            xp, gold, dt = Sheet.get_reward_info(tier, skull=(type == 1))
+            xp, gold, dt, princ_bonus = Sheet.get_reward_info(tier, skull=(type == 1))
             message = f"""La recompensa de una misión de tier {tier} {"estrellas" if type == 0 else "calaveras"} es:
             {xp}xp, {gold}gp, {dt}dt, 1 de piedad, 1 de renombre. 
             El que hace el informe gana {int(xp*1.1)}xp.
-            La gente del principado, dependiendo de su renombre, gana {dt+1}dt y {gold*2}gp."""
+            La gente del principado, dependiendo de su renombre, gana {dt+1}dt y un extra de {princ_bonus}gp."""
             return message
     await ctx.send(tier_message(tier, type))
 
