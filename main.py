@@ -65,9 +65,50 @@ async def missioncomplete(ctx, pj_id: str, tier: int, type=None):
     type = 0 if type is None else 1
 
     xp_add, gold_add, dt_add, princ_bonus = Sheet.get_reward_info(tier, skull=(type == 1))
-    renown, faction = Sheet.get_batch_data(
-        row, [COL.renown, COL.renown_faction])
+    renown, faction, xp, slaves, employees = Sheet.get_batch_data(
+        row, [COL.renown, COL.renown_faction, COL.xp, COL.slaves, COL.employees])
 
+    # Calcular nivel y xp necesaria para el siguiente nivel.
+    new_xp = xp+xp_add
+    old_lvl, _ = utils.level_xp(xp)
+    new_lvl, missing_xp = utils.level_xp(new_xp)
+    if missing_xp > -1:
+
+        if new_lvl > old_lvl:
+            # subes de nivel
+            lvl_up = f"Subes a nivel {new_lvl}."
+
+        else:
+            lvl_up = f"Te mantienes en nivel {new_lvl}."
+        xp_message = f"{lvl_up} Te faltan {missing_xp} para subir a nivel {new_lvl+1}."
+    else:
+        xp_message = "Eres nivel 20, y no puedes subir mas."
+
+    # Calcular dt extra y sueldo de esclavos y empleados
+    if slaves > 0:
+        slave_dt = slaves * 0.1
+        slave_wages = 50 * slaves
+        slave_message = f"\nPagas {slave_wages}gp en mantención de tus {slaves} esclavos. Generan {slave_dt}dt (ya sumado)."
+        slave_extra = f"(+{slave_dt})"
+    else:
+        slave_message = ""
+        slave_extra = ""
+        slave_dt = 0
+        slave_wages = 0
+
+    if employees > 0:
+        employee_dt = slaves * 0.1
+        employee_wages = 100 * slaves
+        employee_message = f"\nPagas {employee_wages}gp en mantención de tus {employees} esclavos. Generan {employee_dt}dt (ya sumado)."
+        employee_extra = f"(+{employee_dt})"
+    else:
+        employee_message = ""
+        employee_extra = ""
+        employee_dt = 0
+        employee_wages = 0
+
+
+    # Calcular bonos del principado
     principado_tier = utils.renown_tier(
         renown) if faction == FACTION.principado else 0
 
@@ -79,13 +120,15 @@ async def missioncomplete(ctx, pj_id: str, tier: int, type=None):
         gold_add += princ_bonus
         principado_message = f"Dado que eres tier {principado_tier} del Principado, se aumentó tu recompensa de DT en 1 y tu recopmensa de oro aumenta en {princ_bonus}"
 
-    Sheet.add_money(row, gold_add)
+    Sheet.add_money(row, gold_add-slave_wages-employee_wages)
+
 
     old_data = Sheet.edit_batch_data(
-        row, [COL.xp, COL.downtime, COL.piety, COL.renown, COL.money_total], [xp_add, dt_add, 1, 1, 0])
+        row, [COL.xp, COL.downtime, COL.piety, COL.renown, COL.money_total], [xp_add, dt_add+slave_dt+employee_dt, 1, 1, 0])
 
     message = f"""Misión de tier {tier} {"estrellas" if type == 0 else "calaveras"}: {Sheet.get_pj_data(row, COL.name)}
-    {xp_add}xp, {gold_add}gp, {dt_add}dt, 1 de piedad, 1 de renombre.
+    {xp_add}xp, {gold_add}gp, {dt_add}dt{slave_extra}{employee_extra}, 1 de piedad, 1 de renombre.
+    {xp_message}{slave_message}{employee_message}
     Si haces el informe, ganas {int(xp_add*0.2)}xp extra y 0.2 dt ($xp {pj_id} {int(xp_add*0.2)})
     """+principado_message
     
@@ -113,13 +156,54 @@ def button_add_mission_rewards_to_secondary_pj(pj:dict, user):
         row = pj["row"]
         name = pj["name"]
         
-        renown, faction, tier = Sheet.get_batch_data(
-        row, [COL.renown, COL.renown_faction, COL.tier])
+        renown, faction, tier, xp, slaves, employees = Sheet.get_batch_data(
+        row, [COL.renown, COL.renown_faction, COL.tier, COL.xp, COL.slaves, COL.employees])
         
         xp_add, gold_add, dt_add, princ_bonus = Sheet.get_reward_info(int(tier))
         dt_add += 1
         principado_tier = utils.renown_tier(
         renown) if faction == FACTION.principado else 0
+
+            # Calcular nivel y xp necesaria para el siguiente nivel.
+        new_xp = xp+xp_add
+        old_lvl, _ = utils.level_xp(xp)
+        new_lvl, missing_xp = utils.level_xp(new_xp)
+        if missing_xp > -1:
+
+            if new_lvl > old_lvl:
+                # subes de nivel
+                lvl_up = f"Subes a nivel {new_lvl}."
+
+            else:
+                lvl_up = f"Te mantienes en nivel {new_lvl}."
+            xp_message = f"\n{lvl_up} Te faltan {missing_xp} para subir a nivel {new_lvl+1}."
+        else:
+            xp_message = "\nEres nivel 20, y no puedes subir mas."
+
+
+            # Calcular dt extra y sueldo de esclavos y empleados
+        if slaves > 0:
+            slave_dt = slaves * 0.1
+            slave_wages = 50 * slaves
+            slave_message = f"\nPagas {slave_wages}gp en mantención de tus {slaves} esclavos. Generan {slave_dt}dt (ya sumado)."
+            slave_extra = f"(+{slave_dt})"
+        else:
+            slave_message = ""
+            slave_extra = ""
+            slave_dt = 0
+            slave_wages = 0
+
+        if employees > 0:
+            employee_dt = slaves * 0.1
+            employee_wages = 100 * slaves
+            employee_message = f"\nPagas {employee_wages}gp en mantención de tus {employees} esclavos. Generan {employee_dt}dt (ya sumado)."
+            employee_extra = f"(+{employee_dt})"
+        else:
+            employee_message = ""
+            employee_extra = ""
+            employee_dt = 0
+            employee_wages = 0
+
 
         principado_message = ""
         if principado_tier >= 1:
@@ -127,8 +211,9 @@ def button_add_mission_rewards_to_secondary_pj(pj:dict, user):
             principado_message = " Se añadió el bono de DT del principado."
             
         Sheet.edit_batch_data(row, [COL.xp, COL.downtime], [xp_add, dt_add])
-            
-        await interaction.response.send_message(f"Se le sumó {xp_add}xp y {dt_add}dt a {name}.{principado_message}")
+        if slave_wages+employee_wages >0:
+            Sheet.pay(row, slave_wages+employee_wages)
+        await interaction.response.send_message(f"Se le sumó {xp_add}xp y {dt_add}dt{slave_extra}{employee_extra} a {name}.{principado_message} {xp_message}{slave_message}{employee_message}")
     
     return callback
         
@@ -168,9 +253,17 @@ async def status(ctx, pj_id: str):
                                  COL.money_cp, COL.money_total, COL.downtime, COL.xp, COL.renown, COL.piety, COL.piety_god])
     name, pp, gp, ep, sp, cp, m_total, dt, xp, ren, piety, god = batch
 
+            # Calcular nivel y xp necesaria para el siguiente nivel.
+    lvl, missing_xp = utils.level_xp(xp)
+    if missing_xp > -1:
+        xp_message = f"Eres nivel {lvl}. Te faltan {missing_xp} para subir a nivel {lvl+1}."
+    else:
+        xp_message = "Eres nivel 20, y no puedes subir mas."
+
     message = f"""Resumen de {name}:
         {pp}pp, {gp}gp, {ep}ep, {sp}sp, {cp}cp, **{m_total}gp** totales.
-        XP: {xp}, DT: {dt}, Renombre: {ren}, Piedad: {piety} con {god}."""
+        XP: {xp}, DT: {dt}, Renombre: {ren}, Piedad: {piety} con {god}.
+        {xp_message}"""
     await ctx.send(message)
 
 

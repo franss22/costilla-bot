@@ -45,6 +45,8 @@ class COL:
     very_rare_1 = "X"
     very_rare_2 = "Y"
     legendary = "Z"
+    slaves = "AA"
+    employees = "AB"
     
     
     @classmethod
