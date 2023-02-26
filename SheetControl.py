@@ -10,7 +10,7 @@ SPREADSHEET_ID = '1gPknOWaAWmaeUAs6UTG6yC_ad8f5RT85Y72-hWHbuqM'
 
 keyEnvVar = varenv.getVar("GOOGLE_CREDENTIALS")
 print(keyEnvVar)
-keys = json.loads(keyEnvVar)
+keys = json.loads(keyEnvVar, strict=False)
 
 creds = service_account.Credentials.from_service_account_info(keys, scopes=SCOPES) #from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 service = build('sheets', 'v4', credentials=creds)
@@ -100,14 +100,14 @@ def clean_formula(old, _):
 def get_pj_data(row:int, col:str, formula=False, single=True):
     render = "FORMULA" if formula else "FORMATTED_VALUE"
     data = sheet.values().get(spreadsheetId=SPREADSHEET_ID,
-                                range=simple_cell(row, col), valueRenderOption=render).execute().get("values", [])
+                                range=simple_cell(row, col), valueRenderOption=render).execute().get("values", [[0]])
     
     return data[0][0] if single else data
 
 def get_data(range:str, formula=False, single=True):
     render = "FORMULA" if formula else "FORMATTED_VALUE"
     data = sheet.values().get(spreadsheetId=SPREADSHEET_ID,
-                                range=range, valueRenderOption=render).execute().get("values", [])
+                                range=range, valueRenderOption=render).execute().get("values", [[0]])
     
     return data[0][0] if single else data
 
@@ -115,13 +115,14 @@ def get_batch_data(row:int, cols:list, formula=False, single=True):
     render = "FORMULA" if formula else "FORMATTED_VALUE"
     ranges = [simple_cell(row, col) for col in cols]
     batch = sheet.values().batchGet(spreadsheetId=SPREADSHEET_ID, ranges=ranges, valueRenderOption=render).execute().get("valueRanges", [])
-    data = [val.get("values")[0][0] for val in batch] if single else [val.get("values") for val in batch]
+    print(batch)
+    data = [val.get("values", [[0]])[0][0] for val in batch] if single else [val.get("values") for val in batch]
     return data
 
 def get_batch_data_anywhere(ranges, formula=False, single=True):
     render = "FORMULA" if formula else "FORMATTED_VALUE"
     batch = sheet.values().batchGet(spreadsheetId=SPREADSHEET_ID, ranges=ranges, valueRenderOption=render).execute().get("valueRanges", [])
-    data = [val.get("values")[0][0] for val in batch] if single else [val.get("values") for val in batch]
+    data = [val.get("values", [[0]])[0][0] for val in batch] if single else [val.get("values") for val in batch]
     return data
 
 def get_pj_data_with_name(pj_id:str, col:str, formula=False):
@@ -130,8 +131,8 @@ def get_pj_data_with_name(pj_id:str, col:str, formula=False):
     name_cell = f"{PJ_SHEET}{COL.name}{row}"
     data_cell = f"{PJ_SHEET}{col}{row}"
     resp = sheet.values().batchGet(spreadsheetId=SPREADSHEET_ID, ranges=[name_cell, data_cell], valueRenderOption=render).execute().get("valueRanges", [])
-    name = resp[0].get("values", [])[0][0]
-    data = resp[1].get("values", [])[0][0]
+    name = resp[0].get("values", [[0]])[0][0]
+    data = resp[1].get("values", [[0]])[0][0]
 
     return (name, data, row)
 

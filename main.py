@@ -176,7 +176,7 @@ def button_add_mission_rewards_to_secondary_pj(pj:dict, user):
 
             else:
                 lvl_up = f"Te mantienes en nivel {new_lvl}."
-            xp_message = f"\n{lvl_up} Te faltan {missing_xp} para subir a nivel {new_lvl+1}."
+            xp_message = f"\n{lvl_up} Te faltan {missing_xp}xp para subir a nivel {new_lvl+1}."
         else:
             xp_message = "\nEres nivel 20, y no puedes subir mas."
 
@@ -256,7 +256,7 @@ async def status(ctx, pj_id: str):
             # Calcular nivel y xp necesaria para el siguiente nivel.
     lvl, missing_xp = utils.level_xp(xp)
     if missing_xp > -1:
-        xp_message = f"Eres nivel {lvl}. Te faltan {missing_xp} para subir a nivel {lvl+1}."
+        xp_message = f"Eres nivel {lvl}. Te faltan {missing_xp}xp para subir a nivel {lvl+1}."
     else:
         xp_message = "Eres nivel 20, y no puedes subir mas."
 
