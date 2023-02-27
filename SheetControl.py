@@ -115,7 +115,7 @@ def get_batch_data(row:int, cols:list, formula=False, single=True):
     render = "FORMULA" if formula else "FORMATTED_VALUE"
     ranges = [simple_cell(row, col) for col in cols]
     batch = sheet.values().batchGet(spreadsheetId=SPREADSHEET_ID, ranges=ranges, valueRenderOption=render).execute().get("valueRanges", [])
-    print(batch)
+    # print(batch)
     data = [val.get("values", [[0]])[0][0] for val in batch] if single else [val.get("values") for val in batch]
     return data
 

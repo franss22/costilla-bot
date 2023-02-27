@@ -2,5 +2,6 @@
 .vscode
 __pycache__
 local_vars.json
+secrets.json
 google-credentials.json
 secrets
