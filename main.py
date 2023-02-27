@@ -327,7 +327,8 @@ async def transfer(ctx, pj_paying_id: str, pj_receiving_id: str, value: float):
     name_r, old_total_r = Sheet.get_pj_data_with_name(row_r, COL.money_total)
 
     success_p = Sheet.pay(row_p, value)
-    success_r = Sheet.add_money(row_r, value)
+    if success_p is True:
+        success_r = Sheet.add_money(row_r, value)
 
     if success_p is True and success_r is True:
         message = f"{name_p} le paga {value}gp a {name_r}.\n {name_p}: {old_total_p} -> {old_total_p-value}\n\n {name_r}: {old_total_r} -> {old_total_r+value}"
