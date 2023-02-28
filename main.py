@@ -320,21 +320,21 @@ async def spend(ctx, pj_id: str, value: float):
 @bot.command()
 @pj_wrap
 async def transfer(ctx, pj_paying_id: str, pj_receiving_id: str, value: float):
-    row_p = Sheet.get_pj_row(pj_paying_id)
-    row_r = Sheet.get_pj_row(pj_receiving_id)
 
-    name_p, old_total_p = Sheet.get_pj_data_with_name(row_p, COL.money_total)
-    name_r, old_total_r = Sheet.get_pj_data_with_name(row_r, COL.money_total)
+    name_p, old_total_p, row_p = Sheet.get_pj_data_with_name(pj_paying_id, COL.money_total)
+    name_r, old_total_r, row_r = Sheet.get_pj_data_with_name(pj_receiving_id, COL.money_total)
+
+    old_total_p = float(old_total_p)
+    old_total_r = float(old_total_r)
+
 
     success_p = Sheet.pay(row_p, value)
     if success_p is True:
         success_r = Sheet.add_money(row_r, value)
 
-    if success_p is True and success_r is True:
-        message = f"{name_p} le paga {value}gp a {name_r}.\n {name_p}: {old_total_p} -> {old_total_p-value}\n\n {name_r}: {old_total_r} -> {old_total_r+value}"
+    if success_p is True:
+        message = f"{name_p} le paga {value}gp a {name_r}.\n\n {name_p}: {old_total_p} -> {old_total_p-value}\n {name_r}: {old_total_r} -> {old_total_r+value}"
         await ctx.send(message)
-    elif success_r is not True:
-        await ctx.send(success_r)
     else:
         await ctx.send(success_p)
 
