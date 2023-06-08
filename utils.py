@@ -17,7 +17,7 @@ def level_xp(xp:int):
     return level, missing_xp
 
 def shop_income_base(tier:int):
-    inc = [0, 200, 400, 750, 2150, 2800, 3350, 3800, 8750, 11900, 13000, 50000]
+    inc = [0, 200, 400, 550, 750, 2150, 2800, 3350, 3800, 8750, 11900, 13000, 50000]
     return inc[int(tier)]
 
 def shop_passive_income():

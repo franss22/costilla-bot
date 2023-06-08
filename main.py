@@ -126,7 +126,7 @@ async def missioncomplete(ctx, pj_id: str, tier: int, type=None):
 
 
     old_data = Sheet.edit_batch_data(
-        row, [COL.xp, COL.downtime, COL.piety, COL.renown, COL.money_total], [xp_add, dt_add+slave_dt+employee_dt, 1, 1, 0])
+        row, [COL.xp, COL.downtime, COL.piety, COL.renown, COL.money_total], [xp_add, dt_add+slave_dt+employee_dt, 3, 3, 0])
 
     message = f"""Misión de tier {tier} {"estrellas" if type == 0 else "calaveras"}: {Sheet.get_pj_data(row, COL.name)}
     {xp_add}xp, {gold_add}gp, {dt_add}dt{slave_extra}{employee_extra}, 1 de piedad, 1 de renombre.
@@ -243,7 +243,7 @@ async def reward(ctx, tier: int, type=None):
         else:
             xp, gold, dt, princ_bonus = Sheet.get_reward_info(tier, skull=(type == 1))
             message = f"""La recompensa de una misión de tier {tier} {"estrellas" if type == 0 else "calaveras"} es:
-            {xp}xp, {gold}gp, {dt}dt, 1 de piedad, 1 de renombre. 
+            {xp}xp, {gold}gp, {dt}dt, 3 de piedad, 3 de renombre. 
             El que hace el informe gana {int(xp*1.1)}xp.
             La gente del principado, dependiendo de su renombre, gana {dt+1}dt y un extra de {princ_bonus}gp."""
             return message
