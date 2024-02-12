@@ -170,9 +170,9 @@ class RegisterDropdownView(nextcord.ui.View):
 @bot.slash_command(description="Registra un nuevo personaje de Megamarch.", guild_ids=[CRI_GUILD_ID])
 @gets_pj_data
 async def register(interaction: nextcord.Interaction, nombre_pj:str, nombre_jugador:str,
-                   clase:str = nextcord.SlashOption(name="clase", required=True, choices=CLASSES), 
-                   ascendencia:str = nextcord.SlashOption(name="ascendencia", required=True), 
-                   religion:str = nextcord.SlashOption(name="religión", required=True, choices=RELIGIONS)):
+                   clase:str = nextcord.SlashOption(name="clase", description="La clase de tu personaje", required=True, choices=CLASSES), 
+                   ascendencia:str = nextcord.SlashOption(name="ascendencia", description="La ascendencia de tu personaje (escribe para el autocomplete)", required=True), 
+                   religion:str = nextcord.SlashOption(name="religión", description="La religión de tu personaje", required=True, choices=RELIGIONS)):
     # Conseguir el ID del usuario
     user_id:int = interaction.user.id
     print(user_id)
