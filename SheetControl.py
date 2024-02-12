@@ -6,19 +6,19 @@ import json
 from functools import wraps
 
 
-PJ_SHEET_ID = 0
-REPUTATION_SHEET_ID = 37818595
+PJ_SHEET_ID = 1542430594
 
 credentials = json.loads(getVar("GOOGLE"), strict=False)
 
 gc = gspread.service_account_from_dict(credentials)
 
-pj_sheet = gc.open("Megamarch").get_worksheet_by_id(PJ_SHEET_ID)
+pj_sheet = gc.open("Dungeonmarch").get_worksheet_by_id(PJ_SHEET_ID)
 
 PJ_DATA = None
 def update_pj_data():
     global PJ_DATA
     PJ_DATA = pj_sheet.get_all_values(value_render_option="UNFORMATTED_VALUE")
+    # print(PJ_DATA)
 
 def gets_pj_data(func):
     @wraps(func)
@@ -28,25 +28,31 @@ def gets_pj_data(func):
     return wrapped_func
 
 class PJ_COL:
-    Name = "A"
-    Discord_id = "B"
-    Player = "C"
-    Class = "D"
-    Arquetypes = "E"
-    Ancestry = "F"
-    Heritage = "G"
-    Downtime = "H"
-    Money_pp = "I"
-    Money_gp = "J"
-    Money_sp = "K"
-    Money_cp = "L"
-    Money_total = "M"
-    Languages = "N"
-    Religion = "O"
+    Personaje = "A"
+    discord_ID = "B"
+    Jugadores = "C"
+    Tier = "D"
+    Niveles = "E"
+    Raza = "F"
+    Subraza = "G"
+    Alignment = "H"
+    Altura = "I"
+    Peso = "J"
+    Edad = "K"
+    money_pp = "L"
+    money_gp = "M"
+    money_ep = "N"
+    money_sp = "O"
+    money_cp = "P"
+    money_total = "Q"
+    Renombre = "R"
+    Deidad = "S"
+    Cantidad = "T"
+    Downtime = "U"
     
     @classmethod
     def num(cls, col:str):
-        return "ABCDEFGHIJKLMNO".index(col)
+        return "ABCDEFGHIJKLMNOPQRSTU".index(col)
     
     @classmethod
     def has_value(cls, value):
@@ -63,7 +69,7 @@ class CharacterNotFoundError(Exception):
 
 def get_pj_row(discord_id:int)->int:
     try:
-        column = whole_column(PJ_COL.Discord_id)
+        column = whole_column(PJ_COL.discord_ID)
         id_row = column.index(str(discord_id))
         # index del primer valor con [discord_id] de todos los ids (+1 por 0 indexed)
         return id_row
@@ -71,7 +77,8 @@ def get_pj_row(discord_id:int)->int:
         raise CharacterNotFoundError(f"Character with discord ID '{discord_id}' was not found")
 
 def first_empty_PJ_row()->int:
-    column = whole_column(PJ_COL.Discord_id)
+    column = whole_column(PJ_COL.discord_ID)
+    # print(column)
     return column.index("")
 
 
@@ -85,23 +92,23 @@ def get_pj_data(pj_row:int, col:str)->str:
 
 
 def get_pj_full(row:int)->list[str]:
-    return PJ_DATA[row]
+    return PJ_DATA[row][:PJ_COL.num(PJ_COL.Downtime)+1]
 
 def get_pj_coins(row:int)->list[float]:
-    pp = PJ_COL.num(PJ_COL.Money_pp)
-    total = PJ_COL.num(PJ_COL.Money_total)
+    pp = PJ_COL.num(PJ_COL.money_pp)
+    total = PJ_COL.num(PJ_COL.money_total)
     coins = PJ_DATA[row][pp:total+1]#pj_sheet.get(f"{PJ_COL.Money_pp}{row}:{PJ_COL.Money_total}{row}", value_render_option = "UNFORMATTED_VALUE")[0]
     return [float(x) for x in coins]
 
 
-def update_range_PJ(pos:str, values):
-    pj_sheet.update(values, pos)
+def update_range_PJ( pj_row:int, start_column:str, end_column:str, values:list):
+    pj_sheet.update(values, f"{start_column}{pj_row+1}:{end_column}{pj_row+1}")
 
 def update_pj_data_cell(pj_row:int, col:str, value):
     pj_sheet.update(value, f"{col}{pj_row+1}")
 
 def update_pj_coins(row:int, values):
-    pj_sheet.update(values, f"{PJ_COL.Money_pp}{row+1}:{PJ_COL.Money_total}{row+1}")
+    pj_sheet.update(values, f"{PJ_COL.money_pp}{row+1}:{PJ_COL.money_total}{row+1}")
 
 
 
