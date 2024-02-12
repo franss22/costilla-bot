@@ -4,3 +4,5 @@
 **/__pycache__
 **/local_vars.json
 **/google-credentials.json
+**/*credentials*
+**/*secrets*

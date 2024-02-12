@@ -2,7 +2,7 @@ from nextcord.ext import commands
 import nextcord
 
 downtime = [
-    # command_name           dt_name                                          image_url
+    # [command_name           dt_name                                          image_url]
     ["trabajar"         , "Trabajar un Oficio"                          , "https://cdn.discordapp.com/attachments/841351175735476277/970817188611117086/Trabajar.png"],
     ["gacha"            , "Comprar un Objeto Magico"                    , "https://i.imgur.com/nsZPCRA.png"],
     ["juerga"           , "Irse de Juerga"                              , "https://cdn.discordapp.com/attachments/841351175735476277/970817284065071104/Irse_de_Juerga.png"],

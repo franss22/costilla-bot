@@ -1,618 +1,369 @@
-from math import ceil
-from discord import Interaction
+import nextcord
 from nextcord.ext import commands
-from nextcord.ui import Button, View
-from nextcord import ButtonStyle
-import dndice
-import dice
-import sqlite3
-import random
-from downtime_activities import downtimeCog
-
 from varenv import getVar
-
-import SheetControl as Sheet
-from SheetControl import COL, get_pj_row, simple_cell
-from utils import FACTION
+import SheetControl as sh
+from SheetControl import PJ_COL
 import utils
+import json
+import dndice
 
+CRI_GUILD_ID = int(getVar("GUILD_ID"))
+PANCHO_ID = getVar("PANCHO_ID")
+BOT_TOKEN = getVar("TOKEN")
 
-from functools import wraps
-import nextcord 
-intents = nextcord.Intents.default()
-intents.message_content = True
-
-bot = commands.Bot(command_prefix='$', intents=intents)
-
-
-def pj_wrap(func):
-    @wraps(func)
-    async def wrapped_func(*args, **kwargs):
-        try:
-            await func(*args, **kwargs)
-        except Sheet.CharacterNameError as e:
-            ctx = args[0]
-            await ctx.send(str(e))
-    return wrapped_func
-
+bot = commands.Bot()
+with open("Ancestries.json") as f:
+    HERITAGES : dict[str, str]= json.load(f)
 
 @bot.event
 async def on_ready():
-    print('Logged on as {0}!'.format(bot.user))
-    print("Generating downtime commands")
+    print(f'We have logged in as {bot.user}')
+
+"""
+register done
+status done
+
+lenguajes
+    setlenguajes
+
+dt done
+pay (pay transfer) done
+addmoney done
+
+earn_income
+
+reputationstatus
+updatereputation
+
+missioncomplete
+"""
+
+RELIGIONS : list[str]= ["La Labor", "El Continuo", "El Camino", "La Prisión", "El Arquitecto", "El Potencial", "Ateo", "Otro"]
+
+LANGUAGES : list[str]= [
+    "Nemer", 
+    "Sval", 
+    "Derani", 
+    "Asthenial", 
+    "Àárâk", 
+    "Originario", 
+    "Jovian", 
+    "Lingua Franca", 
+    "Bíblico", 
+    "Ætérico", 
+    "Grimm", 
+    "Cthonico", 
+    "Assembly", 
+]
+
+CLASSES : list[str]= [
+    "Alchemist",
+    "Barbarian",
+    "Bard",
+    "Champion",
+    "Cleric",
+    "Druid",
+    "Fighter",
+    "Gunslinger",
+    "Inventor",
+    "Investigator",
+    "Kineticist",
+    "Magus",
+    "Monk",
+    "Oracle",
+    "Psychic",
+    "Ranger",
+    "Rogue",
+    "Sorcerer",
+    "Summoner",
+    "Swashbuckler",
+    "Thaumaturge",
+    "Witch",
+    "Wizard"
+]
+
+EARN_INCOME : dict = {
+#   lvl, dc,   fail, trnd, exprt, mstr, lgdry
+    0:  (14, [ 0.01, 0.05, 0.05, 0.05, 0.05]),
+    1:  (15, [ 0.02, 0.2,  0.2,  0.2,  0.2]),
+    2:  (16, [ 0.04, 0.3,  0.3,  0.3,  0.3]),
+    3:  (18, [ 0.08, 0.5,  0.5,  0.5,  0.5]),
+    4:  (19, [ 0.1,  0.7,  0.8,  0.8,  0.8]),
+    5:  (20, [ 0.2,  0.9,  1,    1,    1]),
+    6:  (22, [ 0.3,  1.5,  2,    2,    2]),
+    7:  (23, [ 0.4,  2,    2.5,  2.5,  2.5]),
+    8:  (24, [ 0.5,  2.5,  3,    3,    3]),
+    9:  (26, [ 0.6,  3,    4,    4,    4]),
+    10: (27, [ 0.7,  4,    5,    6,    6]),
+    11: (28, [ 0.8,  5,    6,    8,    8]),
+    12: (30, [ 0.9,  6,    8,    10,   10]),
+    13: (31, [ 1,    7,    10,   15,   15]),
+    14: (32, [ 1.5,  8,    15,   20,   20]),
+    15: (34, [ 2,    10,   20,   28,   28]),
+    16: (35, [ 2.5,  13,   25,   36,   40]),
+    17: (36, [ 3,    15,   30,   45,   55]),
+    18: (38, [ 4,    20,   45,   70,   90]),
+    19: (39, [ 6,    30,   60,   100,  130]),
+    20: (40, [ 8,    40,   75,   150,  200]),
+    21: (50, [ 0,    50,   90,   175,  300]),
+}
+
+ANCESTRIES : list[str]= ["Anadi",
+    "Android",
+    "Automaton",
+    "Azarketi",
+    "Catfolk",
+    "Conrasu",
+    "Dwarf",
+    "Elf",
+    "Fetchling",
+    "Fleshwarp",
+    "Ghoran",
+    "Gnoll",
+    "Gnome",
+    "Goblin",
+    "Goloma",
+    "Grippli",
+    "Halfling",
+    "Hobgoblin",
+    "Human",
+    "Kashrishi",
+    "Kitsune",
+    "Kobold",
+    "Leshy",
+    "Lizardfolk",
+    "Nagaji",
+    "Orc",
+    "Poppet",
+    "Ratfolk",
+    "Shisk",
+    "Shoony",
+    "Skeleton",
+    "Sprite",
+    "Strix",
+    "Tengu",
+    "Vanara",
+    "Vishkanya",
+    ]
+
+class HeritageDropdown(nextcord.ui.Select):
+    Update_func = None
+    def __init__(self, ancestry:str, update_func):
+        heritages = HERITAGES[ancestry]
+        self.Update_func = update_func
+        options = [nextcord.SelectOption(label=h) for h in heritages]
+        super().__init__(placeholder="Opciones de heritage", min_values=1, max_values=1, options=options)
+
+    async def callback(self, interaction:nextcord.Interaction):
+        selected = self.values[0]
+        self.view.stop()
+        await self.Update_func(interaction, selected)
+
+class RegisterDropdownView(nextcord.ui.View):
+    def __init__(self, heritage_dropdown:HeritageDropdown):
+        super().__init__()
+        self.add_item(heritage_dropdown)
+
+@bot.slash_command(description="Registra un nuevo personaje de Megamarch.", guild_ids=[CRI_GUILD_ID])
+async def register(interaction: nextcord.Interaction, nombre_pj:str, nombre_jugador:str,
+                   clase:str = nextcord.SlashOption(name="clase", required=True, choices=CLASSES), 
+                   ascendencia:str = nextcord.SlashOption(name="ascendencia", required=True), 
+                   religion:str = nextcord.SlashOption(name="religión", required=True, choices=RELIGIONS)):
+    # Conseguir el ID del usuario
+    user_id:int = interaction.user.id
+    print(user_id)
+    # Revisar que no tenga otro PJ
+    already_has_character = True
     try:
-        bot.add_cog(downtimeCog(bot))
-        print("Finished generating downtime commands")
-    except Exception as e:
-        print(e)
-
-
-@bot.command()
-@commands.has_role("Mod")
-async def massrenombre(ctx, faccion, amt):
-    await ctx.send(f"Aumentando en {amt} el renombre de todos los PJs de la facción: {faccion}")
-    return
-
-
-@bot.command()
-@pj_wrap
-async def missioncomplete(ctx, pj_id: str, tier: int, type=None):
-    # type 0 -> estrella, 1 -> calavera
-    if tier > 10 or tier < 1:
-        await ctx.send(f"No existen misiones de tier {tier}")
-        return
-    row = get_pj_row(pj_id)
-    type = 0 if type is None else 1
-
-    xp_add, gold_add, dt_add, princ_bonus = Sheet.get_reward_info(tier, skull=(type == 1))
-    renown, faction, xp, slaves, employees = Sheet.get_batch_data(
-        row, [COL.renown, COL.renown_faction, COL.xp, COL.slaves, COL.employees])
-    xp = int(xp)
-    slaves = int(slaves)
-    employees = int(employees)
-    # Calcular nivel y xp necesaria para el siguiente nivel.
-    new_xp = xp+xp_add
-    old_lvl, _ = utils.level_xp(xp)
-    new_lvl, missing_xp = utils.level_xp(new_xp)
-    if missing_xp > -1:
-
-        if new_lvl > old_lvl:
-            # subes de nivel
-            lvl_up = f"Subes a nivel {new_lvl}."
-
-        else:
-            lvl_up = f"Te mantienes en nivel {new_lvl}."
-        xp_message = f"{lvl_up} Te faltan {missing_xp} para subir a nivel {new_lvl+1}."
-    else:
-        xp_message = "Eres nivel 20, y no puedes subir mas."
-
-    # Calcular dt extra y sueldo de esclavos y empleados
-    if slaves > 0:
-        slave_dt = slaves * 0.1
-        slave_wages = 50 * slaves
-        slave_message = f"\nPagas {slave_wages}gp en mantención de tus {slaves} esclavos. Generan {slave_dt}dt (ya sumado)."
-        slave_extra = f"(+{slave_dt})"
-    else:
-        slave_message = ""
-        slave_extra = ""
-        slave_dt = 0
-        slave_wages = 0
-
-    if employees > 0:
-        employee_dt = employees * 0.1
-        employee_wages = 100 * employees
-        employee_message = f"\nPagas {employee_wages}gp en mantención de tus {employees} empleados. Generan {employee_dt}dt (ya sumado)."
-        employee_extra = f"(+{employee_dt})"
-    else:
-        employee_message = ""
-        employee_extra = ""
-        employee_dt = 0
-        employee_wages = 0
-
-
-    # Calcular bonos del principado
-    principado_tier = utils.renown_tier(
-        renown) if faction == FACTION.principado else 0
-
-    principado_message = ""
-    if principado_tier >= 1:
-        dt_add += 1
-        principado_message = "Dado que eres tier 1 del Principado, se aumentó tu recompensa de DT en 1"
-    if principado_tier >= 2:
-        gold_add += princ_bonus
-        principado_message = f"Dado que eres tier {principado_tier} del Principado, se aumentó tu recompensa de DT en 1 y tu recopmensa de oro aumenta en {princ_bonus}"
-
-    Sheet.add_money(row, gold_add-slave_wages-employee_wages)
-
-
-    old_data = Sheet.edit_batch_data(
-        row, [COL.xp, COL.downtime, COL.piety, COL.renown, COL.money_total], [xp_add, dt_add+slave_dt+employee_dt, 3, 3, 0])
-
-    message = f"""Misión de tier {tier} {"estrellas" if type == 0 else "calaveras"}: {Sheet.get_pj_data(row, COL.name)}
-    {xp_add}xp, {gold_add}gp, {dt_add}dt{slave_extra}{employee_extra}, 1 de piedad, 1 de renombre.
-    {xp_message}{slave_message}{employee_message}
-    Si haces el informe, ganas {int(xp_add*0.2)}xp extra y 0.2 dt ($xp {pj_id} {int(xp_add*0.2)})
-    """+principado_message
+        pj_row = sh.get_pj_row(user_id)
+    except sh.CharacterNotFoundError:
+        already_has_character = False
+    if already_has_character:
+        return await interaction.send(f"Ya tienes un personaje en la fila {pj_row}, muevelo al cementario para registrar uno nuevo.")
+    ascendencia = ascendencia.capitalize()
+    if ascendencia not in ANCESTRIES:
+        return await interaction.send(f"'{ascendencia}' no es una ascendencia válida.")
     
-    view = View()
+
+
+    # Generar stats base (0 de dt, 15 de gp)
+    #[nombre, id, jugador, clase, Arquetipos, ascendencia, heritage, dt, pp, gp, sp, cp, total, lenguajes, religión]
+    async def update_func(interaction:nextcord.Interaction, selected_heritage:str):
+        values = [nombre_pj, str(user_id), nombre_jugador, clase, "", ascendencia, selected_heritage, 0, 0, 15, 0, 0]
+        pj_row = sh.first_empty_PJ_row()
+        sh.update_range_PJ([values], f"{PJ_COL.Name}{pj_row}:{PJ_COL.Money_cp}{pj_row}")
+        sh.update_range_PJ([[religion]], f"{PJ_COL.Religion}{pj_row}")
+        await interaction.send(f"Registrado {nombre_pj} en la fila {pj_row}")
+    heritage_dropdown = HeritageDropdown(ascendencia, update_func)
+
+    view = RegisterDropdownView(heritage_dropdown)
+    await interaction.send("Selecciona un heritage para tu personaje", view=view)
+
+
+@register.on_autocomplete("ascendencia")
+async def autocomplete_ancestry(interaction: nextcord.Interaction, ancestry: str):
+    filtered_ancestries = []
+    if ancestry:
+        filtered_ancestries = [a for a in ANCESTRIES if a.lower().startswith(ancestry.lower())]
+    await interaction.response.send_autocomplete(filtered_ancestries)
+
+
+@bot.slash_command(description="Entrega la info de tu personaje", guild_ids=[CRI_GUILD_ID])
+async def status(interaction: nextcord.Interaction, user:nextcord.Member = None):
+    user_id:int = interaction.user.id if user is None else user.id
     try:
-        other_pj = Sheet.detect_other_PJ(row)
-        if other_pj is not None:
-            b =  Button(label="+")
-            b.callback = button_add_mission_rewards_to_secondary_pj(other_pj, ctx.author)
-            message += f"\nSe detectó otro PJ a tu nombre, si quieres añadirle la xp y el dt a {other_pj['name']}, apreta el botón."
-            view.add_item(b)
-    except ValueError as e:
-        message += "\n"+str(e)
-    
-    
-    
-    await ctx.send(message, view=view)
-
-def button_add_mission_rewards_to_secondary_pj(pj:dict, user):
-    async def callback(interaction:Interaction):
-        
-        if interaction.user != user:
-            return
-        
-        row = pj["row"]
-        name = pj["name"]
-        
-        renown, faction, tier, xp, slaves, employees = Sheet.get_batch_data(
-        row, [COL.renown, COL.renown_faction, COL.tier, COL.xp, COL.slaves, COL.employees])
-        xp = int(xp)
-        slaves = int(slaves)
-        employees = int(employees)
-        
-        xp_add, gold_add, dt_add, princ_bonus = Sheet.get_reward_info(int(tier))
-        dt_add += 1
-        principado_tier = utils.renown_tier(
-        renown) if faction == FACTION.principado else 0
-
-            # Calcular nivel y xp necesaria para el siguiente nivel.
-        
-        new_xp = xp+xp_add
-        old_lvl, _ = utils.level_xp(xp)
-        new_lvl, missing_xp = utils.level_xp(new_xp)
-        if missing_xp > -1:
-
-            if new_lvl > old_lvl:
-                # subes de nivel
-                lvl_up = f"Subes a nivel {new_lvl}."
-
-            else:
-                lvl_up = f"Te mantienes en nivel {new_lvl}."
-            xp_message = f"\n{lvl_up} Te faltan {missing_xp}xp para subir a nivel {new_lvl+1}."
-        else:
-            xp_message = "\nEres nivel 20, y no puedes subir mas."
+        pj_row = sh.get_pj_row(user_id)
+    except sh.CharacterNotFoundError:
+        return await interaction.send("No se encontró un personaje con ID de discord correspondiente")
+    data = sh.get_pj_full(pj_row)
+    Name, Id, Player, Class, Arquetypes, Ancestry, Heritage, Dt, pp, gp, sp, cp, total, languages, religion = data
+    Dt = int(Dt)
+    message = f"""# Status de {Name}
+- Jugador: {Player}
+- Clase: {Class}{", " if Arquetypes else ""}{Arquetypes}
+- Ascendencia: {Ancestry}, {Heritage}
+- Dinero: {pp}pp, {gp}gp, {sp}sp, {cp}cp, **Total: {total}gp**
+- Downtime: {Dt//7} semanas y { Dt%7} dias ({Dt} dias)
+"""
+    return await interaction.send(message)
 
 
-            # Calcular dt extra y sueldo de esclavos y empleados
-        if slaves > 0:
-            slave_dt = slaves * 0.1
-            slave_wages = 50 * slaves
-            slave_message = f"\nPagas {slave_wages}gp en mantención de tus {slaves} esclavos. Generan {slave_dt}dt (ya sumado)."
-            slave_extra = f"(+{slave_dt})"
-        else:
-            slave_message = ""
-            slave_extra = ""
-            slave_dt = 0
-            slave_wages = 0
-
-        if employees > 0:
-            employee_dt = employees * 0.1
-            employee_wages = 100 * employees
-            employee_message = f"\nPagas {employee_wages}gp en mantención de tus {employees} empleados. Generan {employee_dt}dt (ya sumado)."
-            employee_extra = f"(+{employee_dt})"
-        else:
-            employee_message = ""
-            employee_extra = ""
-            employee_dt = 0
-            employee_wages = 0
-
-
-        principado_message = ""
-        if principado_tier >= 1:
-            dt_add += 1
-            principado_message = " Se añadió el bono de DT del principado."
-            
-        Sheet.edit_batch_data(row, [COL.xp, COL.downtime], [xp_add, dt_add])
-        if slave_wages+employee_wages >0:
-            Sheet.pay(row, slave_wages+employee_wages)
-        await interaction.response.send_message(f"Se le sumó {xp_add}xp y {dt_add}dt{slave_extra}{employee_extra} a {name}.{principado_message} {xp_message}{slave_message}{employee_message}")
-    
-    return callback
-        
-        
-        
-        
-        
-        
-        
-        
-
-
-@bot.command()
-async def reward(ctx, tier: int, type=None):
-    type = 0 if type is None else 1
-
-    def tier_message(tier: int, type: int):
-        # type 0 = estrella, 1 = calavera
-        if tier > 10 or tier < 1:
-            return f"No existen misiones de tier {tier}"
-        else:
-            xp, gold, dt, princ_bonus = Sheet.get_reward_info(tier, skull=(type == 1))
-            message = f"""La recompensa de una misión de tier {tier} {"estrellas" if type == 0 else "calaveras"} es:
-            {xp}xp, {gold}gp, {dt}dt, 3 de piedad, 3 de renombre. 
-            El que hace el informe gana {int(xp*1.1)}xp.
-            La gente del principado, dependiendo de su renombre, gana {dt+1}dt y un extra de {princ_bonus}gp."""
-            return message
-    await ctx.send(tier_message(tier, type))
-
-
-@bot.command()
-@pj_wrap
-async def status(ctx, pj_id: str):
-    row = Sheet.get_pj_row(pj_id)
-
-    batch = Sheet.get_batch_data(row, [COL.name, COL.money_pp, COL.money_gp, COL.money_ep, COL.money_sp,
-                                 COL.money_cp, COL.money_total, COL.downtime, COL.xp, COL.renown, COL.piety, COL.piety_god])
-    name, pp, gp, ep, sp, cp, m_total, dt, xp, ren, piety, god = batch
-
-            # Calcular nivel y xp necesaria para el siguiente nivel.
-    lvl, missing_xp = utils.level_xp(xp)
-    if missing_xp > -1:
-        xp_message = f"Eres nivel {lvl}. Te faltan {missing_xp}xp para subir a nivel {lvl+1}."
-    else:
-        xp_message = "Eres nivel 20, y no puedes subir mas."
-
-    message = f"""Resumen de {name}:
-        {pp}pp, {gp}gp, {ep}ep, {sp}sp, {cp}cp, **{m_total}gp** totales.
-        XP: {xp}, DT: {dt}, Renombre: {ren}, Piedad: {piety} con {god}.
-        {xp_message}"""
-    await ctx.send(message)
-
-
-@bot.command()
-async def state(ctx, pj_id: str):
-    await status(ctx, pj_id)
-
-
-@bot.command()
-@pj_wrap
-async def addmoney(ctx, pj_id: str, value: float):
-
-    row = Sheet.get_pj_row(pj_id)
-
-    old_total = Sheet.get_pj_data(row, COL.money_total)
-
-    Sheet.add_money(row, value)
-
+@bot.slash_command(description="Cambia el Downtime de tu personaje", guild_ids=[CRI_GUILD_ID])
+async def dt(interaction: nextcord.Interaction, amount:int):
+    user_id:int = interaction.user.id
     try:
-        new_val = Sheet.get_batch_data(
-            row, [COL.money_pp, COL.money_gp, COL.money_ep, COL.money_sp, COL.money_cp, COL.money_total])
-        message = f"Dinero de {Sheet.get_pj_data(row, COL.name)} actualizado: {new_val[0]}pp, {new_val[1]}gp, {new_val[2]}ep, {new_val[3]}sp, {new_val[4]}cp, {new_val[5]} gp totales (antes tenía {old_total}gp)"
-        await ctx.send(message)
-
-    except Exception as e:
-        error = "Hubo un error actualizando tu dinero, si persiste preguntale a Pancho"
-        await ctx.send(error)
+        pj_row = sh.get_pj_row(user_id)
+        pj_name = sh.get_pj_data(pj_row, PJ_COL.Name)
+    except sh.CharacterNotFoundError:
+        return await interaction.send("No se encontró un personaje con ID de discord correspondiente")
 
 
+    pj_dt = sh.get_pj_data(pj_row, PJ_COL.Downtime)
 
-@bot.command()
-@pj_wrap
-async def spend(ctx, pj_id: str, value: float):
-    row = Sheet.get_pj_row(pj_id)
-    old_total = Sheet.get_pj_data(row, COL.money_total)
+    if pj_dt+amount<0:
+        return await interaction.send("No tienes suficiente downtime para esta transacción")
+    
+    new_total = pj_dt+amount
 
-    success = Sheet.pay(row, value)
+    sh.update_pj_data_cell(pj_row, PJ_COL.Downtime, [[new_total]])
 
-    if success is True:
-        new_val = Sheet.get_batch_data(
-            row, [COL.money_pp, COL.money_gp, COL.money_ep, COL.money_sp, COL.money_cp, COL.money_total])
-        message = f"Dinero de {Sheet.get_pj_data(row, COL.name)} actualizado: {new_val[0]}pp, {new_val[1]}gp, {new_val[2]}ep, {new_val[3]}sp, {new_val[4]}cp, {new_val[5]} gp totales (antes tenía {old_total}gp)."
-        await ctx.send(message)
-    else:
-        await ctx.send(success)
+    return await interaction.send(f"{pj_name} {"gana" if amount>0 else "gasta"} {amount} dias de downtime. Ahora tiene {new_total//7} semanas y { new_total%7} dias ({new_total} dias)")
 
 
-@bot.command()
-@pj_wrap
-async def transfer(ctx, pj_paying_id: str, pj_receiving_id: str, value: float):
-
-    name_p, old_total_p, row_p = Sheet.get_pj_data_with_name(pj_paying_id, COL.money_total)
-    name_r, old_total_r, row_r = Sheet.get_pj_data_with_name(pj_receiving_id, COL.money_total)
-
-    old_total_p = float(old_total_p)
-    old_total_r = float(old_total_r)
-
-
-    success_p = Sheet.pay(row_p, value)
-    if success_p is True:
-        success_r = Sheet.add_money(row_r, value)
-
-    if success_p is True:
-        message = f"{name_p} le paga {value}gp a {name_r}.\n\n {name_p}: {old_total_p} -> {old_total_p-value}\n {name_r}: {old_total_r} -> {old_total_r+value}"
-        await ctx.send(message)
-    else:
-        await ctx.send(success_p)
-
-@bot.command()
-@pj_wrap
-async def capitalism(ctx, pj_id:str, tier:int, invertir:str="", supervisar:str="", gremio:str=""):
-    invertir = invertir == "invertir"
-    supervisar = supervisar == "supervisar"
-    gremio = gremio == "gremio"
-
-    income_base = utils.shop_income_base(tier)
-    multiplier = utils.shop_active_income() if invertir else utils.shop_passive_income()
-    print(multiplier)
-
-    dt_cost =  ((0.5 if gremio else 1) if supervisar else 0)
-    invert_cost = income_base * 0.1 if invertir else 0
-    gold_cost = invert_cost + (100 if gremio else 0)
-
-    gross_income = multiplier * income_base + (2.5 * income_base if supervisar else 0)
-    net_income = gross_income - gold_cost
-
-
-    name, dt_val, row = Sheet.get_pj_data_with_name(pj_id, COL.downtime)
-    if float(dt_val) < dt_cost:
-        await ctx.send("No tienes DT suficiente para esto")
-    cell = Sheet.simple_cell(row, COL.downtime)
-
+@bot.slash_command(description="Resta dinero de tu cuenta. Puedes transferir a otra persona.", guild_ids=[CRI_GUILD_ID])
+async def pay(interaction: nextcord.Interaction, amount: float, transfertarget:nextcord.Member= None):
+    user_id:int = interaction.user.id
+    target_id:int = transfertarget.id if transfertarget is not None else None
     try:
-        Sheet.edit_data(cell, -dt_cost)
-    except Exception as e:
-        await ctx.send(f"`Hubo un error actualizando el downtime de {name}: Error Detail: {str(e)}`")
+        pj_row = sh.get_pj_row(user_id)
+        pj_name = sh.get_pj_data(pj_row, PJ_COL.Name)
+        target_pj_row = sh.get_pj_row(target_id) if transfertarget is not None else None
+        target_pj_name = sh.get_pj_data(target_pj_row, PJ_COL.Name) if transfertarget is not None else None
+    except sh.CharacterNotFoundError:
+        return await interaction.send("No se encontró un personaje con ID de discord correspondiente")
+    if amount<0:
+        return await interaction.send("Debes pagar una cantidad positiva de dinero")
+
+    pj_coins = sh.get_pj_coins(pj_row)
+    pp, gp, sp, cp, total = pj_coins
+    if total-amount<0:
+        return await interaction.send("No tienes suficiente dinero para esta transacción")
     
-    success = True
-    if net_income > 0:
-        Sheet.add_money(row, net_income)
-    else:
-        success = Sheet.pay(row, abs(net_income))
+    new_total = total-amount
+    new_coins = utils.gp_to_coin_list(new_total)
+    pp, gp, sp, cp = new_coins
+    sh.update_pj_coins(pj_row, [new_coins])
 
-    compli = (dndice.basic("1d100") <= 5) and invertir
-
-    dt_gremio_message = " (gastando menos gracias al gremio de mercantes, por el modico precio de 100gp)." if gremio else "."
-    dt_cost_message = f" Gasta {dt_cost}dt supervisando{dt_gremio_message}" if supervisar else ""
-
-    message = f'''```{name} lleva su negocio tier {tier} (la mantención es {income_base}).
-    {dt_cost_message}
-    {f" Invierte {invert_cost}gp, aumentando el riesgo y las posibles ganancias." if invertir else ""}
-
-    Tus ganancias brutas son {gross_income}, y tus ganancias netas son {net_income}.
-    {" Y por desgracia, algo sale mal con tu inversión y tienes una complicación." if compli else ""}
-    ```
-    {"ATENCIÓN: TUS PERDIDAS FUERON MAYORES QUE TU DINERO. dEBES RESTARTE EL DINERO MANUALMENTE Y VER LAS REGLAS DE ENDEUDARSE." if success is not True else ""}
-    (El dinero y el dt ya fué cambiado en el excel)
-    '''
-
-    await ctx.send(message)
+    if transfertarget is not None:
+        target_coins = sh.get_pj_coins(target_pj_row)
+        pp, gp, sp, cp, total = target_coins
+        new_total_target = total+amount
+        new_coins = utils.gp_to_coin_list(new_total_target)
+        sh.update_pj_coins(target_pj_row, [new_coins])
+        return await interaction.send(f"{pj_name} le transfiere {amount}gp a {target_pj_name}. \n{pj_name} queda con {new_total:.2f}gp, y {target_pj_name} queda con {new_total_target:.2f}gp.")
+    return await interaction.send(f"{pj_name} paga {amount}gp. Ahora tiene {pp}pp, {gp}gp, {sp}sp, {cp}cp, **Total: {new_total:.2f}gp**")
 
 
-
-
-
-
-@pj_wrap
-async def change_single_value(ctx, pj_id: str, value: float, val_name: str, col: str):
-
-    name, prev_val, row = Sheet.get_pj_data_with_name(pj_id, col)
-    cell = Sheet.simple_cell(row, col)
-
+@bot.slash_command(description="Suma dinero a tu cuenta.", guild_ids=[CRI_GUILD_ID])
+async def addmoney(interaction: nextcord.Interaction, amount: float, target:nextcord.Member= None):
+    user_id:int = target.id if target is not None else interaction.user.id
     try:
-        Sheet.edit_data(cell, value)
-        await ctx.send(f"`{val_name} de {name} actualizado: {prev_val} -> {float(prev_val)+value}`")
-    except Exception as e:
-        await ctx.send(f"`Hubo un error actualizando el {val_name.lower()} de {name}: Error Detail: {str(e)}`")
+        pj_row = sh.get_pj_row(user_id)
+        pj_name = sh.get_pj_data(pj_row, PJ_COL.Name)
+    except sh.CharacterNotFoundError:
+        return await interaction.send("No se encontró un personaje con ID de discord correspondiente")
+    if amount<0:
+        return await interaction.send("Debes ganar una cantidad positiva de dinero")
 
-
-@bot.command()
-async def dt(ctx, pj_id: str, value: float):
-    val_name = "Downtime"
-    col = COL.downtime
-    await change_single_value(ctx, pj_id, value, val_name, col)
-
-
-@bot.command()
-async def renombre(ctx, pj_id: str, value: float):
-    val_name = "Renombre"
-    col = COL.renown
-    await change_single_value(ctx, pj_id, value, val_name, col)
-
-
-@bot.command()
-async def piedad(ctx, pj_id: str, value: int):
-    val_name = "Piedad"
-    col = COL.piety
-    await change_single_value(ctx, pj_id, value, val_name, col)
-
-
-@bot.command()
-async def xp(ctx, pj_id: str, value: int):
-    val_name = "XP"
-    col = COL.xp
-    await change_single_value(ctx, pj_id, value, val_name, col)
-
-
-@bot.command()
-@pj_wrap
-async def cleanmoney(ctx, pj_id: str):
-    row = Sheet.get_pj_row(pj_id)
-    edit_range = f"{Sheet.PJ_SHEET}{COL.money_pp}{row}:{COL.money_cp}{row}"
-    try:
-        Sheet.edit_data(
-            edit_range, 0, edit_func=Sheet.clean_formula, formula=False, single=False)
-        message = f"Dinero de {Sheet.get_pj_data(row, COL.name)} limpiado"
-        await ctx.send(message)
-    except Exception as e:
-        error = f"Hubo un error actualizando tu dinero, si persiste preguntale a Pancho. Detalle del error: {str(e)}"
-        await ctx.send(error)
-
-
-@bot.command()
-async def test(ctx, *args):
-    await ctx.send('{} arguments: {}'.format(len(args), ', '.join(args)))
-
-
-@bot.command()
-async def massroll(ctx, amt: int, atk: str, dmg: str = '0', ac: int = 0, short: str = ''):
-    text = f'''```Massroll: {amt} rolls against AC {ac}'''
-    textEnd = ''
-    #emb = discord.Embed(title=f'Mass roll: {amt} rolls against AC {ac}')
-    sumNum = 0
-    sumCrits = 0
-    try:
-        dndice.basic(atk)
-    except:
-        ctx.send(f'{atk} is not valid roll syntax')
-    try:
-        dndice.basic(dmg)
-    except:
-        ctx.send(f'{dmg} is not valid roll syntax')
-
-    for x in range(amt):
-        atkRoll = dndice.basic(atk)
-        dmgRoll = dndice.basic(dmg)
-
-        if atkRoll == dice.roll_max(atk):
-            critical = ', Critical!'
-            sumCrits += 1
-            dmgRoll = dndice.basic(dmg.replace('d', 'dc'))
-        else:
-            critical = ''
-
-        if dmg != '0':
-            textEnd += f"Attack n°{x}: {atkRoll}, damage: {dmgRoll}{critical}\n"
-            #emb.add_field(name=f'Attack {x}', value=f'{critical}{atkRoll}, damage: {dmgRoll}')
-        else:
-            textEnd += f"Attack {x}: {critical}{atkRoll}\n"
-            #emb.add_field(name=f'Attack {x}', value=f'{critical}{atkRoll}')
-
-        if (atkRoll >= ac or critical == 'Critical Attack!: '):
-            sumNum += dmgRoll
-    text += f'''\n Sum of the Damage: {sumNum} damage'''
-    text += f"\n Amount of critical attacks: {sumCrits}\n\n"
-    if short == "short":
-        pass
-    elif (len(text)+len(textEnd) <= 1997):
-        text += textEnd
-    else:
-        text += "Text is too long, detail doesnt fit."
-    #emb.add_field(name=f'Sum of the Damage', value=f'{sumNum} damage')
-
-    text += "```"
-    await ctx.send(text)
-
-import gachaControl as Gacha
-from gachaControl import GACHACOL
-
-@bot.command()
-@pj_wrap
-async def gacharoll(ctx:commands.Context, pj_id:str, pers_check:int):
+    pj_coins = sh.get_pj_coins(pj_row)
+    pp, gp, sp, cp, total = pj_coins
     
-    user = ctx.author
-    row = Sheet.get_pj_row(pj_id)
-    money, dt = Sheet.get_batch_data(row, [COL.money_total, COL.downtime])
-    if float(money)<100 or float(dt) < 1:
-        return await ctx.send("No tienes suficiente oro o dt praa el coste base de la subasta.")
-    else:
-        Sheet.pay(row, 100)
-        Sheet.edit_data(Sheet.simple_cell(row, COL.downtime), -1)
-    descuento, complicacion, bono = Gacha.gacha_info()
-    
-    total_roll= pers_check+int(bono)
-    
-    controller = Gacha.GachaController(descuento, complicacion, row, user)
-    
-    rolled_table = controller.DMG_table_options(total_roll)
-    
-    view = View()
-    
-    for table in controller.table_options:
-        b = Button(label=table)
-        b.callback = button_choose_table(controller, table)
-        view.add_item(b)
-        
-    msg = f'''**Casa de Subastas**
-Se gastó los 100 gp y 1 dt necsarios del coste base de la subasta.
-Con una tirada de {total_roll}, puedes acceder a la tabla {rolled_table}.
-Puedes elegir una tabla menor, tirando 1d4 por cada tabla que bajes. La cantidad de objetos para elegir es el mayor d4 entre los que tiraste.
-Tienes {money}gp disponibles.
+    new_total = total + amount
+    new_coins = utils.gp_to_coin_list(new_total)
+    pp, gp, sp, cp = new_coins
+    sh.update_pj_coins(pj_row, [new_coins])
 
-*Elige el botón con la tabla en la que quieres tirar.*
-    '''
-    await ctx.send(msg, view=view)        
-
-def button_choose_table(controller:Gacha.GachaController, chosen_table:str):
-    async def callback(interaction):
-        if interaction.user != controller.user:
-            return
-        
-        d4_amount = controller.d4_amount(chosen_table)
-        item_amount = dndice.basic(f'{d4_amount}d4h1')+1
-        controller.roll_items(item_amount, chosen_table)
-        msg = f'''**Casa de Subastas**
-Lanzando {d4_amount}d4, obtienes {item_amount} ofertas de objeto de la tabla {chosen_table}:
-```{controller.items_for_sale_message()}```
-
-*Apreta los botones de los items que desees comprar. Azul si es un item normal, verde si es consumible.*
-'''
-        view = View()
-        for item in controller.items_for_sale():
-            butt_norm = Button(label=item['letter'], style=ButtonStyle.blurple, row=0, disabled=item['bought'])
-            butt_cons = Button(label=item['letter'], style=ButtonStyle.green,   row=1, disabled=item['bought'])
-            
-            butt_norm.callback = button_choose_item(controller, item, False, chosen_table, item_amount, d4_amount)
-            butt_cons.callback = button_choose_item(controller, item, True, chosen_table, item_amount, d4_amount)
-
-            view.add_item(butt_norm)
-            view.add_item(butt_cons)
-        await interaction.response.edit_message(content=msg, view=view)
-    return callback
-
-def button_choose_item(controller:Gacha.GachaController, chosen_item:dict, consumable:bool, chosen_table:str, item_amount:int, d4_amount:int, logs:str=""):
-    async def callback(interaction:nextcord.Interaction):
-        if interaction.user != controller.user:
-            return
-        
-        await interaction.response.defer()
-        
-        
-        activity = logs + controller.buy(chosen_item, consumable)
-        
-        
-        msg = f'''**Casa de Subastas**
-Lanzando {d4_amount}d4, obtienes {item_amount} ofertas de objeto de la tabla {chosen_table}:
-```{controller.items_for_sale_message()}```
-
-*Apreta los botones de los items que desees comprar. Azul si es un item normal, verde si es consumible.*
-{activity}
-'''
-        view = View(timeout=180)
-        for item in controller.items_for_sale():
-            butt_norm = Button(label=item['letter'], style=ButtonStyle.blurple, row=0, disabled=item['bought'])
-            butt_cons = Button(label=item['letter'], style=ButtonStyle.green,   row=1, disabled=item['bought'])
-            
-            butt_norm.callback = button_choose_item(controller, item, False, chosen_table, item_amount, d4_amount, activity)
-            butt_cons.callback = button_choose_item(controller, item, True, chosen_table, item_amount, d4_amount, activity)
-            
-            view.add_item(butt_norm)
-            view.add_item(butt_cons)
-        
-        await interaction.followup.edit_message(content=msg, view=view, message_id=interaction.message.id)
-    return callback
-        
-@bot.command()
-async def playmission(ctx, pj:str):
-    if pj == "Samsir":
-        await ctx.send("Samsir murió.")
-    else:
-        await ctx.send(f"{pj} ganó.")
+    return await interaction.send(f"{pj_name} obtiene {amount}gp. Ahora tiene {pp}pp, {gp}gp, {sp}sp, {cp}cp, **Total: {new_total:.2f}gp**")
 
 
+@bot.slash_command(description="Calcula las ganancias de Earn Income", guild_ids=[CRI_GUILD_ID])
+async def earnincome(interaction: nextcord.Interaction,
+                     taskLevel:int = nextcord.SlashOption("task-level", "Nivel del trabajo", True, min_value=0, max_value=20),
+                     profLevel:str = nextcord.SlashOption("proficiency-level", "Nivel de proficiencia de la skill usada", True, choices=["Trained", "Expert", "Master", "Legendary"]),
+                     downtimeUsed:int = nextcord.SlashOption("downtime-used", "Dias de downtime usados en trabajar", True, min_value=1, default=1),
+                     checkBonus:int = nextcord.SlashOption("check-bonus", "Bono al check utilizado", True),
+                     dcChange:int = nextcord.SlashOption("dc-adjustment", "Cambios al DC impuestos por el DM", False, default=0),
+                     ):
+    dice = dndice.basic("1d20")
+    check_value = dice+checkBonus
+    DC = EARN_INCOME[taskLevel][0]+dcChange
+    check_result = utils.check_results(DC, check_value, dice)
+    prof_column = ["Trained", "Expert", "Master", "Legendary"].index(profLevel)+1
 
-token = getVar("TOKEN")
-bot.run(token)
+    if check_result==0:
+        # crit failure
+        income = 0
+        final_dt_usage = 1
+    if check_result==1:
+        # failure
+        income = EARN_INCOME[taskLevel][1][0]
+        final_dt_usage = min(7, downtimeUsed)
+    if check_result==2:
+        # success
+        income = EARN_INCOME[taskLevel][1][prof_column]
+        final_dt_usage = downtimeUsed
+    if check_result==3:
+        # Critical success
+        income = EARN_INCOME[taskLevel+1][1][prof_column]
+        final_dt_usage = downtimeUsed
+
+    message = f"""Con un {check_value} ({dice}+{checkBonus}) vs DC {DC} , obtienes un {utils.result_name(check_result)}.
+Trabajas {final_dt_usage} dias y obtienes {income} gp al día, por un total de {income*final_dt_usage} gp.
+(Por ahora, debes updatearlos manualmente)
+"""
+    await interaction.send(message)
+
+@bot.slash_command(description="Muestra la lista de tus lenguajes", guild_ids=[CRI_GUILD_ID])
+async def lenguajes(interaction: nextcord.Interaction):
+    pass
+
+
+@bot.slash_command(description="Cambia la lista de tus lenguajes", guild_ids=[CRI_GUILD_ID])
+async def setlenguajes(interaction: nextcord.Interaction, lenguajes:str):
+    pass
+
+
+@bot.slash_command(description="Revisa tu reputación", guild_ids=[CRI_GUILD_ID])
+async def reputation(interaction: nextcord.Interaction, user:nextcord.Member=None):
+    pass
+
+
+@bot.slash_command(description="Actualiza tu reputación con una facción o NPC", guild_ids=[CRI_GUILD_ID])
+async def updatereputation(interaction: nextcord.Interaction, amount:int, faction:str, user:nextcord.Member=None):
+    pass
+
+@bot.slash_command(description="Gana el downtime y dinero esperado de terminar una misión", guild_ids=[CRI_GUILD_ID])
+async def missioncomplete(interaction: nextcord.Interaction, level:int, user:nextcord.Member=None):
+    pass
+
+bot.run(BOT_TOKEN)

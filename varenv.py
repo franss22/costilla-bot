@@ -2,7 +2,7 @@ import os
 import json
 
 def getFromLocal(varname:str):
-    with open("local_vars.json", "r") as f:
+    with open("secrets.json", "r") as f:
         dic = json.load(f)
         return dic[varname]
 

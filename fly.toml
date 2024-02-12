@@ -1,6 +1,6 @@
 # fly.toml file generated for costilla on 2023-01-04T20:25:03-03:00
 
-app = "costilla"
+app = "piranesi"
 kill_signal = "SIGINT"
 kill_timeout = 5
 processes = []

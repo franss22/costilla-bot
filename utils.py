@@ -29,21 +29,31 @@ def shop_active_income():
     return random.choice(mults)
 
 
-def gp_to_coin_list(num: float, with_electrum=False):
+def gp_to_coin_list(num: float):
 
     num = (1 if num >= 0 else -1)*int(round(abs(float(num))*100))
 
     pp = num//1000
     gp = num % 1000//100
-    ep = 0
     sp = num % 100//10
     cp = num % 10
-    if with_electrum:
-        ep = sp//5
-        sp = sp % 5
 
-    return [pp, gp, ep, sp, cp]
+    return [pp, gp, sp, cp]
 
+
+def check_results(DC, result, dice):
+    CHECK_RESULTS = {
+    -1:0,
+    0:0,
+    1:1,
+    2:2,
+    3:3,
+    4:3
+}
+    return CHECK_RESULTS[((0 if result<=DC-10 else (1 if result<DC else (2 if result<DC+10 else 3))) + (1 if dice==20 else 0) - (1 if dice==1 else 0))]
+
+def result_name(result:int):
+    return ["fallo crítico", "fallo", "éxito", "éxito crítico"][result]
 
 def pay_priority(coins, paid_amt: float):
     # calcula la diferencia (lo que hay que restarle al dinero original) para pagar paid_amt
