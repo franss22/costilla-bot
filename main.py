@@ -2,7 +2,7 @@ import nextcord
 from nextcord.ext import commands
 from varenv import getVar
 import SheetControl as sh
-from SheetControl import PJ_COL
+from SheetControl import PJ_COL, gets_pj_data
 import utils
 import json
 import dndice
@@ -165,6 +165,7 @@ class RegisterDropdownView(nextcord.ui.View):
         self.add_item(heritage_dropdown)
 
 @bot.slash_command(description="Registra un nuevo personaje de Megamarch.", guild_ids=[CRI_GUILD_ID])
+@gets_pj_data
 async def register(interaction: nextcord.Interaction, nombre_pj:str, nombre_jugador:str,
                    clase:str = nextcord.SlashOption(name="clase", required=True, choices=CLASSES), 
                    ascendencia:str = nextcord.SlashOption(name="ascendencia", required=True), 
@@ -207,8 +208,8 @@ async def autocomplete_ancestry(interaction: nextcord.Interaction, ancestry: str
         filtered_ancestries = [a for a in ANCESTRIES if a.lower().startswith(ancestry.lower())]
     await interaction.response.send_autocomplete(filtered_ancestries)
 
-
 @bot.slash_command(description="Entrega la info de tu personaje", guild_ids=[CRI_GUILD_ID])
+@gets_pj_data
 async def status(interaction: nextcord.Interaction, user:nextcord.Member = None):
     user_id:int = interaction.user.id if user is None else user.id
     try:
@@ -216,6 +217,7 @@ async def status(interaction: nextcord.Interaction, user:nextcord.Member = None)
     except sh.CharacterNotFoundError:
         return await interaction.send("No se encontró un personaje con ID de discord correspondiente")
     data = sh.get_pj_full(pj_row)
+    print(data)
     Name, Id, Player, Class, Arquetypes, Ancestry, Heritage, Dt, pp, gp, sp, cp, total, languages, religion = data
     Dt = int(Dt)
     message = f"""# Status de {Name}
@@ -227,8 +229,8 @@ async def status(interaction: nextcord.Interaction, user:nextcord.Member = None)
 """
     return await interaction.send(message)
 
-
 @bot.slash_command(description="Cambia el Downtime de tu personaje", guild_ids=[CRI_GUILD_ID])
+@gets_pj_data
 async def dt(interaction: nextcord.Interaction, amount:int):
     user_id:int = interaction.user.id
     try:
@@ -249,8 +251,8 @@ async def dt(interaction: nextcord.Interaction, amount:int):
 
     return await interaction.send(f"{pj_name} {"gana" if amount>0 else "gasta"} {amount} dias de downtime. Ahora tiene {new_total//7} semanas y { new_total%7} dias ({new_total} dias)")
 
-
 @bot.slash_command(description="Resta dinero de tu cuenta. Puedes transferir a otra persona.", guild_ids=[CRI_GUILD_ID])
+@gets_pj_data
 async def pay(interaction: nextcord.Interaction, amount: float, transfertarget:nextcord.Member= None):
     user_id:int = interaction.user.id
     target_id:int = transfertarget.id if transfertarget is not None else None
@@ -283,8 +285,8 @@ async def pay(interaction: nextcord.Interaction, amount: float, transfertarget:n
         return await interaction.send(f"{pj_name} le transfiere {amount}gp a {target_pj_name}. \n{pj_name} queda con {new_total:.2f}gp, y {target_pj_name} queda con {new_total_target:.2f}gp.")
     return await interaction.send(f"{pj_name} paga {amount}gp. Ahora tiene {pp}pp, {gp}gp, {sp}sp, {cp}cp, **Total: {new_total:.2f}gp**")
 
-
 @bot.slash_command(description="Suma dinero a tu cuenta.", guild_ids=[CRI_GUILD_ID])
+@gets_pj_data
 async def addmoney(interaction: nextcord.Interaction, amount: float, target:nextcord.Member= None):
     user_id:int = target.id if target is not None else interaction.user.id
     try:
@@ -338,19 +340,46 @@ async def earnincome(interaction: nextcord.Interaction,
         final_dt_usage = downtimeUsed
 
     message = f"""Con un {check_value} ({dice}+{checkBonus}) vs DC {DC} , obtienes un {utils.result_name(check_result)}.
-Trabajas {final_dt_usage} dias y obtienes {income} gp al día, por un total de {income*final_dt_usage} gp.
+Trabajas {final_dt_usage} dias y obtienes {income} gp al día, por un total de {income*final_dt_usage:.2f} gp.
 (Por ahora, debes updatearlos manualmente)
 """
     await interaction.send(message)
 
 @bot.slash_command(description="Muestra la lista de tus lenguajes", guild_ids=[CRI_GUILD_ID])
-async def lenguajes(interaction: nextcord.Interaction):
-    pass
+@gets_pj_data
+async def lenguajes(interaction: nextcord.Interaction, target:nextcord.Member=None):
+    user_id:int = target.id if target is not None else interaction.user.id
+    try:
+        pj_row:int = sh.get_pj_row(user_id)
+        pj_name:str = sh.get_pj_data(pj_row, PJ_COL.Name)
+        pj_languages:str = sh.get_pj_data(pj_row, PJ_COL.Languages)
+    except sh.CharacterNotFoundError:
+        return await interaction.send("No se encontró un personaje con ID de discord correspondiente")
+    if pj_languages is not None:
+        languages = pj_languages.split(", ")
+        message = f"""**Lenguajes de {pj_name}:**
+- {'\n- '.join(languages)}"""
+    else:
+        message = f"{pj_name} no sabe ningún lenguaje."
+    return await interaction.send(message)
 
-
-@bot.slash_command(description="Cambia la lista de tus lenguajes", guild_ids=[CRI_GUILD_ID])
-async def setlenguajes(interaction: nextcord.Interaction, lenguajes:str):
-    pass
+@bot.slash_command(description="Añade un lenguaje a la lista de tu PJ", guild_ids=[CRI_GUILD_ID])
+@gets_pj_data
+async def addlenguaje(interaction: nextcord.Interaction, addedlanguage= nextcord.SlashOption("lenguaje", "Lenguaje que quieres añadir a tu PJ", True, choices=LANGUAGES), target:nextcord.Member=None):
+    user_id:int = target.id if target is not None else interaction.user.id
+    try:
+        pj_row:int = sh.get_pj_row(user_id)
+        pj_name:str = sh.get_pj_data(pj_row, PJ_COL.Name)
+        pj_languages:str = sh.get_pj_data(pj_row, PJ_COL.Languages)
+    except sh.CharacterNotFoundError:
+        return await interaction.send("No se encontró un personaje con ID de discord correspondiente")
+    languages = [] if pj_languages is None else pj_languages.split(", ")
+    if addedlanguage not in languages:
+        languages.append(addedlanguage)
+        sh.update_pj_data_cell(pj_row, PJ_COL.Languages, [[", ".join(languages)]])
+        return await interaction.send(f"{addedlanguage} ha sido añadido a la lista de {pj_name}.")
+    else:
+        return await interaction.send(f"{addedlanguage} Ya está en la lista de {pj_name}.")
 
 
 @bot.slash_command(description="Revisa tu reputación", guild_ids=[CRI_GUILD_ID])
@@ -363,6 +392,7 @@ async def updatereputation(interaction: nextcord.Interaction, amount:int, factio
     pass
 
 @bot.slash_command(description="Gana el downtime y dinero esperado de terminar una misión", guild_ids=[CRI_GUILD_ID])
+@gets_pj_data
 async def missioncomplete(interaction: nextcord.Interaction, level:int, user:nextcord.Member=None):
     pass
 
