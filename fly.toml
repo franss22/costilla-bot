@@ -8,18 +8,12 @@ primary_region = 'scl'
 kill_signal = 'SIGINT'
 kill_timeout = '5s'
 
-[experimental]
-  auto_rollback = true
-
-[build]
-
-[http_service]
+[[services]]
   internal_port = 8080
-  force_https = true
-  auto_stop_machines = true
+  protocol = "tcp"
   auto_start_machines = true
-  min_machines_running = 0
-  processes = ['app']
+  auto_stop_machines = false  # prevent automatic suspension
+  min_machines_running = 1  # keep a machine running at all times
 
 [[vm]]
   cpu_kind = 'shared'

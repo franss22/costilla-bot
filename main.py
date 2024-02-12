@@ -6,6 +6,9 @@ from SheetControl import PJ_COL, gets_pj_data
 import utils
 import json
 import dndice
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 CRI_GUILD_ID = int(getVar("GUILD_ID"))
 PANCHO_ID = getVar("PANCHO_ID")
