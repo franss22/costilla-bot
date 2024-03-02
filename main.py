@@ -104,7 +104,7 @@ async def status(interaction: nextcord.Interaction, user:nextcord.Member = None)
 - Jugador: {Player}
 - Clase: {Class}{", " if Arquetypes else ""}{Arquetypes}
 - Ascendencia: {Ancestry}, {Heritage}
-- Dinero: {pp}pp, {gp}gp, {sp}sp, {cp}cp, **Total: {total}gp**
+- Dinero: {pp}pp, {gp}gp, {sp}sp, {cp}cp, **Total: {total:.2f}gp**
 - Downtime: {Dt//7} semanas y { Dt%7} dias ({Dt} dias)
 """
     return await interaction.send(message)
@@ -316,7 +316,6 @@ async def updatereputation(interaction: nextcord.Interaction, amount:int, factio
         print(new_row)
         sh.update_rep_row(row_index, new_row)
         await interaction.send(f"Creada la reputación de {pj_name} con {faction}: {amount}")
-        
 
 
 @updatereputation.on_autocomplete("faction")
@@ -355,6 +354,6 @@ async def salary(interaction: nextcord.Interaction, level:int, target:nextcord.M
 
     sh.update_pj_data_cell(pj_row, PJ_COL.Downtime, [[new_total_dt, pp, gp, sp, cp]])
 
-    return await interaction.send(f"{pj_name}: Nivel {level} completado!\n Se te suma el sueldo del nivel: {sueldo}gp (ahora tienes {new_total_gp}gp)\n Se te suman {sueldo_dt} días de dt (ahora tienes {new_total_dt} dias de dt)")
+    return await interaction.send(f"{pj_name}: Nivel {level} completado!\n Se te suma el sueldo del nivel: {sueldo_gp:.2f}gp (ahora tienes {new_total_gp:.2f}gp)\n Se te suman {sueldo_dt} días de dt (ahora tienes {new_total_dt} dias de dt)")
 
 bot.run(BOT_TOKEN)
