@@ -164,8 +164,9 @@ def get_all_existing_factions()->list[str]:
 
 def get_sueldo(level:int):
     data = sueldo_sheet.get_all_values(value_render_option="UNFORMATTED_VALUE")
-    sueldo = data[level][2]
-    return float(sueldo)
+    sueldo_gp = data[level][2]
+    sueldo_dt = data[3][3]
+    return (float(sueldo_gp), int(sueldo_dt))
 
 
 if __name__ == "__main__":

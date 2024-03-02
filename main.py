@@ -23,24 +23,6 @@ with open("Ancestries.json") as f:
 async def on_ready():
     print(f'We have logged in as {bot.user}')
 
-"""
-register done
-status done
-
-lenguajes
-    setlenguajes
-
-dt done
-pay (pay transfer) done
-addmoney done
-
-earn_income
-
-reputationstatus
-updatereputation
-
-missioncomplete
-"""
 
 
 class HeritageDropdown(nextcord.ui.Select):
@@ -350,7 +332,7 @@ async def autocomplete_faction(interaction: nextcord.Interaction, faction: str):
 
 @bot.slash_command(description="Gana el downtime y dinero esperado de terminar una misión", guild_ids=[CRI_GUILD_ID])
 @gets_pj_data
-async def levelcomplete(interaction: nextcord.Interaction, level:int, target:nextcord.Member=None):
+async def salary(interaction: nextcord.Interaction, level:int, target:nextcord.Member=None):
     user_id:int = target.id if target is not None else interaction.user.id
     try:
         pj_row = sh.get_pj_row(user_id)
@@ -359,22 +341,20 @@ async def levelcomplete(interaction: nextcord.Interaction, level:int, target:nex
         return await interaction.send("No se encontró un personaje con ID de discord correspondiente")
     
 
-    sueldo = sh.get_sueldo(level)
+    sueldo_gp, sueldo_dt = sh.get_sueldo(level)
 
     pj_coins = sh.get_pj_coins(pj_row)
     pp, gp, sp, cp, total = pj_coins
     
-    new_total_gp = total + sueldo
+    new_total_gp = total + sueldo_gp
     new_coins = utils.gp_to_coin_list(new_total_gp)
     pp, gp, sp, cp = new_coins
-    # sh.update_pj_coins(pj_row, [new_coins])
 
     pj_dt = sh.get_pj_data(pj_row, PJ_COL.Downtime)
-   
-    new_total_dt = pj_dt+14
+    new_total_dt = pj_dt+sueldo_dt
 
     sh.update_pj_data_cell(pj_row, PJ_COL.Downtime, [[new_total_dt, pp, gp, sp, cp]])
 
-    return await interaction.send(f"{pj_name}: Nivel {level} completado!\n Se te suma el sueldo del nivel: {sueldo}gp (ahora tienes {new_total_gp}gp)\n Se te suman 14 días de dt (ahora tienes {new_total_dt} dias de dt)")
+    return await interaction.send(f"{pj_name}: Nivel {level} completado!\n Se te suma el sueldo del nivel: {sueldo}gp (ahora tienes {new_total_gp}gp)\n Se te suman {sueldo_dt} días de dt (ahora tienes {new_total_dt} dias de dt)")
 
 bot.run(BOT_TOKEN)
