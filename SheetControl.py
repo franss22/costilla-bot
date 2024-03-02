@@ -8,12 +8,15 @@ from functools import wraps
 
 PJ_SHEET_ID = 0
 REPUTATION_SHEET_ID = 37818595
+SUELDO_SHEET_ID = 1681819644
 
 credentials = json.loads(getVar("GOOGLE"), strict=False)
 
 gc = gspread.service_account_from_dict(credentials)
 
 pj_sheet = gc.open("Megamarch").get_worksheet_by_id(PJ_SHEET_ID)
+rep_sheet = gc.open("Megamarch").get_worksheet_by_id(REPUTATION_SHEET_ID)
+sueldo_sheet = gc.open("Megamarch").get_worksheet_by_id(SUELDO_SHEET_ID)
 
 PJ_DATA = None
 def update_pj_data():
@@ -24,8 +27,11 @@ def gets_pj_data(func):
     @wraps(func)
     async def wrapped_func(*args, **kwargs):
         update_pj_data()
+        print("Updated PC data.")
         await func(*args, **kwargs)
     return wrapped_func
+
+
 
 class PJ_COL:
     Name = "A"
@@ -52,7 +58,9 @@ class PJ_COL:
     def has_value(cls, value):
         return value in cls.__dict__.values()
     
-def whole_column(column:str)->list[str]:
+
+    
+def whole_column_pj(column:str)->list[str]:
     c_index = PJ_COL.num(column)
 
     return [row[c_index] for row in PJ_DATA]
@@ -63,7 +71,7 @@ class CharacterNotFoundError(Exception):
 
 def get_pj_row(discord_id:int)->int:
     try:
-        column = whole_column(PJ_COL.Discord_id)
+        column = whole_column_pj(PJ_COL.Discord_id)
         id_row = column.index(str(discord_id))
         # index del primer valor con [discord_id] de todos los ids (+1 por 0 indexed)
         return id_row
@@ -71,9 +79,8 @@ def get_pj_row(discord_id:int)->int:
         raise CharacterNotFoundError(f"Character with discord ID '{discord_id}' was not found")
 
 def first_empty_PJ_row()->int:
-    column = whole_column(PJ_COL.Discord_id)
-    return column.index("")
-
+    column = whole_column_pj(PJ_COL.Discord_id)
+    return column.index("")+1
 
 def get_pj_data(pj_row:int, col:str)->str:
     try:
@@ -103,6 +110,62 @@ def update_pj_data_cell(pj_row:int, col:str, value):
 def update_pj_coins(row:int, values):
     pj_sheet.update(values, f"{PJ_COL.Money_pp}{row+1}:{PJ_COL.Money_total}{row+1}")
 
+
+
+REP_DATA = None
+def update_rep_data():
+    global REP_DATA
+    REP_DATA = rep_sheet.get_all_values(value_render_option="UNFORMATTED_VALUE")
+
+def gets_rep_data(func):
+    @wraps(func)
+    async def wrapped_func(*args, **kwargs):
+        update_rep_data()
+        print("Updated reputation data.")
+        await func(*args, **kwargs)
+    return wrapped_func
+
+class REP_COL:
+    Name = "A"
+    Discord_id = "B"
+    Faction = "C"
+    Reputation = "D"
+    
+    @classmethod
+    def num(cls, col:str):
+        return "ABCDEFGHIJKLMNO".index(col)
+    
+    @classmethod
+    def has_value(cls, value):
+        return value in cls.__dict__.values()
+    
+def first_empty_rep_row()->int:
+    column = whole_column_rep(REP_COL.Discord_id)
+    return len(column)+1
+
+def whole_column_rep(column:str)->list[str]:
+    c_index = REP_COL.num(column)
+
+    return [row[c_index] for row in REP_DATA]
+
+def get_pj_reps(discord_id:int):
+    discord_id = str(discord_id)
+    reps = [row+[REP_DATA.index(row)+1] for row in REP_DATA if row[REP_COL.num(REP_COL.Discord_id)] == discord_id]
+    return reps
+
+def update_rep_row(row_index:int, data:list):
+    rep_sheet.update([data], f"A{row_index}:D{row_index}")
+
+def get_pj_faction():
+    pass
+
+def get_all_existing_factions()->list[str]:
+    return set(whole_column_rep(REP_COL.Faction))
+
+def get_sueldo(level:int):
+    data = sueldo_sheet.get_all_values(value_render_option="UNFORMATTED_VALUE")
+    sueldo = data[level][2]
+    return float(sueldo)
 
 
 if __name__ == "__main__":

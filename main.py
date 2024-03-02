@@ -2,7 +2,8 @@ import nextcord
 from nextcord.ext import commands
 from varenv import getVar
 import SheetControl as sh
-from SheetControl import PJ_COL, gets_pj_data
+from SheetControl import PJ_COL, REP_COL, gets_pj_data, gets_rep_data
+from PF2eData import *
 import utils
 import json
 import dndice
@@ -41,113 +42,6 @@ updatereputation
 missioncomplete
 """
 
-RELIGIONS : list[str]= ["La Labor", "El Continuo", "El Camino", "La Prisión", "El Arquitecto", "El Potencial", "Ateo", "Otro"]
-
-LANGUAGES : list[str]= [
-    "Nemer", 
-    "Sval", 
-    "Derani", 
-    "Asthenial", 
-    "Àárâk", 
-    "Originario", 
-    "Jovian", 
-    "Lingua Franca", 
-    "Bíblico", 
-    "Ætérico", 
-    "Grimm", 
-    "Cthonico", 
-    "Assembly", 
-]
-
-CLASSES : list[str]= [
-    "Alchemist",
-    "Barbarian",
-    "Bard",
-    "Champion",
-    "Cleric",
-    "Druid",
-    "Fighter",
-    "Gunslinger",
-    "Inventor",
-    "Investigator",
-    "Kineticist",
-    "Magus",
-    "Monk",
-    "Oracle",
-    "Psychic",
-    "Ranger",
-    "Rogue",
-    "Sorcerer",
-    "Summoner",
-    "Swashbuckler",
-    "Thaumaturge",
-    "Witch",
-    "Wizard"
-]
-
-EARN_INCOME : dict = {
-#   lvl, dc,   fail, trnd, exprt, mstr, lgdry
-    0:  (14, [ 0.01, 0.05, 0.05, 0.05, 0.05]),
-    1:  (15, [ 0.02, 0.2,  0.2,  0.2,  0.2]),
-    2:  (16, [ 0.04, 0.3,  0.3,  0.3,  0.3]),
-    3:  (18, [ 0.08, 0.5,  0.5,  0.5,  0.5]),
-    4:  (19, [ 0.1,  0.7,  0.8,  0.8,  0.8]),
-    5:  (20, [ 0.2,  0.9,  1,    1,    1]),
-    6:  (22, [ 0.3,  1.5,  2,    2,    2]),
-    7:  (23, [ 0.4,  2,    2.5,  2.5,  2.5]),
-    8:  (24, [ 0.5,  2.5,  3,    3,    3]),
-    9:  (26, [ 0.6,  3,    4,    4,    4]),
-    10: (27, [ 0.7,  4,    5,    6,    6]),
-    11: (28, [ 0.8,  5,    6,    8,    8]),
-    12: (30, [ 0.9,  6,    8,    10,   10]),
-    13: (31, [ 1,    7,    10,   15,   15]),
-    14: (32, [ 1.5,  8,    15,   20,   20]),
-    15: (34, [ 2,    10,   20,   28,   28]),
-    16: (35, [ 2.5,  13,   25,   36,   40]),
-    17: (36, [ 3,    15,   30,   45,   55]),
-    18: (38, [ 4,    20,   45,   70,   90]),
-    19: (39, [ 6,    30,   60,   100,  130]),
-    20: (40, [ 8,    40,   75,   150,  200]),
-    21: (50, [ 0,    50,   90,   175,  300]),
-}
-
-ANCESTRIES : list[str]= ["Anadi",
-    "Android",
-    "Automaton",
-    "Azarketi",
-    "Catfolk",
-    "Conrasu",
-    "Dwarf",
-    "Elf",
-    "Fetchling",
-    "Fleshwarp",
-    "Ghoran",
-    "Gnoll",
-    "Gnome",
-    "Goblin",
-    "Goloma",
-    "Grippli",
-    "Halfling",
-    "Hobgoblin",
-    "Human",
-    "Kashrishi",
-    "Kitsune",
-    "Kobold",
-    "Leshy",
-    "Lizardfolk",
-    "Nagaji",
-    "Orc",
-    "Poppet",
-    "Ratfolk",
-    "Shisk",
-    "Shoony",
-    "Skeleton",
-    "Sprite",
-    "Strix",
-    "Tengu",
-    "Vanara",
-    "Vishkanya",
-    ]
 
 class HeritageDropdown(nextcord.ui.Select):
     Update_func = None
@@ -155,6 +49,7 @@ class HeritageDropdown(nextcord.ui.Select):
         heritages = HERITAGES[ancestry]
         self.Update_func = update_func
         options = [nextcord.SelectOption(label=h) for h in heritages]
+        options += [nextcord.SelectOption(label=h, description="(Heritage versátil)") for h in HERITAGES["Versatile"]]
         super().__init__(placeholder="Opciones de heritage", min_values=1, max_values=1, options=options)
 
     async def callback(self, interaction:nextcord.Interaction):
@@ -256,7 +151,9 @@ async def dt(interaction: nextcord.Interaction, amount:int):
 
 @bot.slash_command(description="Resta dinero de tu cuenta. Puedes transferir a otra persona.", guild_ids=[CRI_GUILD_ID])
 @gets_pj_data
-async def pay(interaction: nextcord.Interaction, amount: float, transfertarget:nextcord.Member= None):
+async def pay(interaction: nextcord.Interaction, 
+              amount: float = nextcord.SlashOption("money-gp", "Dinero restado a tu cuenta, en gp", True, min_value=0), 
+              transfertarget:nextcord.Member= nextcord.SlashOption("target-trasnferencia", "Usuario al que se le transfiere el dinero", False, default=None)):
     user_id:int = interaction.user.id
     target_id:int = transfertarget.id if transfertarget is not None else None
     try:
@@ -290,7 +187,9 @@ async def pay(interaction: nextcord.Interaction, amount: float, transfertarget:n
 
 @bot.slash_command(description="Suma dinero a tu cuenta.", guild_ids=[CRI_GUILD_ID])
 @gets_pj_data
-async def addmoney(interaction: nextcord.Interaction, amount: float, target:nextcord.Member= None):
+async def addmoney(interaction: nextcord.Interaction, 
+                   amount: float = nextcord.SlashOption("money-gp", "Dinero añadido a tu cuenta, en gp", True, min_value=0), 
+                   target:nextcord.Member= nextcord.SlashOption("target", "Usuario al que se le añade el dinero", False, default=None)):
     user_id:int = target.id if target is not None else interaction.user.id
     try:
         pj_row = sh.get_pj_row(user_id)
@@ -350,7 +249,7 @@ Trabajas {final_dt_usage} dias y obtienes {income} gp al día, por un total de {
 
 @bot.slash_command(description="Muestra la lista de tus lenguajes", guild_ids=[CRI_GUILD_ID])
 @gets_pj_data
-async def lenguajes(interaction: nextcord.Interaction, target:nextcord.Member=None):
+async def languages(interaction: nextcord.Interaction, target:nextcord.Member=None):
     user_id:int = target.id if target is not None else interaction.user.id
     try:
         pj_row:int = sh.get_pj_row(user_id)
@@ -368,7 +267,7 @@ async def lenguajes(interaction: nextcord.Interaction, target:nextcord.Member=No
 
 @bot.slash_command(description="Añade un lenguaje a la lista de tu PJ", guild_ids=[CRI_GUILD_ID])
 @gets_pj_data
-async def addlenguaje(interaction: nextcord.Interaction, addedlanguage= nextcord.SlashOption("lenguaje", "Lenguaje que quieres añadir a tu PJ", True, choices=LANGUAGES), target:nextcord.Member=None):
+async def addlanguage(interaction: nextcord.Interaction, addedlanguage= nextcord.SlashOption("lenguaje", "Lenguaje que quieres añadir a tu PJ", True, choices=LANGUAGES), target:nextcord.Member=None):
     user_id:int = target.id if target is not None else interaction.user.id
     try:
         pj_row:int = sh.get_pj_row(user_id)
@@ -376,27 +275,106 @@ async def addlenguaje(interaction: nextcord.Interaction, addedlanguage= nextcord
         pj_languages:str = sh.get_pj_data(pj_row, PJ_COL.Languages)
     except sh.CharacterNotFoundError:
         return await interaction.send("No se encontró un personaje con ID de discord correspondiente")
-    languages = [] if pj_languages is None else pj_languages.split(", ")
+    languages = [] if pj_languages in [None, ""] else pj_languages.split(", ")
     if addedlanguage not in languages:
         languages.append(addedlanguage)
         sh.update_pj_data_cell(pj_row, PJ_COL.Languages, [[", ".join(languages)]])
         return await interaction.send(f"{addedlanguage} ha sido añadido a la lista de {pj_name}.")
     else:
-        return await interaction.send(f"{addedlanguage} Ya está en la lista de {pj_name}.")
+        return await interaction.send(f"{addedlanguage} ya está en la lista de {pj_name}.")
 
 
 @bot.slash_command(description="Revisa tu reputación", guild_ids=[CRI_GUILD_ID])
-async def reputation(interaction: nextcord.Interaction, user:nextcord.Member=None):
-    pass
+@gets_rep_data
+async def reputation(interaction: nextcord.Interaction, target:nextcord.Member=None):
+    user_id:int = target.id if target is not None else interaction.user.id
+    reps:list = sh.get_pj_reps(user_id)
+    message = ""
+    print(reps)
+    if len(reps)>0:
+        message = f"# Reputación de {reps[0][REP_COL.num(REP_COL.Name)]}"
+        reps.sort(reverse=True, key=lambda r: r[REP_COL.num(REP_COL.Reputation)])
+        print(reps)
+
+        for rep in reps:
+            row_pj_name, row_discord_id, row_faction, row_reputation, row_index = rep
+            message += f"\n- {row_faction}: {row_reputation}"
+    else:
+        message = "Tu personaje no tiene reputación con ningún NPC ni facción."
+    return await interaction.send(message)
 
 
 @bot.slash_command(description="Actualiza tu reputación con una facción o NPC", guild_ids=[CRI_GUILD_ID])
-async def updatereputation(interaction: nextcord.Interaction, amount:int, faction:str, user:nextcord.Member=None):
-    pass
+@gets_rep_data
+@gets_pj_data
+async def updatereputation(interaction: nextcord.Interaction, amount:int, faction:str, target:nextcord.Member=None):
+    
+    user_id:int = target.id if target is not None else interaction.user.id
+
+    reps:list = sh.get_pj_reps(user_id)
+    rep_row = [row for row in reps if row[REP_COL.num(REP_COL.Faction)] == faction]
+
+    if len(rep_row):
+        # Add reptuation
+        row_pj_name, row_discord_id, row_faction, row_reputation, row_index = rep_row[0]
+        new_rep = row_reputation+amount
+        new_row = [row_pj_name, row_discord_id, row_faction, new_rep]
+        sh.update_rep_row(row_index, new_row)
+        await interaction.send(f"Actualizada la reputación de {row_pj_name} con {faction}: {row_reputation} -> {new_rep}")
+
+    else:
+        # Create new line
+        try:
+            pj_row = sh.get_pj_row(user_id)
+            pj_name = sh.get_pj_data(pj_row, PJ_COL.Name)
+        except sh.CharacterNotFoundError:
+            return await interaction.send("No se encontró un personaje con ID de discord correspondiente")
+        row_index = sh.first_empty_rep_row()
+        new_row = [pj_name, str(user_id), faction, amount]
+        print(new_row)
+        sh.update_rep_row(row_index, new_row)
+        await interaction.send(f"Creada la reputación de {pj_name} con {faction}: {amount}")
+        
+
+
+@updatereputation.on_autocomplete("faction")
+async def autocomplete_faction(interaction: nextcord.Interaction, faction: str):
+    filtered_ancestries = []
+    if faction:
+        if len(faction)==1:
+            sh.update_rep_data()
+            print("Updated rep data once")
+        filtered_ancestries = [a for a in sh.get_all_existing_factions() if a.lower().startswith(faction.lower())]
+    await interaction.response.send_autocomplete(filtered_ancestries)
+
 
 @bot.slash_command(description="Gana el downtime y dinero esperado de terminar una misión", guild_ids=[CRI_GUILD_ID])
 @gets_pj_data
-async def missioncomplete(interaction: nextcord.Interaction, level:int, user:nextcord.Member=None):
-    pass
+async def levelcomplete(interaction: nextcord.Interaction, level:int, target:nextcord.Member=None):
+    user_id:int = target.id if target is not None else interaction.user.id
+    try:
+        pj_row = sh.get_pj_row(user_id)
+        pj_name = sh.get_pj_data(pj_row, PJ_COL.Name)
+    except sh.CharacterNotFoundError:
+        return await interaction.send("No se encontró un personaje con ID de discord correspondiente")
+    
+
+    sueldo = sh.get_sueldo(level)
+
+    pj_coins = sh.get_pj_coins(pj_row)
+    pp, gp, sp, cp, total = pj_coins
+    
+    new_total_gp = total + sueldo
+    new_coins = utils.gp_to_coin_list(new_total_gp)
+    pp, gp, sp, cp = new_coins
+    # sh.update_pj_coins(pj_row, [new_coins])
+
+    pj_dt = sh.get_pj_data(pj_row, PJ_COL.Downtime)
+   
+    new_total_dt = pj_dt+14
+
+    sh.update_pj_data_cell(pj_row, PJ_COL.Downtime, [[new_total_dt, pp, gp, sp, cp]])
+
+    return await interaction.send(f"{pj_name}: Nivel {level} completado!\n Se te suma el sueldo del nivel: {sueldo}gp (ahora tienes {new_total_gp}gp)\n Se te suman 14 días de dt (ahora tienes {new_total_dt} dias de dt)")
 
 bot.run(BOT_TOKEN)

@@ -1,1 +1,302 @@
-{"Anadi": ["Adaptive Anadi", "Polychromatic Anadi", "Snaring Anadi", "Spindly Anadi", "Venomous Anadi"], "Android": ["Artisan Android", "Impersonator Android", "Laborer Android", "Polyglot Android", "Warrior Android"], "Automaton": ["Hunter Automaton", "Mage Automaton", "Warrior Automaton", "Sharpshooter Automaton"], "Azarketi": ["Ancient Scale Azarketi", "Benthic Azarketi", "Mistbreath Azarketi", "River Azarketi", "Thalassic Azarketi", "Inured Azarketi", "Murkeyed Azarketi", "Spined Azarketi", "Tactile Azarketi"], "Catfolk": ["Clawed Catfolk", "Hunting Catfolk", "Jungle Catfolk", "Nine Lives Catfolk", "Winter Catfolk", "Flexible Catfolk", "Liminal Catfolk", "Sharp-Eared Catfolk"], "Conrasu": ["Rite of Knowing", "Rite of Light", "Rite of Passage", "Rite of Reinforcement", "Rite of Invocation"], "Dwarf": ["Ancient-Blooded Dwarf", "Death Warden Dwarf", "Forge Dwarf", "Rock Dwarf", "Strong-Blooded Dwarf", "Anvil Dwarf", "Elemental Heart Dwarf", "Oathkeeper Dwarf"], "Elf": ["Arctic Elf", "Cavern Elf", "Seer Elf", "Whisper Elf", "Woodland Elf", "Ancient Elf", "Desert Elf"], "Fetchling": ["Bright Fetchling", "Deep Fetchling", "Liminal Fetchling", "Resolute Fetchling", "Wisp Fetchling"], "Fleshwarp": ["Created Fleshwarp", "Mutated Fleshwarp", "Shapewrought Fleshwarp", "Technological Fleshwarp", "Cataphract Fleshwarp", "Discarded Fleshwarp", "Surgewise Fleshwarp"], "Ghoran": ["Ancient Ash", "Enchanting Lily", "Strong Oak", "Thorned Rose"], "Gnoll": ["Ant Gnoll", "Great Gnoll", "Sweetbreath Gnoll", "Witch Gnoll"], "Gnome": ["Chameleon Gnome", "Fey-Touched Gnome", "Sensate Gnome", "Umbral Gnome", "Wellspring Gnome", "Vivacious Gnome"], "Goblin": ["Charhide Goblin", "Irongut Goblin", "Razortooth Goblin", "Snow Goblin", "Unbreakable Goblin", "Tailed Goblin", "Treedweller Goblin"], "Goloma": ["Farsight Goloma", "Frightful Goloma", "Insightful Goloma", "Vicious Goloma", "Vigilant Goloma"], "Grippli": ["Poisonhide Grippli", "Snaptongue Grippli", "Stickytoe Grippli", "Windweb Grippli"], "Halfling": ["Gutsy Halfling", "Hillock Halfling", "Nomadic Halfling", "Twilight Halfling", "Wildwood Halfling", "Observant Halfling"], "Hobgoblin": ["Elfbane Hobgoblin", "Runtboss Hobgoblin", "Smokeworker Hobgoblin", "Warmarch Hobgoblin", "Warrenbred Hobgoblin"], "Human": ["Half-Elf", "Half-Orc", "Skilled Heritage", "Versatile Heritage", "Wintertouched Heritage"], "Kashrishi": ["Athamasi", "Lethoci", "Nascent", "Trogloshi", "Xyloshi"], "Kitsune": ["Celestial Envoy Kitsune", "Dark Fields Kitsune", "Earthly Wilds Kitsune", "Empty Sky Kitsune", "Frozen Wind Kitsune"], "Kobold": ["Cavern Kobold", "Dragonscaled Kobold", "Spellscale Kobold", "Strongjaw Kobold", "Venomtail Kobold", "Caveclimber Kobold", "Tunnelflood Kobold"], "Leshy": ["Cactus Leshy", "Fruit Leshy", "Lotus Leshy", "Root Leshy", "Seaweed Leshy", "Fungus Leshy", "Gourd Leshy", "Leaf Leshy", "Vine Leshy"], "Lizardfolk": ["Cliffscale Lizardfolk", "Frilled Lizardfolk", "Sandstrider Lizardfolk", "Unseen Lizardfolk", "Wetlander Lizardfolk", "Cloudleaper Lizardfolk", "Woodstalker Lizardfolk"], "Nagaji": ["Hooded Nagaji", "Sacred Nagaji", "Titan Nagaji", "Venomshield Nagaji", "Whipfang Nagaji"], "Orc": ["Badlands Orc", "Deep Orc", "Hold-Scarred Orc", "Rainfall Orc", "Battle-Ready Orc", "Grave Orc", "Winter Orc"], "Poppet": ["Ghost Poppet", "Stuffed Poppet", "Toy Poppet", "Windup Poppet", "Wishborn Poppet"], "Ratfolk": ["Deep Rat", "Desert Rat", "Longsnout Rat", "Sewer Rat", "Shadow Rat", "Snow Rat", "Tunnel Rat"], "Shisk": ["Lorekeeper Shisk", "Quillcoat Shisk", "Spellkeeper Shisk", "Stronggut Shisk", "Stonestep Shisk"], "Shoony": ["Bloodhound Shoony", "Fishseeker Shoony", "Paddler Shoony", "Thickcoat Shoony"], "Skeleton": ["Fodder Skeleton", "Compact Skeleton", "Sturdy Skeleton", "Monstrous Skeleton"], "Sprite": ["Draxie", "Grig", "Luminous Sprite", "Melixie", "Nyktera", "Pixie"], "Strix": ["Nightglider Strix", "Predator Strix", "Scavenger Strix", "Shoreline Strix", "Songbird Strix"], "Tengu": ["Jinxed Tengu", "Mountainkeeper Tengu", "Skyborn Tengu", "Stormtossed Tengu", "Taloned Tengu", "Dogtooth Tengu", "Wavediver Tengu"], "Vanara": ["Bandaagee Vanara", "Lahkgyan Vanara", "Ragdyan Vanara", "Wajaghand Vanara"], "Vishkanya": ["Elusive Vishkanya", "Keen-Venom Vishkanya", "Old-Blood Vishkanya", "Prismatic Vishkanya", "Scalekeeper Vishkanya", "Venom-Resistant"]}
+{
+    "Anadi": [
+        "Adaptive Anadi",
+        "Polychromatic Anadi",
+        "Snaring Anadi",
+        "Spindly Anadi",
+        "Venomous Anadi"
+    ],
+    "Android": [
+        "Artisan Android",
+        "Impersonator Android",
+        "Laborer Android",
+        "Polyglot Android",
+        "Warrior Android"
+    ],
+    "Automaton": [
+        "Hunter Automaton",
+        "Mage Automaton",
+        "Warrior Automaton",
+        "Sharpshooter Automaton"
+    ],
+    "Azarketi": [
+        "Ancient Scale Azarketi",
+        "Benthic Azarketi",
+        "Mistbreath Azarketi",
+        "River Azarketi",
+        "Thalassic Azarketi",
+        "Inured Azarketi",
+        "Murkeyed Azarketi",
+        "Spined Azarketi",
+        "Tactile Azarketi"
+    ],
+    "Catfolk": [
+        "Clawed Catfolk",
+        "Hunting Catfolk",
+        "Jungle Catfolk",
+        "Nine Lives Catfolk",
+        "Winter Catfolk",
+        "Flexible Catfolk",
+        "Liminal Catfolk",
+        "Sharp-Eared Catfolk"
+    ],
+    "Conrasu": [
+        "Rite of Knowing",
+        "Rite of Light",
+        "Rite of Passage",
+        "Rite of Reinforcement",
+        "Rite of Invocation"
+    ],
+    "Dwarf": [
+        "Ancient-Blooded Dwarf",
+        "Death Warden Dwarf",
+        "Forge Dwarf",
+        "Rock Dwarf",
+        "Strong-Blooded Dwarf",
+        "Anvil Dwarf",
+        "Elemental Heart Dwarf",
+        "Oathkeeper Dwarf"
+    ],
+    "Elf": [
+        "Arctic Elf",
+        "Cavern Elf",
+        "Seer Elf",
+        "Whisper Elf",
+        "Woodland Elf",
+        "Ancient Elf",
+        "Desert Elf"
+    ],
+    "Fetchling": [
+        "Bright Fetchling",
+        "Deep Fetchling",
+        "Liminal Fetchling",
+        "Resolute Fetchling",
+        "Wisp Fetchling"
+    ],
+    "Fleshwarp": [
+        "Created Fleshwarp",
+        "Mutated Fleshwarp",
+        "Shapewrought Fleshwarp",
+        "Technological Fleshwarp",
+        "Cataphract Fleshwarp",
+        "Discarded Fleshwarp",
+        "Surgewise Fleshwarp"
+    ],
+    "Ghoran": [
+        "Ancient Ash",
+        "Enchanting Lily",
+        "Strong Oak",
+        "Thorned Rose"
+    ],
+    "Gnoll": [
+        "Ant Gnoll",
+        "Great Gnoll",
+        "Sweetbreath Gnoll",
+        "Witch Gnoll"
+    ],
+    "Gnome": [
+        "Chameleon Gnome",
+        "Fey-Touched Gnome",
+        "Sensate Gnome",
+        "Umbral Gnome",
+        "Wellspring Gnome",
+        "Vivacious Gnome"
+    ],
+    "Goblin": [
+        "Charhide Goblin",
+        "Irongut Goblin",
+        "Razortooth Goblin",
+        "Snow Goblin",
+        "Unbreakable Goblin",
+        "Tailed Goblin",
+        "Treedweller Goblin"
+    ],
+    "Goloma": [
+        "Farsight Goloma",
+        "Frightful Goloma",
+        "Insightful Goloma",
+        "Vicious Goloma",
+        "Vigilant Goloma"
+    ],
+    "Grippli": [
+        "Poisonhide Grippli",
+        "Snaptongue Grippli",
+        "Stickytoe Grippli",
+        "Windweb Grippli"
+    ],
+    "Halfling": [
+        "Gutsy Halfling",
+        "Hillock Halfling",
+        "Nomadic Halfling",
+        "Twilight Halfling",
+        "Wildwood Halfling",
+        "Observant Halfling"
+    ],
+    "Hobgoblin": [
+        "Elfbane Hobgoblin",
+        "Runtboss Hobgoblin",
+        "Smokeworker Hobgoblin",
+        "Warmarch Hobgoblin",
+        "Warrenbred Hobgoblin"
+    ],
+    "Human": [
+        "Half-Elf",
+        "Half-Orc",
+        "Skilled Heritage",
+        "Versatile Heritage",
+        "Wintertouched Heritage"
+    ],
+    "Kashrishi": [
+        "Athamasi",
+        "Lethoci",
+        "Nascent",
+        "Trogloshi",
+        "Xyloshi"
+    ],
+    "Kitsune": [
+        "Celestial Envoy Kitsune",
+        "Dark Fields Kitsune",
+        "Earthly Wilds Kitsune",
+        "Empty Sky Kitsune",
+        "Frozen Wind Kitsune"
+    ],
+    "Kobold": [
+        "Cavern Kobold",
+        "Dragonscaled Kobold",
+        "Spellscale Kobold",
+        "Strongjaw Kobold",
+        "Venomtail Kobold",
+        "Caveclimber Kobold",
+        "Tunnelflood Kobold"
+    ],
+    "Leshy": [
+        "Cactus Leshy",
+        "Fruit Leshy",
+        "Lotus Leshy",
+        "Root Leshy",
+        "Seaweed Leshy",
+        "Fungus Leshy",
+        "Gourd Leshy",
+        "Leaf Leshy",
+        "Vine Leshy"
+    ],
+    "Lizardfolk": [
+        "Cliffscale Lizardfolk",
+        "Frilled Lizardfolk",
+        "Sandstrider Lizardfolk",
+        "Unseen Lizardfolk",
+        "Wetlander Lizardfolk",
+        "Cloudleaper Lizardfolk",
+        "Woodstalker Lizardfolk"
+    ],
+    "Nagaji": [
+        "Hooded Nagaji",
+        "Sacred Nagaji",
+        "Titan Nagaji",
+        "Venomshield Nagaji",
+        "Whipfang Nagaji"
+    ],
+    "Orc": [
+        "Badlands Orc",
+        "Deep Orc",
+        "Hold-Scarred Orc",
+        "Rainfall Orc",
+        "Battle-Ready Orc",
+        "Grave Orc",
+        "Winter Orc"
+    ],
+    "Poppet": [
+        "Ghost Poppet",
+        "Stuffed Poppet",
+        "Toy Poppet",
+        "Windup Poppet",
+        "Wishborn Poppet"
+    ],
+    "Ratfolk": [
+        "Deep Rat",
+        "Desert Rat",
+        "Longsnout Rat",
+        "Sewer Rat",
+        "Shadow Rat",
+        "Snow Rat",
+        "Tunnel Rat"
+    ],
+    "Shisk": [
+        "Lorekeeper Shisk",
+        "Quillcoat Shisk",
+        "Spellkeeper Shisk",
+        "Stronggut Shisk",
+        "Stonestep Shisk"
+    ],
+    "Shoony": [
+        "Bloodhound Shoony",
+        "Fishseeker Shoony",
+        "Paddler Shoony",
+        "Thickcoat Shoony"
+    ],
+    "Skeleton": [
+        "Fodder Skeleton",
+        "Compact Skeleton",
+        "Sturdy Skeleton",
+        "Monstrous Skeleton"
+    ],
+    "Sprite": [
+        "Draxie",
+        "Grig",
+        "Luminous Sprite",
+        "Melixie",
+        "Nyktera",
+        "Pixie"
+    ],
+    "Strix": [
+        "Nightglider Strix",
+        "Predator Strix",
+        "Scavenger Strix",
+        "Shoreline Strix",
+        "Songbird Strix"
+    ],
+    "Tengu": [
+        "Jinxed Tengu",
+        "Mountainkeeper Tengu",
+        "Skyborn Tengu",
+        "Stormtossed Tengu",
+        "Taloned Tengu",
+        "Dogtooth Tengu",
+        "Wavediver Tengu"
+    ],
+    "Vanara": [
+        "Bandaagee Vanara",
+        "Lahkgyan Vanara",
+        "Ragdyan Vanara",
+        "Wajaghand Vanara"
+    ],
+    "Vishkanya": [
+        "Elusive Vishkanya",
+        "Keen-Venom Vishkanya",
+        "Old-Blood Vishkanya",
+        "Prismatic Vishkanya",
+        "Scalekeeper Vishkanya",
+        "Venom-Resistant"
+    ],
+    "Versatile": [
+        "Aiuvarin",
+        "Dromaar",
+        "Aphorite",
+        "Ardande",
+        "Changeling",
+        "Custom Mixed Heritage",
+        "Dhampir",
+        "Duskwalker",
+        "Ganzi",
+        "Ifrit",
+        "Nephilim",
+        "Oread",
+        "Suli",
+        "Sylph",
+        "Talos",
+        "Undine",
+        "Beastkin",
+        "Reflection"
+    ]
+
+}
