@@ -40,7 +40,7 @@ async def registrar(interaction: nextcord.Interaction, nombre_pj:str, nombre_jug
 
 @bot.slash_command(description="Entrega la info de tu personaje", guild_ids=[CRI_GUILD_ID])
 @gets_pj_data
-async def resumen(interaction: nextcord.Interaction, user:nextcord.Member = None):
+async def resumen(interaction: nextcord.Interaction, full_data:bool=False, user:nextcord.Member = None):
     user_id:int = interaction.user.id if user is None else user.id
     try:
         pj_row = sh.get_pj_row(user_id)
@@ -48,7 +48,7 @@ async def resumen(interaction: nextcord.Interaction, user:nextcord.Member = None
         return await interaction.send("No se encontró un personaje con ID de discord correspondiente")
     data = sh.get_pj_full(pj_row)
     print(data)
-    Name, Id, Player, Tier, Levels, Race, Subrace, Alignment, height, weight, age, pp, gp, ep, sp, cp, total, renombre, deidad, piedad, downtime= data
+    Name, Id, Player, Tier, Levels, Race, Subrace, Alignment, height, weight, age, pp, gp, ep, sp, cp, total, renombre, deidad, piedad, downtime, divinefavor, reputacion, crianza, expresion, infamia= data
     Dt = int(downtime)
     message = f"""# Status de {Name}, Tier {Tier}
 - Jugador: {Player}
@@ -58,6 +58,14 @@ async def resumen(interaction: nextcord.Interaction, user:nextcord.Member = None
 - Renombre: {renombre}
 - Dinero: {pp}pp, {gp}gp, {ep}ep, {sp}sp, {cp}cp, **Total: {total}gp**
 - Downtime: {Dt//1} semanas y {Dt*10//10} dias
+"""
+    if full_data:
+        message +=f""""
+- Favor divino: {divinefavor}
+- Reputación: {reputacion}
+- Crianza: {crianza}
+- Expresión: {expresion}
+- Infamia: {infamia}
 """
     return await interaction.send(message)
 
@@ -145,25 +153,66 @@ async def añadirdinero(interaction: nextcord.Interaction, amount: float, user:n
     return await interaction.send(f"{pj_name} obtiene {amount}gp. Ahora tiene {pp}pp, {gp}gp, {ep}ep, {sp}sp, {cp}cp, **Total: {new_total:.2f}gp**")
 
 
-@bot.slash_command(description="Revisa tu reputación", guild_ids=[CRI_GUILD_ID])
+
+
+def simple_value_update_command(value_row:str, value_name:str):
+    async def command(interaction: nextcord.Interaction, amount:int=0, user:nextcord.Member=None):
+        user_id:int = interaction.user.id if user == None else user.id
+
+        try:
+            pj_row = sh.get_pj_row(user_id)
+            pj_name = sh.get_pj_data(pj_row, PJ_COL.Personaje)
+        except sh.CharacterNotFoundError:
+            return await interaction.send("No se encontró un personaje con ID de discord correspondiente")
+
+        pj_value = sh.get_pj_data(pj_row, value_row)
+        pj_value = 0 if pj_value == '' else int(pj_value)
+        if amount == 0:
+            return await interaction.send(f"{pj_name} tiene {amount} de {value_name}.")
+        else:
+            new_value = pj_value+amount
+            sh.update_pj_data_cell(pj_row, value_row, [[new_value]])
+
+            return await interaction.send(f"{pj_name} {"gana" if amount>0 else "pierde"} {amount} de {value_name}. Ahora tiene {new_value}.")
+    return command
+
+
+
+@bot.slash_command(description="Revisa o actualiza tu renombre", guild_ids=[CRI_GUILD_ID])
 @gets_pj_data
 async def renombre(interaction: nextcord.Interaction, amount:int, user:nextcord.Member=None):
-    user_id:int = interaction.user.id if user == None else user.id
+    command = simple_value_update_command(PJ_COL.Renombre, "renombre")
+    return command(interaction, amount, user)
 
-    try:
-        pj_row = sh.get_pj_row(user_id)
-        pj_name = sh.get_pj_data(pj_row, PJ_COL.Personaje)
-    except sh.CharacterNotFoundError:
-        return await interaction.send("No se encontró un personaje con ID de discord correspondiente")
+@bot.slash_command(description="Revisa o actualiza tu favor divino", guild_ids=[CRI_GUILD_ID])
+@gets_pj_data
+async def favordivino(interaction: nextcord.Interaction, amount:int, user:nextcord.Member=None):
+    command = simple_value_update_command(PJ_COL.Renombre, "renombre")
+    return command(interaction, amount, user)
 
-    pj_renown = sh.get_pj_data(pj_row, PJ_COL.Renombre)
-    pj_renown = 0 if pj_renown == '' else int(pj_renown)
-    
-    new_total = pj_renown+amount
+@bot.slash_command(description="Revisa o actualiza tu reputación", guild_ids=[CRI_GUILD_ID])
+@gets_pj_data
+async def reputacion(interaction: nextcord.Interaction, amount:int, user:nextcord.Member=None):
+    command = simple_value_update_command(PJ_COL.Reputacion, "reputación")
+    return command(interaction, amount, user)
 
-    sh.update_pj_data_cell(pj_row, PJ_COL.Renombre, [[new_total]])
+@bot.slash_command(description="Revisa o actualiza tu crianza", guild_ids=[CRI_GUILD_ID])
+@gets_pj_data
+async def reputacion(interaction: nextcord.Interaction, amount:int, user:nextcord.Member=None):
+    command = simple_value_update_command(PJ_COL.Crianza, "crianza")
+    return command(interaction, amount, user)
 
-    return await interaction.send(f"{pj_name} {"gana" if amount>0 else "pierde"} {amount} de renombre. Ahora tiene {new_total}.")
+@bot.slash_command(description="Revisa o actualiza tu expresión", guild_ids=[CRI_GUILD_ID])
+@gets_pj_data
+async def expresion(interaction: nextcord.Interaction, amount:int, user:nextcord.Member=None):
+    command = simple_value_update_command(PJ_COL.Expresion, "expresión")
+    return command(interaction, amount, user)
+
+@bot.slash_command(description="Revisa o actualiza tu infamia", guild_ids=[CRI_GUILD_ID])
+@gets_pj_data
+async def expresion(interaction: nextcord.Interaction, amount:int, user:nextcord.Member=None):
+    command = simple_value_update_command(PJ_COL.Infamia, "infamia")
+    return command(interaction, amount, user)
 
 @bot.slash_command(description="Gana el downtime y dinero esperado de terminar una misión", guild_ids=[CRI_GUILD_ID])
 @gets_pj_data

@@ -49,6 +49,11 @@ class PJ_COL:
     Deidad = "S"
     Cantidad = "T"
     Downtime = "U"
+    DivineFavor = "V"
+    Reputacion = "W"
+    Crianza = "X"
+    Expresion = "Y"
+    Infamia = "Z"
     
     @classmethod
     def num(cls, col:str):
@@ -92,7 +97,7 @@ def get_pj_data(pj_row:int, col:str)->str:
 
 
 def get_pj_full(row:int)->list[str]:
-    return PJ_DATA[row][:PJ_COL.num(PJ_COL.Downtime)+1]
+    return PJ_DATA[row][:PJ_COL.num(PJ_COL.Infamia)+1]
 
 def get_pj_coins(row:int)->list[float]:
     pp = PJ_COL.num(PJ_COL.money_pp)
