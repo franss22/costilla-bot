@@ -173,7 +173,7 @@ def simple_value_update_command(value_row:str, value_name:str):
             new_value = pj_value+amount
             sh.update_pj_data_cell(pj_row, value_row, [[new_value]])
 
-            return await interaction.send(f"{pj_name} {"gana" if amount>0 else "pierde"} {amount} de {value_name}. Ahora tiene {new_value}.")
+            return await interaction.send(f"{pj_name} {"gana" if amount>0 else "pierde"} {abs(amount)} de {value_name}. Ahora tiene {new_value}.")
     return command
 
 
