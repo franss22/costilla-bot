@@ -57,7 +57,7 @@ class PJ_COL:
     
     @classmethod
     def num(cls, col:str):
-        return "ABCDEFGHIJKLMNOPQRSTU".index(col)
+        return "ABCDEFGHIJKLMNOPQRSTUVWXYZ".index(col)
     
     @classmethod
     def has_value(cls, value):

@@ -60,7 +60,7 @@ async def resumen(interaction: nextcord.Interaction, full_data:bool=False, user:
 - Downtime: {Dt//1} semanas y {Dt*10//10} dias
 """
     if full_data:
-        message +=f""""
+        message +=f"""
 - Favor divino: {divinefavor}
 - Reputación: {reputacion}
 - Crianza: {crianza}
@@ -182,37 +182,37 @@ def simple_value_update_command(value_row:str, value_name:str):
 @gets_pj_data
 async def renombre(interaction: nextcord.Interaction, amount:int, user:nextcord.Member=None):
     command = simple_value_update_command(PJ_COL.Renombre, "renombre")
-    return command(interaction, amount, user)
+    return await command(interaction, amount, user)
 
 @bot.slash_command(description="Revisa o actualiza tu favor divino", guild_ids=[CRI_GUILD_ID])
 @gets_pj_data
 async def favordivino(interaction: nextcord.Interaction, amount:int, user:nextcord.Member=None):
-    command = simple_value_update_command(PJ_COL.Renombre, "renombre")
-    return command(interaction, amount, user)
+    command = simple_value_update_command(PJ_COL.DivineFavor, "favor divino")
+    return await command(interaction, amount, user)
 
 @bot.slash_command(description="Revisa o actualiza tu reputación", guild_ids=[CRI_GUILD_ID])
 @gets_pj_data
 async def reputacion(interaction: nextcord.Interaction, amount:int, user:nextcord.Member=None):
     command = simple_value_update_command(PJ_COL.Reputacion, "reputación")
-    return command(interaction, amount, user)
+    return await command(interaction, amount, user)
 
 @bot.slash_command(description="Revisa o actualiza tu crianza", guild_ids=[CRI_GUILD_ID])
 @gets_pj_data
-async def reputacion(interaction: nextcord.Interaction, amount:int, user:nextcord.Member=None):
+async def crianza(interaction: nextcord.Interaction, amount:int, user:nextcord.Member=None):
     command = simple_value_update_command(PJ_COL.Crianza, "crianza")
-    return command(interaction, amount, user)
+    return await command(interaction, amount, user)
 
 @bot.slash_command(description="Revisa o actualiza tu expresión", guild_ids=[CRI_GUILD_ID])
 @gets_pj_data
 async def expresion(interaction: nextcord.Interaction, amount:int, user:nextcord.Member=None):
     command = simple_value_update_command(PJ_COL.Expresion, "expresión")
-    return command(interaction, amount, user)
+    return await command(interaction, amount, user)
 
 @bot.slash_command(description="Revisa o actualiza tu infamia", guild_ids=[CRI_GUILD_ID])
 @gets_pj_data
-async def expresion(interaction: nextcord.Interaction, amount:int, user:nextcord.Member=None):
+async def infamia(interaction: nextcord.Interaction, amount:int, user:nextcord.Member=None):
     command = simple_value_update_command(PJ_COL.Infamia, "infamia")
-    return command(interaction, amount, user)
+    return await command(interaction, amount, user)
 
 @bot.slash_command(description="Gana el downtime y dinero esperado de terminar una misión", guild_ids=[CRI_GUILD_ID])
 @gets_pj_data
