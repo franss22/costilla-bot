@@ -4,30 +4,6 @@ import random
 def sign(num):
     return 1 if num >= 0 else -1
 
-def level_xp(xp:int):
-    xp = int(xp)
-    xp_table = enumerate([0,300,900,2700,6500,14000,23000,34000,48000,64000,85000,100000,120000,140000,165000,195000,225000,265000,305000,355000])
-    level = 20
-    missing_xp = -1
-    for i, n in xp_table:
-        if xp < n:
-            level = i
-            missing_xp = n-xp
-            break
-    return level, missing_xp
-
-def shop_income_base(tier:int):
-    inc = [0, 200, 400, 550, 750, 2150, 2800, 3350, 3800, 8750, 11900, 13000, 50000]
-    return inc[int(tier)]
-
-def shop_passive_income():
-    mults = [-3,-1.5,-1.5,-1.5,-1.5,-1.5,-1.5,-1.5,-1.5,-1.5,-1.5,-1.5,-1.5,-1.5,-1.5,-1.5,-1.5,-1.5,-1.5,-1.5,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-0.5,-0.5,-0.5,-0.5,-0.5,-0.5,-0.5,-0.5,-0.5,-0.5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,2.5,5]
-    return random.choice(mults)
-
-def shop_active_income():
-    mults = [-12,-4.8,-4.8,-4.8,-4.8,-4.8,-4.8,-4.8,-4.8,-4.8,-4.8,-4.8,-4.8,-4.8,-4.8,-4.8,-4.8,-4.8,-4.8,-4.8,-3.6,-3.6,-3.6,-3.6,-3.6,-3.6,-3.6,-3.6,-3.6,-3.6,-2.4,-2.4,-2.4,-2.4,-2.4,-2.4,-2.4,-2.4,-2.4,-2.4,-1.2,-1.2,-1.2,-1.2,-1.2,-1.2,-1.2,-1.2,-1.2,-1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,1.2,3,3,3,3,3,3,3,3,3,3,6,6,6,6,6,6,6,6,6,6,7.2,7.2,7.2,7.2,7.2,7.2,7.2,7.2,7.2,7.2,8.4,8.4,8.4,8.4,8.4,8.4,8.4,8.4,8.4,12]
-    return random.choice(mults)
-
 
 def gp_to_coin_list(num: float):
 
@@ -44,10 +20,10 @@ def gp_to_coin_list(num: float):
 def check_results(DC, result, dice):
     CHECK_RESULTS = {
     -1:0,
-    0:0,
-    1:1,
-    2:2,
-    3:3,
+    0:0, # crit fail
+    1:1, # fail
+    2:2, # success
+    3:3, # crit success
     4:3
 }
     return CHECK_RESULTS[((0 if result<=DC-10 else (1 if result<DC else (2 if result<DC+10 else 3))) + (1 if dice==20 else 0) - (1 if dice==1 else 0))]
@@ -60,7 +36,7 @@ def pay_priority(coins, paid_amt: float):
     price = gp_to_coin_list(paid_amt, with_electrum=True)
     # pagamos de las monedas mas caras a las mas baratas
     old = [int(float(x)) for x in coins]
-    vals = [10, 2, 5, 10]
+    vals = [10, 10, 10, 10]
 
     resta = [old[i]-price[i] for i in range(5)]
 
@@ -102,28 +78,3 @@ def renown_tier(renown_val: int):
         return 1
     else:
         return 0
-
-
-class FACTION:
-    @classmethod
-    def has_value(cls, value):
-        return value in cls.__dict__.values()
-
-    dinastia    = "Dinastía Li Hei"
-    principado  = "Principado Infernal"
-    conclave    = "Conclave de la Raiz"
-    corona      = "Corona de la Orden"
-    
-    dinastia_short    = "dinastia"
-    principado_short  = "principado"
-    conclave_short    = "conclave"
-    corona_short      = "corona"
-
-    @classmethod
-    def full_name(cls, short_name: str):
-        return {
-            "principado": cls.principado,
-            "dinastia": cls.dinastia,
-            "conclave": cls.conclave,
-            "corona": cls.corona
-        }[short_name]
