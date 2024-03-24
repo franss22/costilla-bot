@@ -1,5 +1,5 @@
-import nextcord
-from nextcord.ext import commands
+import nextcord  # type: ignore
+from nextcord.ext import commands  # type: ignore
 from varenv import getVar
 import SheetControl as sh
 from SheetControl import PJ_COL, REP_COL, gets_pj_data, gets_rep_data
@@ -8,7 +8,8 @@ import utils
 import json
 import dndice  # type: ignore
 import logging
-from typing import Callable
+from typing import Callable, Any
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -22,7 +23,7 @@ with open("Ancestries.json") as f:
 
 
 @bot.event
-async def on_ready():
+async def on_ready() -> None:
     print(f"We have logged in as {bot.user}")
 
 
@@ -34,12 +35,14 @@ default_user_option = nextcord.SlashOption(
 )
 
 
-class HeritageDropdown(nextcord.ui.Select):
-    Update_func: Callable | None = None
+class HeritageDropdown(nextcord.ui.Select):  # type: ignore
+    Update_func: Callable[[nextcord.Interaction, str], Any]
 
-    def __init__(self, ancestry: str, update_func: Callable):
+    def __init__(self, ancestry: str, update_func: Callable[[nextcord.Interaction, str], Any]):
         heritages: list[str] = HERITAGES[ancestry]
-        self.Update_func: Callable = update_func
+        self.Update_func: Callable[[
+            nextcord.Interaction, str], Any] = update_func
+
         options = [nextcord.SelectOption(label=h) for h in heritages]
         options += [
             nextcord.SelectOption(label=h, description="(Heritage versátil)")
@@ -52,11 +55,10 @@ class HeritageDropdown(nextcord.ui.Select):
             options=options,
         )
 
-    async def callback(self: HeritageDropdown, interaction: nextcord.Interaction):
-        selected = self.values[0]
+    async def callback(self: HeritageDropdown, interaction: nextcord.Interaction) -> None:
+        selected: str = self.values[0]
         try:
             assert self.view is not None
-            assert self.Update_func is not None
         except AssertionError as e:
             return
         self.view.stop()
@@ -94,7 +96,7 @@ async def register(
         required=True,
         choices=RELIGIONS,
     ),
-):
+) -> Any:
     # Conseguir el ID del usuario
     try:
         assert interaction.user is not None
@@ -118,7 +120,7 @@ async def register(
 
     # Generar stats base (0 de dt, 15 de gp)
     # [nombre, id, jugador, clase, Arquetipos, ascendencia, heritage, dt, pp, gp, sp, cp, total, lenguajes, religión]
-    async def update_func(interaction: nextcord.Interaction, selected_heritage: str):
+    async def update_func(interaction: nextcord.Interaction, selected_heritage: str) -> Any:
         values = [
             nombre_pj,
             str(user_id),
@@ -146,7 +148,7 @@ async def register(
 
 
 @register.on_autocomplete("ascendencia")
-async def autocomplete_ancestry(interaction: nextcord.Interaction, ancestry: str):
+async def autocomplete_ancestry(interaction: nextcord.Interaction, ancestry: str) -> Any:
     filtered_ancestries = []
     if ancestry:
         filtered_ancestries = [
@@ -161,7 +163,7 @@ async def autocomplete_ancestry(interaction: nextcord.Interaction, ancestry: str
 @gets_pj_data
 async def status(
     interaction: nextcord.Interaction, user: nextcord.Member = default_user_option
-):
+) -> Any:
     try:
         assert interaction.user is not None
     except AssertionError as e:
@@ -207,7 +209,7 @@ async def status(
     description="Cambia el Downtime de tu personaje", guild_ids=[CRI_GUILD_ID]
 )
 @gets_pj_data
-async def dt(interaction: nextcord.Interaction, amount: int):
+async def dt(interaction: nextcord.Interaction, amount: int) -> Any:
     try:
         assert interaction.user is not None
     except AssertionError as e:
@@ -253,24 +255,23 @@ async def pay(
         False,
         default=None,
     ),
-):
+) -> Any:
     try:
         assert interaction.user is not None
     except AssertionError as e:
         return await interaction.send("Error: Null user")
     user_id: int = interaction.user.id
 
-    target_id: int = transfertarget.id if transfertarget is not None else None
     try:
-        pj_row = sh.get_pj_row(user_id)
-        pj_name = sh.get_pj_data(pj_row, PJ_COL.Name)
-        target_pj_row = sh.get_pj_row(
-            target_id) if transfertarget is not None else None
-        target_pj_name = (
-            sh.get_pj_data(target_pj_row, PJ_COL.Name)
-            if transfertarget is not None
-            else None
-        )
+        pj_row: int = sh.get_pj_row(user_id)
+        pj_name: str = sh.get_pj_data(pj_row, PJ_COL.Name)
+        if transfertarget is not None:
+            target_id: int = transfertarget.id
+            target_pj_row: int = sh.get_pj_row(target_id)
+            target_pj_name: str = sh.get_pj_data(target_pj_row, PJ_COL.Name)
+        else:
+            target_pj_row = target_pj_name = None
+
     except sh.CharacterNotFoundError:
         return await interaction.send(
             "No se encontró un personaje con ID de discord correspondiente"
@@ -278,7 +279,7 @@ async def pay(
     if amount < 0:
         return await interaction.send("Debes pagar una cantidad positiva de dinero")
 
-    pj_coins = sh.get_pj_coins(pj_row)
+    pj_coins: list[float] = sh.get_pj_coins(pj_row)
     pp, gp, sp, cp, total = pj_coins
     if total - amount < 0:
         return await interaction.send(
@@ -286,11 +287,11 @@ async def pay(
         )
 
     new_total = total - amount
-    new_coins = utils.gp_to_coin_list(new_total)
+    new_coins: list[int] = utils.gp_to_coin_list(new_total)
     pp, gp, sp, cp = new_coins
     sh.update_pj_coins(pj_row, [new_coins])
 
-    if transfertarget is not None:
+    if transfertarget is not None and target_pj_row is not None:
         target_coins = sh.get_pj_coins(target_pj_row)
         pp, gp, sp, cp, total = target_coins
         new_total_target = total + amount
@@ -314,7 +315,7 @@ async def addmoney(
     target: nextcord.Member = nextcord.SlashOption(
         "usuario-target", "Usuario al que se le añade el dinero", False, default=None
     ),
-):
+) -> Any:
     try:
         assert interaction.user is not None
     except AssertionError as e:
@@ -370,14 +371,14 @@ async def earnincome(
     dcChange: int = nextcord.SlashOption(
         "dc-adjustment", "Cambios al DC impuestos por el DM", False, default=0
     ),
-):
+) -> Any:
     dice = dndice.basic("1d20")
     check_value = dice + checkBonus
     DC = EARN_INCOME[taskLevel][0] + dcChange
     check_result = utils.check_results(DC, check_value, dice)
     prof_column = ["Trained", "Expert", "Master",
                    "Legendary"].index(profLevel) + 1
-    income:float
+    income: float
 
     if check_result == 0:
         # crit failure
@@ -409,7 +410,7 @@ Trabajas {final_dt_usage} dias y obtienes {income:.2f} gp al día, por un total 
 @gets_pj_data
 async def languages(
     interaction: nextcord.Interaction, target: nextcord.Member = default_user_option
-):
+) -> Any:
     try:
         assert interaction.user is not None
     except AssertionError as e:
@@ -439,11 +440,11 @@ async def languages(
 @gets_pj_data
 async def addlanguage(
     interaction: nextcord.Interaction,
-    addedlanguage=nextcord.SlashOption(
+    addedlanguage: str = nextcord.SlashOption(
         "lenguaje", "Lenguaje que quieres añadir a tu PJ", True, choices=LANGUAGES
     ),
     target: nextcord.Member = default_user_option,
-):
+) -> Any:
     try:
         assert interaction.user is not None
     except AssertionError as e:
@@ -475,13 +476,13 @@ async def addlanguage(
 @gets_rep_data
 async def reputation(
     interaction: nextcord.Interaction, target: nextcord.Member = default_user_option
-):
+) -> Any:
     try:
         assert interaction.user is not None
     except AssertionError as e:
         return await interaction.send("Error: Null user")
     user_id: int = target.id if target is not None else interaction.user.id
-    reps: list = sh.get_pj_reps(user_id)
+    reps: list[tuple[str, str, str, str, int]] = sh.get_pj_reps(user_id)
     message = ""
     print(reps)
     if len(reps) > 0:
@@ -509,21 +510,21 @@ async def updatereputation(
     amount: int,
     faction: str,
     target: nextcord.Member = default_user_option,
-):
+) -> Any:
     try:
         assert interaction.user is not None
     except AssertionError as e:
         return await interaction.send("Error: Null user")
     user_id: int = target.id if target is not None else interaction.user.id
 
-    reps: list = sh.get_pj_reps(user_id)
-    rep_row = [row for row in reps if row[REP_COL.num(
+    reps: list[tuple[str, str, str, str, int]] = sh.get_pj_reps(user_id)
+    rep_row: list[tuple[str, str, str, str, int]] = [row for row in reps if row[REP_COL.num(
         REP_COL.Faction)] == faction]
 
     if len(rep_row):
         # Add reptuation
         row_pj_name, row_discord_id, row_faction, row_reputation, row_index = rep_row[0]
-        new_rep = row_reputation + amount
+        new_rep = int(row_reputation) + amount
         new_row = [row_pj_name, row_discord_id, row_faction, new_rep]
         sh.update_rep_row(row_index, new_row)
         await interaction.send(
@@ -549,7 +550,7 @@ async def updatereputation(
 
 
 @updatereputation.on_autocomplete("faction")
-async def autocomplete_faction(interaction: nextcord.Interaction, faction: str):
+async def autocomplete_faction(interaction: nextcord.Interaction, faction: str) -> Any:
     filtered_ancestries = []
     if faction:
         if len(faction) == 1:
@@ -572,7 +573,7 @@ async def salary(
     interaction: nextcord.Interaction,
     level: int,
     target: nextcord.Member = default_user_option,
-):
+) -> Any:
     try:
         assert interaction.user is not None
     except AssertionError as e:
@@ -595,7 +596,7 @@ async def salary(
     new_coins = utils.gp_to_coin_list(new_total_gp)
     pp, gp, sp, cp = new_coins
 
-    pj_dt = sh.get_pj_data(pj_row, PJ_COL.Downtime)
+    pj_dt = int(sh.get_pj_data(pj_row, PJ_COL.Downtime))
     new_total_dt = pj_dt + sueldo_dt
 
     sh.update_pj_data_cell(pj_row, PJ_COL.Downtime, [

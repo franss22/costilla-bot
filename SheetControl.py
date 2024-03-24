@@ -4,7 +4,7 @@ from varenv import getVar
 import json
 
 from functools import wraps
-from typing import Callable
+from typing import Callable, Any, Iterable
 
 
 PJ_SHEET_ID = 0
@@ -27,9 +27,9 @@ def update_pj_data() -> None:
     PJ_DATA = pj_sheet.get_all_values(value_render_option="UNFORMATTED_VALUE")
 
 
-def gets_pj_data(func) -> Callable:
+def gets_pj_data(func: Callable[..., Any]) -> Callable[..., Any]:
     @wraps(func)
-    async def wrapped_func(*args, **kwargs):
+    async def wrapped_func(*args: Any, **kwargs: Any) -> Any:
         update_pj_data()
         print("Updated PC data.")
         await func(*args, **kwargs)
@@ -103,15 +103,15 @@ def get_pj_coins(row: int) -> list[float]:
     return [float(x) for x in coins]
 
 
-def update_range_PJ(values, pos: str):
+def update_range_PJ(values: Iterable[Iterable[Any]], pos: str) -> None:
     pj_sheet.update(values, pos)
 
 
-def update_pj_data_cell(pj_row: int, col: str, value):
+def update_pj_data_cell(pj_row: int, col: str, value: Iterable[Iterable[Any]]) -> None:
     pj_sheet.update(value, f"{col}{pj_row+1}")
 
 
-def update_pj_coins(row: int, values):
+def update_pj_coins(row: int, values: Iterable[Iterable[Any]]) -> None:
     pj_sheet.update(
         values, f"{PJ_COL.Money_pp}{row+1}:{PJ_COL.Money_total}{row+1}")
 
@@ -119,15 +119,15 @@ def update_pj_coins(row: int, values):
 REP_DATA: list[list[str]]
 
 
-def update_rep_data()->None:
+def update_rep_data() -> None:
     global REP_DATA
     REP_DATA = rep_sheet.get_all_values(
         value_render_option="UNFORMATTED_VALUE")
 
 
-def gets_rep_data(func)->Callable:
+def gets_rep_data(func: Callable[..., Any]) -> Callable[..., Any]:
     @wraps(func)
-    async def wrapped_func(*args, **kwargs):
+    async def wrapped_func(*args: Any, **kwargs: Any) -> Any:
         update_rep_data()
         print("Updated reputation data.")
         await func(*args, **kwargs)
@@ -141,7 +141,7 @@ class REP_COL:
     Reputation = "D"
 
     @classmethod
-    def num(cls, col: str)->int:
+    def num(cls, col: str) -> int:
         return utils.column_to_num(col)
 
 
@@ -156,25 +156,22 @@ def whole_column_rep(column: str) -> list[str]:
     return [row[c_index] for row in REP_DATA]
 
 
-def get_pj_reps(discord_id: int)->list[tuple[str, str, str, str, int]]:
+def get_pj_reps(discord_id: int) -> list[tuple[str, str, str, str, int]]:
     discord_id_str: str = str(discord_id)
-    reps: list[tuple[str, str, str, str, int]] = [(row[0], row[1], row[2], row[3], REP_DATA.index(row)+1) for row in REP_DATA if row[REP_COL.num(REP_COL.Discord_id)] == discord_id_str]
+    reps: list[tuple[str, str, str, str, int]] = [(row[0], row[1], row[2], row[3], REP_DATA.index(
+        row)+1) for row in REP_DATA if row[REP_COL.num(REP_COL.Discord_id)] == discord_id_str]
     return reps
 
 
-def update_rep_row(row_index: int, data: list):
+def update_rep_row(row_index: int, data: Iterable[Any])-> None:
     rep_sheet.update([data], f"A{row_index}:D{row_index}")
-
-
-def get_pj_faction():
-    pass
 
 
 def get_all_existing_factions() -> set[str]:
     return set(whole_column_rep(REP_COL.Faction))
 
 
-def get_sueldo(level: int):
+def get_sueldo(level: int) -> tuple[float, int]:
     data = sueldo_sheet.get_all_values(value_render_option="UNFORMATTED_VALUE")
     sueldo_gp = data[level][2]
     sueldo_dt = data[3][3]
