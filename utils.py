@@ -33,7 +33,7 @@ def result_name(result:int):
 
 def pay_priority(coins, paid_amt: float):
     # calcula la diferencia (lo que hay que restarle al dinero original) para pagar paid_amt
-    price = gp_to_coin_list(paid_amt, with_electrum=True)
+    price = gp_to_coin_list(paid_amt)
     # pagamos de las monedas mas caras a las mas baratas
     old = [int(float(x)) for x in coins]
     vals = [10, 10, 10, 10]
@@ -56,7 +56,7 @@ def pay_priority(coins, paid_amt: float):
     return [resta[i]-old[i] for i in range(5)]
 
 
-def numToColumn(column_int):
+def num_to_column(column_int: int)-> str:
     start_index = 1  # it can start either at 0 or at 1
     letter = ''
     while column_int > 25 + start_index:
@@ -66,15 +66,13 @@ def numToColumn(column_int):
     return letter
 
 
-def renown_tier(renown_val: int):
-    renown_val = int(renown_val)
-    if renown_val >= 50:
-        return 4
-    elif renown_val >= 25:
-        return 3
-    elif renown_val >= 10:
-        return 2
-    elif renown_val >= 3:
-        return 1
-    else:
-        return 0
+def column_to_num(column: str)-> int:
+    letters: str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".lower()
+    num:int = 0
+    for letter in column.lower():
+        if letter not in letters:
+            raise ValueError("Column must have only roman alphabet characters")
+        num *=len(letters)
+        num += letters.index(letter)+1
+        
+    return num
