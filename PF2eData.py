@@ -1,4 +1,4 @@
-RELIGIONS : list[str]= ["La Labor", "El Continuo", "El Camino", "La Prisión", "El Arquitecto", "El Potencial", "Ateo", "Otro"]
+RELIGIONS : list[str]= ["La Labor", "El Continuo", "El Camino", "La Prisión", "El Arquitecto", "El Potencial", "Ninguna", "Otro"]
 
 LANGUAGES : list[str]= [
     "Nemer", 
