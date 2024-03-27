@@ -81,7 +81,7 @@ def get_pj_row(discord_id: int) -> int:
 
 def first_empty_PJ_row() -> int:
     column = whole_column_pj(PJ_COL.Discord_id)
-    return column.index("")+1
+    return column.index("") + 1
 
 
 def get_pj_data(pj_row: int, col: str) -> str:
@@ -99,7 +99,7 @@ def get_pj_coins(row: int) -> list[float]:
     pp = PJ_COL.num(PJ_COL.Money_pp)
     total = PJ_COL.num(PJ_COL.Money_total)
     # pj_sheet.get(f"{PJ_COL.Money_pp}{row}:{PJ_COL.Money_total}{row}", value_render_option = "UNFORMATTED_VALUE")[0]
-    coins = PJ_DATA[row][pp:total+1]
+    coins = PJ_DATA[row][pp:total + 1]
     return [float(x) for x in coins]
 
 
@@ -108,12 +108,12 @@ def update_range_PJ(values: Iterable[Iterable[Any]], pos: str) -> None:
 
 
 def update_pj_data_cell(pj_row: int, col: str, value: Iterable[Iterable[Any]]) -> None:
-    pj_sheet.update(value, f"{col}{pj_row+1}")
+    pj_sheet.update(value, f"{col}{pj_row + 1}")
 
 
 def update_pj_coins(row: int, values: Iterable[Iterable[Any]]) -> None:
     pj_sheet.update(
-        values, f"{PJ_COL.Money_pp}{row+1}:{PJ_COL.Money_total}{row+1}")
+        values, f"{PJ_COL.Money_pp}{row + 1}:{PJ_COL.Money_total}{row + 1}")
 
 
 REP_DATA: list[list[str]]
@@ -147,7 +147,7 @@ class REP_COL:
 
 def first_empty_rep_row() -> int:
     column: list[str] = whole_column_rep(REP_COL.Discord_id)
-    return len(column)+1
+    return len(column) + 1
 
 
 def whole_column_rep(column: str) -> list[str]:
@@ -159,11 +159,11 @@ def whole_column_rep(column: str) -> list[str]:
 def get_pj_reps(discord_id: int) -> list[tuple[str, str, str, str, int]]:
     discord_id_str: str = str(discord_id)
     reps: list[tuple[str, str, str, str, int]] = [(row[0], row[1], row[2], row[3], REP_DATA.index(
-        row)+1) for row in REP_DATA if row[REP_COL.num(REP_COL.Discord_id)] == discord_id_str]
+        row) + 1) for row in REP_DATA if row[REP_COL.num(REP_COL.Discord_id)] == discord_id_str]
     return reps
 
 
-def update_rep_row(row_index: int, data: Iterable[Any])-> None:
+def update_rep_row(row_index: int, data: Iterable[Any]) -> None:
     rep_sheet.update([data], f"A{row_index}:D{row_index}")
 
 

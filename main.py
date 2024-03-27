@@ -3,12 +3,12 @@ from nextcord.ext import commands  # type: ignore
 from varenv import getVar
 import SheetControl as sh
 from SheetControl import PJ_COL, REP_COL, gets_pj_data, gets_rep_data
-from PF2eData import *
+from PF2eData import CLASSES, ANCESTRIES, RELIGIONS, EARN_INCOME, LANGUAGES
 import utils
 import json
 import dndice  # type: ignore
 import logging
-from typing import Callable, Any
+from typing import Callable, Any, Self
 
 
 logging.basicConfig(level=logging.INFO)
@@ -38,7 +38,11 @@ default_user_option = nextcord.SlashOption(
 class HeritageDropdown(nextcord.ui.Select):  # type: ignore
     Update_func: Callable[[nextcord.Interaction, str], Any]
 
-    def __init__(self, ancestry: str, update_func: Callable[[nextcord.Interaction, str], Any]):
+    def __init__(
+            self,
+            ancestry: str,
+            update_func: Callable[[nextcord.Interaction, str], Any]
+    ):
         heritages: list[str] = HERITAGES[ancestry]
         self.Update_func: Callable[[
             nextcord.Interaction, str], Any] = update_func
@@ -55,11 +59,11 @@ class HeritageDropdown(nextcord.ui.Select):  # type: ignore
             options=options,
         )
 
-    async def callback(self: HeritageDropdown, interaction: nextcord.Interaction) -> None:
+    async def callback(self: Self, interaction: nextcord.Interaction) -> None:
         selected: str = self.values[0]
         try:
             assert self.view is not None
-        except AssertionError as e:
+        except AssertionError:
             return
         self.view.stop()
         await self.Update_func(interaction, selected)
@@ -72,7 +76,8 @@ class RegisterDropdownView(nextcord.ui.View):
 
 
 @bot.slash_command(
-    description="Registra un nuevo personaje de Megamarch.", guild_ids=[CRI_GUILD_ID]
+    description="Registra un nuevo personaje de Megamarch.",
+    guild_ids=[CRI_GUILD_ID]
 )
 @gets_pj_data
 async def register(
@@ -100,7 +105,7 @@ async def register(
     # Conseguir el ID del usuario
     try:
         assert interaction.user is not None
-    except AssertionError as e:
+    except AssertionError:
         return await interaction.send("Error: Null user")
 
     user_id: int = interaction.user.id
@@ -112,7 +117,8 @@ async def register(
         already_has_character = False
     if already_has_character:
         return await interaction.send(
-            f"Ya tienes un personaje en la fila {pj_row}, muevelo al cementario para registrar uno nuevo."
+            f"Ya tienes un personaje en la fila {
+                pj_row}, muevelo al cementario para registrar uno nuevo."
         )
     ascendencia = ascendencia.capitalize()
     if ascendencia not in ANCESTRIES:
@@ -120,7 +126,10 @@ async def register(
 
     # Generar stats base (0 de dt, 15 de gp)
     # [nombre, id, jugador, clase, Arquetipos, ascendencia, heritage, dt, pp, gp, sp, cp, total, lenguajes, religión]
-    async def update_func(interaction: nextcord.Interaction, selected_heritage: str) -> Any:
+    async def update_func(
+            interaction: nextcord.Interaction,
+            selected_heritage: str
+    ) -> Any:
         values = [
             nombre_pj,
             str(user_id),
@@ -148,7 +157,10 @@ async def register(
 
 
 @register.on_autocomplete("ascendencia")
-async def autocomplete_ancestry(interaction: nextcord.Interaction, ancestry: str) -> Any:
+async def autocomplete_ancestry(
+    interaction: nextcord.Interaction,
+    ancestry: str
+) -> Any:
     filtered_ancestries = []
     if ancestry:
         filtered_ancestries = [
@@ -200,7 +212,7 @@ async def status(
 - Clase: {Class}{", " if Arquetypes else ""}{Arquetypes}
 - Ascendencia: {Ancestry}, {Heritage}
 - Dinero: {pp}pp, {gp}gp, {sp}sp, {cp}cp, **Total: {total:.2f}gp**
-- Downtime: {Dt_int//7} semanas y { Dt%7} dias ({Dt_int} dias)
+- Downtime: {Dt_int // 7} semanas y {Dt % 7} dias ({Dt_int} dias)
 """
     return await interaction.send(message)
 
@@ -235,7 +247,8 @@ async def dt(interaction: nextcord.Interaction, amount: int) -> Any:
     sh.update_pj_data_cell(pj_row, PJ_COL.Downtime, [[new_total]])
 
     return await interaction.send(
-        f"{pj_name} {'gana' if amount>0 else 'gasta'} {amount} dias de downtime. Ahora tiene {new_total//7} semanas y { new_total%7} dias ({new_total} dias)"
+        f"{pj_name} {'gana' if amount > 0 else 'gasta'} {amount} dias de downtime. Ahora tiene {
+            new_total // 7} semanas y {new_total % 7} dias ({new_total} dias)"
     )
 
 
@@ -298,11 +311,14 @@ async def pay(
         new_coins = utils.gp_to_coin_list(new_total_target)
         sh.update_pj_coins(target_pj_row, [new_coins])
         return await interaction.send(
-            f"{pj_name} le transfiere {amount}gp a {target_pj_name}. \n{pj_name} queda con {new_total:.2f}gp, y {target_pj_name} queda con {new_total_target:.2f}gp."
+            f"{pj_name} le transfiere {amount}gp a {target_pj_name}. \n{pj_name} queda con {
+                new_total:.2f}gp, y {target_pj_name} queda con {new_total_target:.2f}gp."
         )
-    return await interaction.send(
-        f"{pj_name} paga {amount}gp. Ahora tiene {pp}pp, {gp}gp, {sp}sp, {cp}cp, **Total: {new_total:.2f}gp**"
-    )
+    else:
+        return await interaction.send(
+            f"{pj_name} paga {amount}gp. Ahora tiene {pp}pp, {
+                gp}gp, {sp}sp, {cp}cp, **Total: {new_total:.2f}gp**"
+        )
 
 
 @bot.slash_command(description="Suma dinero a tu cuenta.", guild_ids=[CRI_GUILD_ID])
@@ -340,7 +356,8 @@ async def addmoney(
     sh.update_pj_coins(pj_row, [new_coins])
 
     return await interaction.send(
-        f"{pj_name} obtiene {amount}gp. Ahora tiene {pp}pp, {gp}gp, {sp}sp, {cp}cp, **Total: {new_total:.2f}gp**"
+        f"{pj_name} obtiene {amount}gp. Ahora tiene {pp}pp, {
+            gp}gp, {sp}sp, {cp}cp, **Total: {new_total:.2f}gp**"
     )
 
 
@@ -398,7 +415,7 @@ async def earnincome(
         final_dt_usage = downtimeUsed
 
     message = f"""Con un {check_value} ({dice}+{checkBonus}) vs DC {DC} , obtienes un {utils.result_name(check_result)}.
-Trabajas {final_dt_usage} dias y obtienes {income:.2f} gp al día, por un total de {income*final_dt_usage:.2f} gp.
+Trabajas {final_dt_usage} dias y obtienes {income:.2f} gp al día, por un total de {income * final_dt_usage:.2f} gp.
 (Por ahora, debes updatearlos manualmente)
 """
     await interaction.send(message)
@@ -518,8 +535,10 @@ async def updatereputation(
     user_id: int = target.id if target is not None else interaction.user.id
 
     reps: list[tuple[str, str, str, str, int]] = sh.get_pj_reps(user_id)
-    rep_row: list[tuple[str, str, str, str, int]] = [row for row in reps if row[REP_COL.num(
-        REP_COL.Faction)] == faction]
+    rep_row: list[tuple[str, str, str, str, int]] = [
+        row for row in reps
+        if row[REP_COL.num(REP_COL.Faction)] == faction
+    ]
 
     if len(rep_row):
         # Add reptuation
@@ -528,7 +547,8 @@ async def updatereputation(
         new_row = [row_pj_name, row_discord_id, row_faction, new_rep]
         sh.update_rep_row(row_index, new_row)
         await interaction.send(
-            f"Actualizada la reputación de {row_pj_name} con {faction}: {row_reputation} -> {new_rep}"
+            f"Actualizada la reputación de {row_pj_name} con {
+                faction}: {row_reputation} -> {new_rep}"
         )
 
     else:
@@ -603,7 +623,8 @@ async def salary(
                            [new_total_dt, pp, gp, sp, cp]])
 
     return await interaction.send(
-        f"{pj_name}: Nivel {level} completado!\n Se te suma el sueldo del nivel: {sueldo_gp:.2f}gp (ahora tienes {new_total_gp:.2f}gp)\n Se te suman {sueldo_dt} días de dt (ahora tienes {new_total_dt} dias de dt)"
+        f"{pj_name}: Nivel {level} completado!\n Se te suma el sueldo del nivel: {sueldo_gp:.2f}gp (ahora tienes {
+            new_total_gp:.2f}gp)\n Se te suman {sueldo_dt} días de dt (ahora tienes {new_total_dt} dias de dt)"
     )
 
 
