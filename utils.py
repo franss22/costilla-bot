@@ -89,4 +89,4 @@ def column_to_num(column: str) -> int:
         num *= len(letters)
         num += letters.index(letter) + 1
 
-    return num
+    return num - 1

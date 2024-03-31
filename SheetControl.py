@@ -71,6 +71,7 @@ class CharacterNotFoundError(Exception):
 def get_pj_row(discord_id: int) -> int:
     try:
         column = whole_column_pj(PJ_COL.Discord_id)
+        print(column)
         id_row = column.index(str(discord_id))
         # index del primer valor con [discord_id] de todos los ids (+1 por 0 indexed)
         return id_row

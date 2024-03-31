@@ -180,7 +180,9 @@ async def status(
         assert interaction.user is not None
     except AssertionError as e:
         return await interaction.send("Error: Null user")
+
     user_id: int = interaction.user.id if user is None else user.id
+    print(user_id)
     try:
         pj_row = sh.get_pj_row(user_id)
     except sh.CharacterNotFoundError:
