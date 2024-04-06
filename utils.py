@@ -1,9 +1,25 @@
 from math import ceil
-import random
+
+from nextcord import SlashOption
+
+default_user_option = SlashOption(
+    name="usuario-target",
+    description="Usuario al que se le aplica el comando",
+    required=False,
+    default=None,
+)
 
 
 def sign(num: int | float) -> int:
     return 1 if num >= 0 else -1
+
+
+def parse_float_arg(num: str) -> float:
+    rnum = num.replace(",", ".")
+    try:
+        return float(rnum)
+    except ValueError:
+        raise ValueError(f"{num} no es un número válido")
 
 
 def gp_to_coin_list(num: float) -> list[int]:
@@ -21,16 +37,27 @@ def gp_to_coin_list(num: float) -> list[int]:
 
 def check_results(DC: int, result: int, dice: int) -> int:
     """Given a DC, a dice result (with bonuses), and the unmodified result of the dice,
-    returns the degree of success of the check, from 0 (crit fail) to 3 (crit success)."""
+    returns the degree of success of the check, from 0 (crit fail) to 3 (crit success).
+    """
     CHECK_RESULTS = {
         -1: 0,
         0: 0,  # crit fail
         1: 1,  # fail
         2: 2,  # success
         3: 3,  # crit success
-        4: 3
+        4: 3,
     }
-    return CHECK_RESULTS[((0 if result <= DC - 10 else (1 if result < DC else (2 if result < DC + 10 else 3))) + (1 if dice == 20 else 0) - (1 if dice == 1 else 0))]
+    return CHECK_RESULTS[
+        (
+            (
+                0
+                if result <= DC - 10
+                else (1 if result < DC else (2 if result < DC + 10 else 3))
+            )
+            + (1 if dice == 20 else 0)
+            - (1 if dice == 1 else 0)
+        )
+    ]
 
 
 def result_name(result: int) -> str:
@@ -71,7 +98,7 @@ def num_to_column(column_int: int) -> str:
     if column_int <= 0:
         raise ValueError("Column must be 1 or higher.")
     start_index = 1  # it can start either at 0 or at 1
-    letter = ''
+    letter = ""
     while column_int > 25 + start_index:
         letter += chr(65 + int((column_int - start_index) / 26) - 1)
         column_int = column_int - (int((column_int - start_index) / 26)) * 26
@@ -84,8 +111,7 @@ def column_to_num(column: str) -> int:
     num: int = 0
     for letter in column.lower():
         if letter not in letters:
-            raise ValueError(
-                "Column must have only roman alphabet characters.")
+            raise ValueError("Column must have only roman alphabet characters.")
         num *= len(letters)
         num += letters.index(letter) + 1
 
