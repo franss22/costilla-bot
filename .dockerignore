@@ -1,5 +1,6 @@
 # flyctl launch added from .gitignore
 **/.env
+**/dmarchvenv
 **/.vscode
 **/__pycache__
 **/local_vars.json
