@@ -6,7 +6,7 @@ from nextcord.ext import commands  # type: ignore
 import SheetControl as sh
 from PF2eData import LANGUAGES
 from SheetControl import PJ_COL, gets_pj_data
-from utils import default_user_option
+from utils import CharacterNotFoundError, default_user_option
 from varenv import getVar
 
 CRI_GUILD_ID = int(getVar("GUILD_ID"))
@@ -34,7 +34,7 @@ class Languages(commands.Cog):
             pj_row: int = sh.get_pj_row(user_id)
             pj_name: str = sh.get_pj_data(pj_row, PJ_COL.Name)
             pj_languages: str = sh.get_pj_data(pj_row, PJ_COL.Languages)
-        except sh.CharacterNotFoundError:
+        except CharacterNotFoundError:
             return await interaction.send(
                 "No se encontró un personaje con ID de discord correspondiente"
             )
@@ -68,7 +68,7 @@ class Languages(commands.Cog):
             pj_row: int = sh.get_pj_row(user_id)
             pj_name: str = sh.get_pj_data(pj_row, PJ_COL.Name)
             pj_languages: str = sh.get_pj_data(pj_row, PJ_COL.Languages)
-        except sh.CharacterNotFoundError:
+        except CharacterNotFoundError:
             return await interaction.send(
                 "No se encontró un personaje con ID de discord correspondiente"
             )

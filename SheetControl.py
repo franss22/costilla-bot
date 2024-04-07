@@ -1,14 +1,14 @@
-import gspread  # type: ignore
-import utils
-from varenv import getVar
 import json
-
 from functools import wraps
-from typing import Callable, Any, Iterable
+from typing import Any, Callable, Iterable, Self
 
+import gspread  # type: ignore
+
+import utils
+from utils import CharacterNotFoundError, Column
+from varenv import getVar
 
 PJ_SHEET_ID = 0
-REPUTATION_SHEET_ID = 37818595
 SUELDO_SHEET_ID = 1681819644
 
 credentials = json.loads(getVar("GOOGLE"), strict=False)
@@ -16,7 +16,6 @@ credentials = json.loads(getVar("GOOGLE"), strict=False)
 gc = gspread.service_account_from_dict(credentials)
 
 pj_sheet = gc.open("Megamarch").get_worksheet_by_id(PJ_SHEET_ID)
-rep_sheet = gc.open("Megamarch").get_worksheet_by_id(REPUTATION_SHEET_ID)
 sueldo_sheet = gc.open("Megamarch").get_worksheet_by_id(SUELDO_SHEET_ID)
 
 PJ_DATA: list[list[str]]
@@ -33,39 +32,35 @@ def gets_pj_data(func: Callable[..., Any]) -> Callable[..., Any]:
         update_pj_data()
         print("Updated PC data.")
         await func(*args, **kwargs)
+
     return wrapped_func
 
 
 class PJ_COL:
-    Name = "A"
-    Discord_id = "B"
-    Player = "C"
-    Class = "D"
-    Arquetypes = "E"
-    Ancestry = "F"
-    Heritage = "G"
-    Downtime = "H"
-    Money_pp = "I"
-    Money_gp = "J"
-    Money_sp = "K"
-    Money_cp = "L"
-    Money_total = "M"
-    Languages = "N"
-    Religion = "O"
+    Name: Column = Column("A")
+    Discord_id: Column = Column("B")
+    Player: Column = Column("C")
+    Class: Column = Column("D")
+    Arquetypes: Column = Column("E")
+    Ancestry: Column = Column("F")
+    Heritage: Column = Column("G")
+    Downtime: Column = Column("H")
+    Money_pp: Column = Column("I")
+    Money_gp: Column = Column("J")
+    Money_sp: Column = Column("K")
+    Money_cp: Column = Column("L")
+    Money_total: Column = Column("M")
+    Languages: Column = Column("N")
+    Religion: Column = Column("O")
 
     @classmethod
-    def num(cls, col: str) -> int:
+    def num(cls: Self, col: str) -> int:
         return utils.column_to_num(col)
 
 
-def whole_column_pj(column: str) -> list[str]:
-    c_index: int = PJ_COL.num(column)
+def whole_column_pj(column: Column) -> list[str]:
 
-    return [row[c_index] for row in PJ_DATA]
-
-
-class CharacterNotFoundError(Exception):
-    pass
+    return [row[column.excel_index()] for row in PJ_DATA]
 
 
 def get_pj_row(discord_id: int) -> int:
@@ -77,7 +72,8 @@ def get_pj_row(discord_id: int) -> int:
         return id_row
     except ValueError:
         raise CharacterNotFoundError(
-            f"Character with discord ID '{discord_id}' was not found")
+            f"Error: No se encontró un personaje con ID de discord '{discord_id}'."
+        )
 
 
 def first_empty_PJ_row() -> int:
@@ -85,22 +81,30 @@ def first_empty_PJ_row() -> int:
     return column.index("") + 1
 
 
-def get_pj_data(pj_row: int, col: str) -> str:
+def get_pj_data(pj_row: int, col: Column) -> str:
+    global PJ_DATA
+
     try:
-        return PJ_DATA[pj_row][PJ_COL.num(col)]
+        return PJ_DATA[pj_row][col.excel_index()]
     except IndexError:
-        raise CharacterNotFoundError()
+        raise CharacterNotFoundError(
+            "Error: No se encontró un personaje en la fila indicada."
+        )
 
 
 def get_pj_full(row: int) -> list[str]:
+    global PJ_DATA
+
     return PJ_DATA[row]
 
 
 def get_pj_coins(row: int) -> list[float]:
-    pp = PJ_COL.num(PJ_COL.Money_pp)
-    total = PJ_COL.num(PJ_COL.Money_total)
+    global PJ_DATA
+
+    pp = PJ_COL.Money_pp.excel_index()
+    total = PJ_COL.Money_total.excel_index()
     # pj_sheet.get(f"{PJ_COL.Money_pp}{row}:{PJ_COL.Money_total}{row}", value_render_option = "UNFORMATTED_VALUE")[0]
-    coins = PJ_DATA[row][pp:total + 1]
+    coins = PJ_DATA[row][pp : total + 1]  # noqa: E203
     return [float(x) for x in coins]
 
 
@@ -109,67 +113,13 @@ def update_range_PJ(values: Iterable[Iterable[Any]], pos: str) -> None:
 
 
 def update_pj_data_cell(pj_row: int, col: str, value: Iterable[Iterable[Any]]) -> None:
+    "row indexado a 0"
     pj_sheet.update(value, f"{col}{pj_row + 1}")
 
 
 def update_pj_coins(row: int, values: Iterable[Iterable[Any]]) -> None:
-    pj_sheet.update(
-        values, f"{PJ_COL.Money_pp}{row + 1}:{PJ_COL.Money_total}{row + 1}")
-
-
-REP_DATA: list[list[str]]
-
-
-def update_rep_data() -> None:
-    global REP_DATA
-    REP_DATA = rep_sheet.get_all_values(
-        value_render_option="UNFORMATTED_VALUE")
-
-
-def gets_rep_data(func: Callable[..., Any]) -> Callable[..., Any]:
-    @wraps(func)
-    async def wrapped_func(*args: Any, **kwargs: Any) -> Any:
-        update_rep_data()
-        print("Updated reputation data.")
-        await func(*args, **kwargs)
-    return wrapped_func
-
-
-class REP_COL:
-    Name = "A"
-    Discord_id = "B"
-    Faction = "C"
-    Reputation = "D"
-
-    @classmethod
-    def num(cls, col: str) -> int:
-        return utils.column_to_num(col)
-
-
-def first_empty_rep_row() -> int:
-    column: list[str] = whole_column_rep(REP_COL.Discord_id)
-    return len(column) + 1
-
-
-def whole_column_rep(column: str) -> list[str]:
-    c_index: int = REP_COL.num(column)
-
-    return [row[c_index] for row in REP_DATA]
-
-
-def get_pj_reps(discord_id: int) -> list[tuple[str, str, str, str, int]]:
-    discord_id_str: str = str(discord_id)
-    reps: list[tuple[str, str, str, str, int]] = [(row[0], row[1], row[2], row[3], REP_DATA.index(
-        row) + 1) for row in REP_DATA if row[REP_COL.num(REP_COL.Discord_id)] == discord_id_str]
-    return reps
-
-
-def update_rep_row(row_index: int, data: Iterable[Any]) -> None:
-    rep_sheet.update([data], f"A{row_index}:D{row_index}")
-
-
-def get_all_existing_factions() -> set[str]:
-    return set(whole_column_rep(REP_COL.Faction))
+    "row indexado a 0"
+    pj_sheet.update(values, f"{PJ_COL.Money_pp}{row + 1}:{PJ_COL.Money_total}{row + 1}")
 
 
 def get_sueldo(level: int) -> tuple[float, int]:
@@ -179,8 +129,7 @@ def get_sueldo(level: int) -> tuple[float, int]:
     return (float(sueldo_gp), int(sueldo_dt))
 
 
-if __name__ == "__main__":
-    # print(COL.name)
-    # print(get_pj_data_with_name("test", COL.money_total))
-    # print(detect_other_PJ(15))
-    pass
+def get_level_global() -> int:
+    data = sueldo_sheet.get_all_values(value_render_option="UNFORMATTED_VALUE")
+    level_global = int(data[6][3])
+    return level_global

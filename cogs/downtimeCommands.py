@@ -5,6 +5,7 @@ from nextcord.ext import commands  # type: ignore
 
 import SheetControl as sh
 from SheetControl import PJ_COL, gets_pj_data
+from utils import CharacterNotFoundError
 from varenv import getVar
 
 CRI_GUILD_ID = int(getVar("GUILD_ID"))
@@ -23,7 +24,7 @@ class Downtime(commands.Cog):
         try:
             pj_row = sh.get_pj_row(user_id)
             pj_name = sh.get_pj_data(pj_row, PJ_COL.Name)
-        except sh.CharacterNotFoundError:
+        except CharacterNotFoundError:
             return await interaction.send(
                 "No se encontró un personaje con ID de discord correspondiente"
             )
@@ -49,6 +50,3 @@ class Downtime(commands.Cog):
 
 def setup(client: commands.Bot) -> None:
     client.add_cog(Downtime(client))
-
-
-aaa = 1

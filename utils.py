@@ -1,4 +1,5 @@
 from math import ceil
+from typing import Self
 
 from nextcord import SlashOption
 
@@ -95,6 +96,13 @@ def pay_priority(coins: list[int], paid_amt: float) -> list[int]:
 
 
 def num_to_column(column_int: int) -> str:
+    """
+    Entrega la letra de un numero (indexado a 1)
+    Ejemplos:
+    - 1 -> A
+    - 3 -> C
+    - 27 -> AA
+    """
     if column_int <= 0:
         raise ValueError("Column must be 1 or higher.")
     start_index = 1  # it can start either at 0 or at 1
@@ -107,6 +115,13 @@ def num_to_column(column_int: int) -> str:
 
 
 def column_to_num(column: str) -> int:
+    """
+    Entrega el indice (indexado a 0 de la letra de la columna)
+    Ejemplos:
+    - A -> 0
+    - C -> 2
+    - AA -> 26
+    """
     letters: str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".lower()
     num: int = 0
     for letter in column.lower():
@@ -116,3 +131,19 @@ def column_to_num(column: str) -> int:
         num += letters.index(letter) + 1
 
     return num - 1
+
+
+class Column(str):
+    def excel_index(self: Self) -> int:
+        """
+        Entrega el indice (indexado a 0) de la letra de la columna
+        Ejemplos:
+        - A -> 0
+        - C -> 2
+        - AA -> 26
+        """
+        return column_to_num(self)
+
+
+class CharacterNotFoundError(Exception):
+    pass

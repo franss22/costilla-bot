@@ -13,9 +13,10 @@ from cogs import (
     moneyCommands,
     registerCommands,
     reputationCommands,
+    skillCommands,
 )
 from SheetControl import PJ_COL, gets_pj_data
-from utils import default_user_option
+from utils import CharacterNotFoundError, default_user_option
 from varenv import getVar
 
 CRI_GUILD_ID = int(getVar("GUILD_ID"))
@@ -41,7 +42,7 @@ async def status(
     user_id: int = interaction.user.id if user is None else user.id
     try:
         pj_row = sh.get_pj_row(user_id)
-    except sh.CharacterNotFoundError:
+    except CharacterNotFoundError:
         return await interaction.send(
             "No se encontró un personaje con ID de discord correspondiente"
         )
@@ -92,7 +93,7 @@ async def salary(
     try:
         pj_row = sh.get_pj_row(user_id)
         pj_name = sh.get_pj_data(pj_row, PJ_COL.Name)
-    except sh.CharacterNotFoundError:
+    except CharacterNotFoundError:
         return await interaction.send(
             "No se encontró un personaje con ID de discord correspondiente"
         )
@@ -128,6 +129,7 @@ downtimeCommands.setup(bot)
 moneyCommands.setup(bot)
 earn_incomeCommands.setup(bot)
 languagesCommands.setup(bot)
+skillCommands.setup(bot)
 
 
 bot.run(BOT_TOKEN)

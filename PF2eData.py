@@ -1,4 +1,5 @@
 import json
+from typing import Any, Self, Tuple
 
 RELIGIONS: list[str] = [
     "La Labor",
@@ -117,6 +118,72 @@ ANCESTRIES: list[str] = [
     "Vanara",
     "Vishkanya",
 ]
+
+
+class Ability(str):
+    name: str
+
+    def __new__(cls: Self, content: str, name: str) -> Any:
+        ret = super().__new__(cls, content)
+        ret.name = name
+        return ret
+
+
+class ABILITIES:
+    Str = Ability("C", "Str")
+    Dex = Ability("D", "Dex")
+    Con = Ability("E", "Con")
+    Int = Ability("F", "Int")
+    Wis = Ability("G", "Wis")
+    Cha = Ability("H", "Cha")
+
+
+SKILLS: list[Tuple[str, Ability]] = [
+    ("Acrobatics", ABILITIES.Dex),
+    ("Arcana", ABILITIES.Int),
+    ("Athletics", ABILITIES.Str),
+    ("Crafting", ABILITIES.Int),
+    ("Deception", ABILITIES.Cha),
+    ("Diplomacy", ABILITIES.Cha),
+    ("Intimidation", ABILITIES.Cha),
+    ("Lore", ABILITIES.Int),
+    ("Medicine", ABILITIES.Wis),
+    ("Nature", ABILITIES.Wis),
+    ("Occultism", ABILITIES.Int),
+    ("Performance", ABILITIES.Cha),
+    ("Religion", ABILITIES.Wis),
+    ("Society", ABILITIES.Int),
+    ("Stealth", ABILITIES.Dex),
+    ("Survival", ABILITIES.Wis),
+    ("Thievery", ABILITIES.Dex),
+]
+
+
+class PROF:
+    Untrained: str = "Untrained"
+    Trained: str = "Trained"
+    Expert: str = "Expert"
+    Master: str = "Master"
+    Legendary: str = "Legendary"
+
+    max_length: int = len("Legendary")
+    profs_list: list[str] = [
+        Untrained,
+        Trained,
+        Expert,
+        Master,
+        Legendary,
+    ]
+
+
+PROF_BONUSES: dict[str, int] = {
+    PROF.Untrained: 0,
+    PROF.Trained: 2,
+    PROF.Expert: 4,
+    PROF.Master: 6,
+    PROF.Legendary: 8,
+}
+
 
 with open("Ancestries.json") as f:
     HERITAGES: dict[str, list[str]] = json.load(f)

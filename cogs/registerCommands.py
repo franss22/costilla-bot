@@ -6,6 +6,7 @@ from nextcord.ext import commands
 import SheetControl as sh
 from PF2eData import ANCESTRIES, CLASSES, HERITAGES, RELIGIONS
 from SheetControl import PJ_COL, gets_pj_data
+from utils import CharacterNotFoundError
 from varenv import getVar
 
 CRI_GUILD_ID = int(getVar("GUILD_ID"))
@@ -93,7 +94,7 @@ class Register(commands.Cog):
         already_has_character = True
         try:
             pj_row = sh.get_pj_row(user_id)
-        except sh.CharacterNotFoundError:
+        except CharacterNotFoundError:
             already_has_character = False
         if already_has_character:
             return await interaction.send(

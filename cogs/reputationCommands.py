@@ -3,9 +3,11 @@ from typing import Any, Self
 import nextcord  # type: ignore
 from nextcord.ext import commands  # type: ignore
 
-import SheetControl as sh
-from SheetControl import PJ_COL, REP_COL, gets_pj_data, gets_rep_data
-from utils import default_user_option
+import SheetControl as shpj
+import SheetControlReputation as shr
+from SheetControl import PJ_COL, gets_pj_data
+from SheetControlReputation import REP_COL, gets_rep_data
+from utils import CharacterNotFoundError, default_user_option
 from varenv import getVar
 
 CRI_GUILD_ID = int(getVar("GUILD_ID"))
@@ -29,12 +31,12 @@ class Reputation(commands.Cog):
         except AssertionError:
             return await interaction.send("Error: Null user")
         user_id: int = target.id if target is not None else interaction.user.id
-        reps: list[tuple[str, str, str, str, int]] = sh.get_pj_reps(user_id)
+        reps: list[tuple[str, str, str, str, int]] = shr.get_pj_reps(user_id)
         message = ""
         print(reps)
         if len(reps) > 0:
-            message = f"# Reputación de {reps[0][REP_COL.num(REP_COL.Name)]}"
-            reps.sort(reverse=True, key=lambda r: r[REP_COL.num(REP_COL.Reputation)])
+            message = f"# Reputación de {reps[0][REP_COL.Name.excel_index()]}"
+            reps.sort(reverse=True, key=lambda r: r[REP_COL.Reputation.excel_index()])
             print(reps)
 
             for rep in reps:
@@ -59,15 +61,12 @@ class Reputation(commands.Cog):
         faction: str,
         target: nextcord.Member = default_user_option,
     ) -> Any:
-        try:
-            assert interaction.user is not None
-        except AssertionError:
-            return await interaction.send("Error: Null user")
+
         user_id: int = target.id if target is not None else interaction.user.id
 
-        reps: list[tuple[str, str, str, str, int]] = sh.get_pj_reps(user_id)
+        reps: list[tuple[str, str, str, str, int]] = shr.get_pj_reps(user_id)
         rep_row: list[tuple[str, str, str, str, int]] = [
-            row for row in reps if row[REP_COL.num(REP_COL.Faction)] == faction
+            row for row in reps if row[REP_COL.Faction.excel_index()] == faction
         ]
 
         if len(rep_row):
@@ -77,7 +76,7 @@ class Reputation(commands.Cog):
             )
             new_rep = int(row_reputation) + amount
             new_row = [row_pj_name, row_discord_id, row_faction, new_rep]
-            sh.update_rep_row(row_index, new_row)
+            shr.update_rep_row(row_index, new_row)
             await interaction.send(
                 (
                     f"Actualizada la reputación de {row_pj_name} con"
@@ -88,16 +87,16 @@ class Reputation(commands.Cog):
         else:
             # Create new line
             try:
-                pj_row = sh.get_pj_row(user_id)
-                pj_name = sh.get_pj_data(pj_row, PJ_COL.Name)
-            except sh.CharacterNotFoundError:
+                pj_row = shpj.get_pj_row(user_id)
+                pj_name = shpj.get_pj_data(pj_row, PJ_COL.Name)
+            except CharacterNotFoundError:
                 return await interaction.send(
                     "No se encontró un personaje con ID de discord correspondiente"
                 )
-            row_index = sh.first_empty_rep_row()
+            row_index = shr.first_empty_rep_row()
             new_row = [pj_name, str(user_id), faction, amount]
             print(new_row)
-            sh.update_rep_row(row_index, new_row)
+            shr.update_rep_row(row_index, new_row)
             await interaction.send(
                 f"Creada la reputación de {pj_name} con {faction}: {amount}"
             )
@@ -109,11 +108,11 @@ class Reputation(commands.Cog):
         filtered_ancestries = []
         if faction:
             if len(faction) == 1:
-                sh.update_rep_data()
+                shr.update_rep_data()
                 print("Updated rep data once")
             filtered_ancestries = [
                 a
-                for a in sh.get_all_existing_factions()
+                for a in shr.get_all_existing_factions()
                 if a.lower().startswith(faction.lower())
             ]
         await interaction.response.send_autocomplete(filtered_ancestries)
