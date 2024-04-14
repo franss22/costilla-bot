@@ -206,9 +206,12 @@ def update_ability_row(
 
 def get_all_existing_lore_subnames(id: int | None = None) -> list[str]:
     global SKILL_DATA
-    data = SKILL_DATA if id is None else _get_pj_skills_raw(id)
 
+    data = SKILL_DATA if id is None else [row for index, row in _get_pj_skills_raw(id)]
+    print("id", id)
+    print("data", data)
     skill_names = _column(data, SKILL_COL.Skill)
+    print("skill_names column", skill_names)
 
     # Se asume que todos los lores están en formato "Lore (subname)"
     lore_subnames = [skill[6:-1] for skill in skill_names if skill.startswith("Lore")]

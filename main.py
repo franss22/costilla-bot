@@ -82,7 +82,7 @@ async def status(
 @gets_pj_data
 async def salary(
     interaction: nextcord.Interaction,
-    level: int = None,
+    overwrite_level: int = None,
     target: nextcord.Member = default_user_option,
 ) -> Any:
     try:
@@ -97,9 +97,11 @@ async def salary(
         return await interaction.send(
             "No se encontró un personaje con ID de discord correspondiente"
         )
-    level = sh.get_level_global() if level is None else level
+    overwrite_level = (
+        sh.get_level_global() if overwrite_level is None else overwrite_level
+    )
 
-    sueldo_gp, sueldo_dt = sh.get_sueldo(level)
+    sueldo_gp, sueldo_dt = sh.get_sueldo(overwrite_level)
 
     pj_coins = sh.get_pj_coins(pj_row)
     pp, gp, sp, cp, total = pj_coins
@@ -115,10 +117,10 @@ async def salary(
 
     return await interaction.send(
         (
-            f"{pj_name}: Nivel {level} completado!"
-            f"\n Se te suma el sueldo del nivel:"
-            f" {sueldo_gp: .2f}gp(ahora tienes {new_total_gp: .2f}gp)"
-            f"\n Se te suman {sueldo_dt} días de dt"
+            f"{pj_name}: Misión nivel {overwrite_level} completada!"
+            f"\n Se te suma el sueldo de la misión:"
+            f" {sueldo_gp: .2f}gp (ahora tienes {new_total_gp: .2f}gp)"
+            f"\n Se te suman {sueldo_dt} días de dt "
             f"(ahora tienes {new_total_dt} dias de dt)"
         )
     )
@@ -143,5 +145,6 @@ async def update_global_level(
 ) -> Any:
     sh.update_level_global(level)
     return await interaction.send("Nivel global actualizado")
+
 
 bot.run(BOT_TOKEN)

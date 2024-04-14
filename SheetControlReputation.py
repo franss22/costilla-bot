@@ -55,7 +55,7 @@ def first_empty_rep_row() -> int:
 
 
 def whole_column_rep(column: utils.Column) -> list[str]:
-    return [row[column.excel_index()] for row in REP_DATA]
+    return [row[column.excel_index()] for row in REP_DATA][1:]
 
 
 def get_pj_reps(discord_id: int) -> list[tuple[str, str, str, str, int]]:

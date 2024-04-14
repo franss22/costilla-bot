@@ -103,18 +103,16 @@ class Reputation(commands.Cog):
 
     @updatereputation.on_autocomplete("faction")
     async def autocomplete_faction(
-        interaction: nextcord.Interaction, faction: str
+        self: Self, interaction: nextcord.Interaction, faction: str
     ) -> Any:
-        filtered_ancestries = []
-        if faction:
-            if len(faction) == 1:
-                shr.update_rep_data()
-                print("Updated rep data once")
-            filtered_ancestries = [
-                a
-                for a in shr.get_all_existing_factions()
-                if a.lower().startswith(faction.lower())
-            ]
+        if len(faction) == 0:
+            shr.update_rep_data()
+            print("Updated rep data once")
+        filtered_ancestries = [
+            a
+            for a in shr.get_all_existing_factions()
+            if a.lower().startswith(faction.lower())
+        ]
         await interaction.response.send_autocomplete(filtered_ancestries)
 
 
