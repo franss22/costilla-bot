@@ -139,6 +139,7 @@ class ABILITIES:
 
 
 SKILLS: list[Tuple[str, Ability]] = [
+    ("Perception", ABILITIES.Wis),
     ("Acrobatics", ABILITIES.Dex),
     ("Arcana", ABILITIES.Int),
     ("Athletics", ABILITIES.Str),

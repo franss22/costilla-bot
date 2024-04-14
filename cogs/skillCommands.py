@@ -58,9 +58,10 @@ def skill_description(
         )
         submsg: str = (
             f"\n- {skill_title.ljust(35)} `"
-            f'{f"{signed_bonus(prof_bonus+pj_mod_bonus+extra_bonus+level_bonus)} ".ljust(4)}'
+            f'{f"{signed_bonus(prof_bonus + pj_mod_bonus +
+                               extra_bonus + level_bonus)} ".ljust(4)}'
             f"*([{mod_type.name}: {signed_bonus(pj_mod_bonus)}]"
-            f"[{prof_level}: {signed_bonus(prof_bonus+level_bonus)}]"
+            f"[{prof_level}: {signed_bonus(prof_bonus + level_bonus)}]"
             f"{extra_msg}"
         )
     return submsg
@@ -231,7 +232,6 @@ class Skills(commands.Cog):
             name="lore",
             description="El lore de tu personaje (sin 'Lore ')",
             required=True,
-            choices=[skill[0] for skill in SKILLS if skill[0] != "Lore"],
         ),
         extra_info: bool = False,
     ) -> Any:
@@ -343,6 +343,12 @@ class Skills(commands.Cog):
     async def set_all_skills(
         self: Self,
         interaction: nextcord.Interaction,
+        perception: str = nextcord.SlashOption(
+            name="perception",
+            description="El nivel de proficiencia de Perception",
+            required=True,
+            choices=PROF.profs_list,
+        ),
         acrobatics: str = nextcord.SlashOption(
             name="acrobatics",
             description="El nivel de proficiencia de Acrobatics",
@@ -450,6 +456,7 @@ class Skills(commands.Cog):
         except CharacterNotFoundError as e:
             return await interaction.send(e)
         better_args = [
+            ("Perception", perception),
             ("Acrobatics", acrobatics),
             ("Arcana", arcana),
             ("Athletics", athletics),
@@ -604,6 +611,63 @@ class Skills(commands.Cog):
         return await interaction.send(
             f"Actualizados los modificadores de habilidad de {pj_name}"
         )
+
+    # @nextcord.slash_command(
+    #     description="Tira un skill check con el skill seleccionado",
+    #     guild_ids=[CRI_GUILD_ID],
+    # )
+    # @gets_skill_data
+    # async def roll_skill(
+    #     self: Self,
+    #     interaction: nextcord.Interaction,
+    #     skill: str = nextcord.SlashOption(
+    #         name="skill",
+    #         description="La skill de tu personaje",
+    #         required=True,
+    #         choices=[skill[0] for skill in SKILLS if skill[0] != "Lore"],
+    #     ),
+    #     extra_modifiers: int = nextcord.SlashOption(
+    #         name="extra_modifiers",
+    #         description="Cualquier bono o penalización adicional para esta tirada",
+    #         required=False,
+    #         default=0
+    #     ),
+    #     extra_info: bool = False,
+    # ) -> Any:
+    #     user_id: int = interaction.user.id
+    #     pj_mods: dict[Ability, int]
+    #     name_mods, row, pj_mods = sh_skills.get_pj_abilities(user_id)
+
+    #     if name_mods is None:
+    #         return await interaction.send(
+    #             "Tu personaje no tiene modificadores de habilidad definidos. Definelos con /set_modifiers."
+    #         )
+
+    #     pj_skills: dict[str, dict[str, str | int]]
+    #     # {skill_name: {prof_level: str, extra_bonus: int, extra_descripcion: str}}
+    #     name, pj_skills = sh_skills.get_pj_skills(user_id)
+    #     mod_type: Ability = [ab for skill_nm, ab in SKILLS if skill_nm == skill][0]
+
+    #     pj_skill = pj_skills.get(skill, None)
+    #     if pj_skill is None:
+    #         dice = dndice.basic('1d20')
+
+    #     prof_level: str = pj_skill["prof_level"]
+    #     level_bonus: int = 0 if prof_level == PROF.Untrained else pj_level
+    #     prof_bonus: int = PROF_BONUSES[prof_level]
+    #     extra_bonus: int = pj_skill["extra_bonus"]
+    #     extra_descripcion: str = pj_skill["extra_descripcion"]
+    #     skill_title = f"**{skill}** *({prof_level})*:`"
+
+    #     extra_msg = (
+    #         ""
+    #         if (extra_bonus == 0 and extra_descripcion == "")
+    #         else f"[Other: {signed_bonus(extra_bonus)}{f' ({extra_descripcion})' if extra_info else ''}])*"
+    #     )
+
+    #     pj_level = sh_pj.get_level_global()
+
+    #     return await interaction.send(message)
 
     @set_lore.on_autocomplete("lore_subname")
     async def autocomplete_set_lore_subname(

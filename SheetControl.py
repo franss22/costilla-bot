@@ -104,7 +104,7 @@ def get_pj_coins(row: int) -> list[float]:
     pp = PJ_COL.Money_pp.excel_index()
     total = PJ_COL.Money_total.excel_index()
     # pj_sheet.get(f"{PJ_COL.Money_pp}{row}:{PJ_COL.Money_total}{row}", value_render_option = "UNFORMATTED_VALUE")[0]
-    coins = PJ_DATA[row][pp : total + 1]  # noqa: E203
+    coins = PJ_DATA[row][pp: total + 1]  # noqa: E203
     return [float(x) for x in coins]
 
 
@@ -129,7 +129,18 @@ def get_sueldo(level: int) -> tuple[float, int]:
     return (float(sueldo_gp), int(sueldo_dt))
 
 
+LEVEL_GLOBAL = 1
+
+
+def update_level_global(new_value: int = None) -> None:
+    global LEVEL_GLOBAL
+    if new_value is None:
+        data = sueldo_sheet.get_all_values(value_render_option="UNFORMATTED_VALUE")
+        LEVEL_GLOBAL = int(data[6][3])
+    else:
+        sueldo_sheet.update([[new_value]], 'D7')
+
+
 def get_level_global() -> int:
-    data = sueldo_sheet.get_all_values(value_render_option="UNFORMATTED_VALUE")
-    level_global = int(data[6][3])
-    return level_global
+    global LEVEL_GLOBAL
+    return LEVEL_GLOBAL

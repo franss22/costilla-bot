@@ -82,7 +82,7 @@ async def status(
 @gets_pj_data
 async def salary(
     interaction: nextcord.Interaction,
-    level: int,
+    level: int = None,
     target: nextcord.Member = default_user_option,
 ) -> Any:
     try:
@@ -97,6 +97,7 @@ async def salary(
         return await interaction.send(
             "No se encontró un personaje con ID de discord correspondiente"
         )
+    level = sh.get_level_global() if level is None else level
 
     sueldo_gp, sueldo_dt = sh.get_sueldo(level)
 
@@ -131,5 +132,16 @@ earn_incomeCommands.setup(bot)
 languagesCommands.setup(bot)
 skillCommands.setup(bot)
 
+sh.update_level_global()
+
+
+@bot.slash_command(
+    description="Cambia el nivel de todos los personajes", guild_ids=[CRI_GUILD_ID]
+)
+async def update_global_level(
+    interaction: nextcord.Interaction, level: int = None
+) -> Any:
+    sh.update_level_global(level)
+    return await interaction.send("Nivel global actualizado")
 
 bot.run(BOT_TOKEN)
