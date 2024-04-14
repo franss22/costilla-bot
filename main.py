@@ -122,9 +122,13 @@ async def resumen(
 )
 @gets_pj_data
 async def downtime(
-    interaction: nextcord.Interaction, amount: float, user: nextcord.Member = None
+    interaction: nextcord.Interaction, amount_dt: str, user: nextcord.Member = None
 ) -> Any:
     user_id: int = interaction.user.id if user is None else user.id
+    try:
+        amount: float = utils.parse_float_arg(amount_str)
+    except ValueError as e:
+        return await interaction.send(f"Error: {e}")
     try:
         pj_row = sh.get_pj_row(user_id)
         pj_name = sh.get_pj_data(pj_row, PJ_COL.Personaje)
@@ -134,6 +138,7 @@ async def downtime(
         )
 
     pj_dt = float(sh.get_pj_data(pj_row, PJ_COL.Downtime))
+    
 
     if pj_dt + amount < 0:
         return await interaction.send(
@@ -156,7 +161,7 @@ async def downtime(
 @gets_pj_data
 async def pagar(
     interaction: nextcord.Interaction,
-    amount_str: float,
+    amount_str: str,
     transfertarget: nextcord.Member = None,
 ) -> Any:
     try:
@@ -221,7 +226,7 @@ async def pagar(
 @bot.slash_command(description="Suma dinero a tu cuenta.", guild_ids=[CRI_GUILD_ID])
 @gets_pj_data
 async def añadirdinero(
-    interaction: nextcord.Interaction, amount_str: float, user: nextcord.Member = None
+    interaction: nextcord.Interaction, amount_str: str, user: nextcord.Member = None
 ) -> Any:
     try:
         amount: float = utils.parse_float_arg(amount_str)

@@ -1,0 +1,21 @@
+# fly.toml app configuration file generated for piranesi on 2024-02-12T13:28:58-03:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'dungeonmarchbot'
+primary_region = 'scl'
+kill_signal = 'SIGINT'
+kill_timeout = '5s'
+
+[[services]]
+  internal_port = 8080
+  protocol = "tcp"
+  auto_start_machines = true
+  auto_stop_machines = false  # prevent automatic suspension
+  min_machines_running = 1  # keep a machine running at all times
+
+[[vm]]
+  cpu_kind = 'shared'
+  cpus = 1
+  memory_mb = 256

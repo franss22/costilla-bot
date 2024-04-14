@@ -267,7 +267,7 @@ def shop_active_income() -> float:
     return random.choice(mults)
 
 
-def gp_to_coin_list(num: float, with_electrum: bool = False) -> Tuple[int * 5]:
+def gp_to_coin_list(num: float, with_electrum: bool = False) -> Tuple[int, int, int, int, int]:
 
     num = (1 if num >= 0 else -1) * int(round(abs(float(num)) * 100))
 
@@ -283,7 +283,7 @@ def gp_to_coin_list(num: float, with_electrum: bool = False) -> Tuple[int * 5]:
     return [pp, gp, ep, sp, cp]
 
 
-def pay_priority(coins: Tuple[int * 5], paid_amt: float) -> Tuple[int * 5]:
+def pay_priority(coins: Tuple[int, int, int, int, int], paid_amt: float) -> Tuple[int, int, int, int, int]:
     # calcula la diferencia (lo que hay que restarle al dinero original) para pagar paid_amt
     price = gp_to_coin_list(paid_amt, with_electrum=True)
     # pagamos de las monedas mas caras a las mas baratas
