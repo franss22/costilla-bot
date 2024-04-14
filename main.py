@@ -104,7 +104,7 @@ async def resumen(
 - Deidad: {deidad}, {piedad} de piedad
 - Renombre: {renombre}
 - Dinero: {pp}pp, {gp}gp, {ep}ep, {sp}sp, {cp}cp, **Total: {total}gp**
-- Downtime: {Dt//1} semanas y {Dt*10//10} dias
+- Downtime: {Dt//1} semanas y {round(Dt%1*10)} dias
 """
     if full_data:
         message += f"""
