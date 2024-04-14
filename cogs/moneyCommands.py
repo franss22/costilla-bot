@@ -1,4 +1,4 @@
-from typing import Any, Self
+from typing import Any, Self, Tuple
 
 import nextcord  # type: ignore
 from nextcord.ext import commands  # type: ignore
@@ -126,13 +126,7 @@ class Money(commands.Cog):
         if amount < 0:
             return await interaction.send("Debes ganar una cantidad positiva de dinero")
 
-        pj_coins = sh.get_pj_coins(pj_row)
-        pp, gp, sp, cp, total = pj_coins
-
-        new_total = total + amount
-        new_coins = utils.gp_to_coin_list(new_total)
-        pp, gp, sp, cp = new_coins
-        sh.update_pj_coins(pj_row, [new_coins])
+        pp, gp, sp, cp, new_total = self.add_money_helper(amount, pj_row)
 
         return await interaction.send(
             (
@@ -140,6 +134,20 @@ class Money(commands.Cog):
                 f" {gp}gp, {sp}sp, {cp}cp, **Total: {new_total:.2f}gp**"
             )
         )
+
+
+def add_money_helper(amount, pj_row) -> Tuple[int, int, int, int, int]:
+    """
+    return pp, gp, sp, cp, new_total
+    """
+    pj_coins = sh.get_pj_coins(pj_row)
+    pp, gp, sp, cp, total = pj_coins
+
+    new_total = total + amount
+    new_coins = utils.gp_to_coin_list(new_total)
+    pp, gp, sp, cp = new_coins
+    sh.update_pj_coins(pj_row, [new_coins])
+    return pp, gp, sp, cp, new_total
 
 
 def setup(client: commands.Bot) -> None:

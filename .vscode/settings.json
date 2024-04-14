@@ -1,0 +1,8 @@
+{
+  "flake8.args": [
+    "--max-line-length=100",
+    "--select=E,W",
+    "--exclude=migrations, __pycache__, settings.py, .venv, .env"
+  ],
+  "editor.formatOnSave": true
+}

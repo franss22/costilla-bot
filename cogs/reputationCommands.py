@@ -54,7 +54,7 @@ class Reputation(commands.Cog):
     )
     @gets_rep_data
     @gets_pj_data
-    async def updatereputation(
+    async def update_reputation(
         self: Self,
         interaction: nextcord.Interaction,
         amount: int,

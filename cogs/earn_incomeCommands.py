@@ -18,7 +18,7 @@ class EarnIncome(commands.Cog):
     @nextcord.slash_command(
         description="Calcula las ganancias de Earn Income", guild_ids=[CRI_GUILD_ID]
     )
-    async def earnincome(
+    async def earn_income(
         self: Self,
         interaction: nextcord.Interaction,
         taskLevel: int = nextcord.SlashOption(

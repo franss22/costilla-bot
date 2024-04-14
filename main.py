@@ -15,6 +15,7 @@ from cogs import (
     reputationCommands,
     skillCommands,
 )
+from cogs.moneyCommands import add_money_helper
 from SheetControl import PJ_COL, gets_pj_data
 from utils import CharacterNotFoundError, default_user_option
 from varenv import getVar
@@ -103,12 +104,7 @@ async def salary(
 
     sueldo_gp, sueldo_dt = sh.get_sueldo(overwrite_level)
 
-    pj_coins = sh.get_pj_coins(pj_row)
-    pp, gp, sp, cp, total = pj_coins
-
-    new_total_gp = total + sueldo_gp
-    new_coins = utils.gp_to_coin_list(new_total_gp)
-    pp, gp, sp, cp = new_coins
+    pp, gp, sp, cp, new_total_gp = add_money_helper(sueldo_gp, pj_row)
 
     pj_dt = int(sh.get_pj_data(pj_row, PJ_COL.Downtime))
     new_total_dt = pj_dt + sueldo_dt

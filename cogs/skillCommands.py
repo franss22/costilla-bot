@@ -9,6 +9,7 @@ import SheetControlSkills as sh_skills
 from PF2eData import ABILITIES, PROF, PROF_BONUSES, SKILLS, Ability
 from SheetControl import PJ_COL, gets_pj_data
 from SheetControlSkills import gets_skill_data
+from cogs.skillUtils import filter_lores
 from utils import CharacterNotFoundError
 from varenv import getVar
 
@@ -637,18 +638,6 @@ class Skills(commands.Cog):
 
         filtered_lores: list[str] = filter_lores(lore_subname, user_id)
         await interaction.response.send_autocomplete(filtered_lores)
-
-
-def filter_lores(lore_subname: str, user_id: int | None) -> list[str]:
-    print(lore_subname)
-    if len(lore_subname) == 0:
-        sh_skills._update_skill_data()
-        print("Updated skill data once")
-    filtered_lores = sh_skills.get_all_existing_lore_subnames(user_id)
-    filtered_lores = [
-        a for a in filtered_lores if a.lower().startswith(lore_subname.lower())
-    ]
-    return filtered_lores
 
 
 def setup(client: commands.Bot) -> None:

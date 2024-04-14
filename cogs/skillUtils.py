@@ -1,5 +1,6 @@
 import nextcord
 from PF2eData import PROF, PROF_BONUSES, Ability
+import SheetControlSkills as sh_skills
 
 
 def nat_20_1_message(dice_result: int):
@@ -62,3 +63,15 @@ def ability_param(ability_name: str):
         required=True,
         choices=PROF.profs_list,
     )
+
+
+def filter_lores(lore_subname: str, user_id: int | None) -> list[str]:
+    print(lore_subname)
+    if len(lore_subname) == 0:
+        sh_skills._update_skill_data()
+        print("Updated skill data once")
+    filtered_lores = sh_skills.get_all_existing_lore_subnames(user_id)
+    filtered_lores = [
+        a for a in filtered_lores if a.lower().startswith(lore_subname.lower())
+    ]
+    return filtered_lores
