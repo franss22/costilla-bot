@@ -6,15 +6,16 @@ import gspread
 from varenv import getVar
 
 PJ_SHEET_ID = 1542430594
-
+SUELDO_SHEET_ID = 258151197
 credentials = json.loads(getVar("GOOGLE"), strict=False)
 
 gc = gspread.service_account_from_dict(credentials)
 
 pj_sheet = gc.open("Dungeonmarch").get_worksheet_by_id(PJ_SHEET_ID)
+sueldo_sheet = gc.open("Masters Dungeonmarch").get_worksheet_by_id(SUELDO_SHEET_ID)
 
 PJ_DATA = None
-
+SUELDO_DATA = None
 
 def update_pj_data():
     global PJ_DATA
@@ -26,6 +27,20 @@ def gets_pj_data(func):
     @wraps(func)
     async def wrapped_func(*args, **kwargs):
         update_pj_data()
+        await func(*args, **kwargs)
+
+    return wrapped_func
+
+def update_sueldo_data():
+    global SUELDO_DATA
+    SUELDO_DATA = sueldo_sheet.get_all_values(value_render_option="UNFORMATTED_VALUE")
+    # print(PJ_DATA)
+
+
+def gets_sueldo_data(func):
+    @wraps(func)
+    async def wrapped_func(*args, **kwargs):
+        update_sueldo_data()
         await func(*args, **kwargs)
 
     return wrapped_func
@@ -127,6 +142,14 @@ def update_pj_data_cell(pj_row: int, col: str, value):
 def update_pj_coins(row: int, values):
     pj_sheet.update(values, f"{PJ_COL.money_pp}{row+1}:{PJ_COL.money_total}{row+1}")
 
+
+def sueldo_info(mission: int): 
+    tiers = [row for row in SUELDO_DATA[1:]]
+    for tier in tiers:
+        start, end, gp = tier
+        if mission >= int(start) and mission <= int(end):
+            return int(gp)
+    return None
 
 if __name__ == "__main__":
     # print(COL.name)

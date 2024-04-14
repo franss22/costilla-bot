@@ -6,7 +6,7 @@ from nextcord.ext import commands
 
 import SheetControl as sh
 import utils
-from SheetControl import PJ_COL, gets_pj_data
+from SheetControl import PJ_COL, gets_pj_data, gets_sueldo_data, sueldo_info
 from varenv import getVar
 
 logging.basicConfig(level=logging.INFO)
@@ -239,6 +239,15 @@ async def añadirdinero(
     if amount < 0:
         return await interaction.send("Debes ganar una cantidad positiva de dinero")
 
+    pp, gp, ep, sp, cp, new_total = add_money(amount, pj_row)
+
+    return await interaction.send(
+        f"{pj_name} obtiene {amount}gp."
+        f" Ahora tiene {pp}pp, {gp}gp, {ep}ep, {sp}sp, {cp}cp,"
+        f" **Total: {new_total:.2f}gp**"
+    )
+
+def add_money(amount, pj_row):
     pj_coins = sh.get_pj_coins(pj_row)
     pp, gp, ep, sp, cp, total = pj_coins
     added_coins = utils.gp_to_coin_list(amount)
@@ -246,12 +255,7 @@ async def añadirdinero(
     new_coins = [pj_coins[x] + added_coins[x] for x in range(5)]
     pp, gp, ep, sp, cp = new_coins
     sh.update_pj_coins(pj_row, [new_coins])
-
-    return await interaction.send(
-        f"{pj_name} obtiene {amount}gp."
-        f" Ahora tiene {pp}pp, {gp}gp, {ep}ep, {sp}sp, {cp}cp,"
-        f" **Total: {new_total:.2f}gp**"
-    )
+    return pp,gp,ep,sp,cp,new_total
 
 
 def simple_value_update_command(value_row: str, value_name: str) -> Any:
@@ -354,11 +358,29 @@ async def infamia(
     guild_ids=[CRI_GUILD_ID],
 )
 @gets_pj_data
+@gets_sueldo_data
 async def completarmision(
-    interaction: nextcord.Interaction, level: int, user: nextcord.Member = None
+    interaction: nextcord.Interaction, mision: int, user: nextcord.Member = None
 ) -> Any:
     user_id: int = interaction.user.id if user is None else user.id
-    pass
+    amt = sueldo_info(mision)
+    if amt is None:
+        return await interaction.send(f"{mision} no es un numero de misión válido")
+    else:
+        try:
+            pj_row = sh.get_pj_row(user_id)
+            pj_name = sh.get_pj_data(pj_row, PJ_COL.Personaje)
+        except sh.CharacterNotFoundError:
+            return await interaction.send(
+                "No se encontró un personaje con ID de discord correspondiente"
+            )
+        
+        pp, gp, ep, sp, cp, new_total = add_money(amt, pj_row)
+
+        return await interaction.send(f'{pj_name} recibe los {amt}gp de sueldo de la misión {mision}.\n Ahora tiene {new_total}gp.')
+
+
+
 
 
 bot.run(BOT_TOKEN)

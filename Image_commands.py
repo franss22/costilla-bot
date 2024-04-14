@@ -140,7 +140,7 @@ def genDowntime(command_name: str, dt_name: str, image_url: str) -> Any:
     return f
 
 
-def generateDowntimeCommands(bot: commands.Bot) -> None:
+def generateDowntimeCommands(bot: commands.Bot) -> None: # type: ignore
     for i in downtime:
         command_name = i[0]
         dt_name = i[1]
