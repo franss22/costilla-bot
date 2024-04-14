@@ -37,7 +37,7 @@ def skill_description(
         prof_bonus: int = PROF_BONUSES[prof_level]
         extra_bonus: int = pj_skill["extra_bonus"]
         extra_descripcion: str = pj_skill["extra_descripcion"]
-        skill_title = f"**{skill_name}** *({prof_level})*:`"
+        skill_title = f"**{skill_name}** *({prof_level})*`"
 
         extra_msg = (
             ""
