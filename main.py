@@ -126,7 +126,7 @@ async def downtime(
 ) -> Any:
     user_id: int = interaction.user.id if user is None else user.id
     try:
-        amount: float = utils.parse_float_arg(amount_str)
+        amount: float = utils.parse_float_arg(amount_dt)
     except ValueError as e:
         return await interaction.send(f"Error: {e}")
     try:
