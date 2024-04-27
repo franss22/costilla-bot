@@ -1,7 +1,7 @@
 import json
 from functools import wraps
 from typing import Any, Callable, Iterable, Self
-
+from icecream import ic
 import gspread  # type: ignore
 
 import utils
@@ -30,7 +30,7 @@ def gets_pj_data(func: Callable[..., Any]) -> Callable[..., Any]:
     @wraps(func)
     async def wrapped_func(*args: Any, **kwargs: Any) -> Any:
         update_pj_data()
-        print("Updated PC data.")
+        ic("Updated PC data.")
         await func(*args, **kwargs)
 
     return wrapped_func
@@ -59,14 +59,16 @@ class PJ_COL:
 
 
 def whole_column_pj(column: Column) -> list[str]:
-
+    """
+    Entrega una columna completa (con el header)
+    """
     return [row[column.excel_index()] for row in PJ_DATA]
 
 
 def get_pj_row(discord_id: int) -> int:
     try:
         column = whole_column_pj(PJ_COL.Discord_id)
-        print(column)
+        ic(column)
         id_row = column.index(str(discord_id))
         # index del primer valor con [discord_id] de todos los ids (+1 por 0 indexed)
         return id_row
@@ -104,7 +106,7 @@ def get_pj_coins(row: int) -> list[float]:
     pp = PJ_COL.Money_pp.excel_index()
     total = PJ_COL.Money_total.excel_index()
     # pj_sheet.get(f"{PJ_COL.Money_pp}{row}:{PJ_COL.Money_total}{row}", value_render_option = "UNFORMATTED_VALUE")[0]
-    coins = PJ_DATA[row][pp: total + 1]  # noqa: E203
+    coins = PJ_DATA[row][pp : total + 1]  # noqa: E203
     return [float(x) for x in coins]
 
 
@@ -138,7 +140,7 @@ def update_level_global(new_value: int = None) -> None:
         data = sueldo_sheet.get_all_values(value_render_option="UNFORMATTED_VALUE")
         LEVEL_GLOBAL = int(data[6][3])
     else:
-        sueldo_sheet.update([[new_value]], 'D7')
+        sueldo_sheet.update([[new_value]], "D7")
 
 
 def get_level_global() -> int:

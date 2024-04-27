@@ -1,5 +1,5 @@
 import json
-from typing import Any, Self, Tuple
+from typing import Any, Self, Tuple, TypedDict
 
 RELIGIONS: list[str] = [
     "La Labor",
@@ -184,6 +184,11 @@ PROF_BONUSES: dict[str, int] = {
     PROF.Master: 6,
     PROF.Legendary: 8,
 }
+
+
+class Recipe(TypedDict):
+    name: str
+    level: int
 
 
 with open("Ancestries.json") as f:

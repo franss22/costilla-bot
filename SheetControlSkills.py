@@ -1,6 +1,7 @@
 import json
 from functools import wraps
 from typing import Any, Callable, Tuple
+from icecream import ic
 
 import gspread  # type: ignore
 
@@ -35,7 +36,7 @@ def gets_skill_data(func: Callable[..., Any]) -> Callable[..., Any]:
     @wraps(func)
     async def wrapped_func(*args: Any, **kwargs: Any) -> Any:
         _update_skill_data()
-        print("Updated skill/ability data.")
+        ic("Updated skill/ability data.")
         await func(*args, **kwargs)
 
     return wrapped_func
@@ -62,6 +63,9 @@ class ABILITY_COL:
 
 
 def _column(DATA: list[list[str]], column: utils.Column) -> list[str]:
+    """
+    Entrega una columna completa (con el header)
+    """
     return [row[column.excel_index()] for row in DATA]
 
 
@@ -76,9 +80,9 @@ def _first_empty_row(DATA: list[list[str]], col: utils.Column) -> int:
 def _get_id_row(DATA: list[list[str]], col: Column, id: int) -> int | None:
     """Retorna la row (index 0) de la primera fila de DATA con el id indicado."""
     id_column: list[str] = _column(DATA, col)
-    print("id int:", id)
-    print("id str:", str(id))
-    print("column:", id_column)
+    ic("id int:", id)
+    ic("id str:", str(id))
+    ic("column:", id_column)
 
     try:
         return id_column.index(str(id))
@@ -208,10 +212,10 @@ def get_all_existing_lore_subnames(id: int | None = None) -> list[str]:
     global SKILL_DATA
 
     data = SKILL_DATA if id is None else [row for index, row in _get_pj_skills_raw(id)]
-    print("id", id)
-    print("data", data)
+    ic("id", id)
+    ic("data", data)
     skill_names = _column(data, SKILL_COL.Skill)
-    print("skill_names column", skill_names)
+    ic("skill_names column", skill_names)
 
     # Se asume que todos los lores están en formato "Lore (subname)"
     lore_subnames = [skill[6:-1] for skill in skill_names if skill.startswith("Lore")]

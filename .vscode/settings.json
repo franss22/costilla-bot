@@ -1,6 +1,6 @@
 {
   "flake8.args": [
-    "--max-line-length=100",
+    "--max-line-length=200",
     "--select=E,W",
     "--exclude=migrations, __pycache__, settings.py, .venv, .env"
   ],

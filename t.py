@@ -1,3 +1,4 @@
+from icecream import ic
 from PF2eData import ABILITIES, PROF, PROF_BONUSES, SKILLS, Ability
 
 
@@ -31,9 +32,9 @@ def skill_description(
         skill_title = f"**{skill_name}** *({prof_level})*:"
         submsg: str = (
             f"\n- {skill_title.ljust(justify)} "
-            f'{f"{signed_bonus(prof_bonus+pj_mod_bonus+extra_bonus+level_bonus)} ".ljust(4)}'
+            f'{f"{signed_bonus(prof_bonus + pj_mod_bonus + extra_bonus + level_bonus)} ".ljust(4)}'
             f"*([{mod_type.name}: {signed_bonus(pj_mod_bonus)}]"
-            f"[{prof_level}: {prof_bonus+level_bonus}]"
+            f"[{prof_level}: {prof_bonus + level_bonus}]"
             f"[Other: {signed_bonus(extra_bonus)}{f' ({extra_descripcion})' if extra_info else ''}])*"
         )
     return submsg
@@ -49,7 +50,7 @@ justify = 40
 
 # for skill, mod in SKILLS:
 
-#     print(
+#     ic(
 #         skill_description(
 #             pj_mod_bonus, pj_level, mod, skill, pj_skill, extra_info, justify
 #         )
@@ -65,4 +66,4 @@ skills = {
     }
 }
 for name, val in skills:
-    print(name)
+    ic(name)

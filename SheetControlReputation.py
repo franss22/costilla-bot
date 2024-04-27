@@ -1,6 +1,7 @@
 import json
 from functools import wraps
 from typing import Any, Callable, Iterable, Self
+from icecream import ic
 
 import gspread  # type: ignore
 
@@ -20,16 +21,16 @@ rep_sheet = gc.open("Megamarch").get_worksheet_by_id(REPUTATION_SHEET_ID)
 REP_DATA: list[list[str]]
 
 
-def update_rep_data() -> None:
+def update_reputation_data() -> None:
     global REP_DATA
     REP_DATA = rep_sheet.get_all_values(value_render_option="UNFORMATTED_VALUE")
 
 
-def gets_rep_data(func: Callable[..., Any]) -> Callable[..., Any]:
+def gets_reputation_data(func: Callable[..., Any]) -> Callable[..., Any]:
     @wraps(func)
     async def wrapped_func(*args: Any, **kwargs: Any) -> Any:
-        update_rep_data()
-        print("Updated reputation data.")
+        update_reputation_data()
+        ic("Updated reputation data.")
         await func(*args, **kwargs)
 
     return wrapped_func
@@ -51,10 +52,13 @@ def first_empty_rep_row() -> int:
     Entrega el index (indexado a 1) de la primera fila vacía de las reputaciones
     """
     column: list[str] = whole_column_rep(REP_COL.Discord_id)
-    return len(column) + 1
+    return len(column) + 2
 
 
 def whole_column_rep(column: utils.Column) -> list[str]:
+    """
+    Entrega una columna completa (sin el header)
+    """
     return [row[column.excel_index()] for row in REP_DATA][1:]
 
 

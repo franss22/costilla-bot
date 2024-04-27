@@ -14,23 +14,30 @@ from cogs import (
     registerCommands,
     reputationCommands,
     skillCommands,
+    recipesCommands,
 )
 from cogs.moneyCommands import add_money_helper
 from SheetControl import PJ_COL, gets_pj_data
 from utils import CharacterNotFoundError, default_user_option
 from varenv import getVar
 
+
+from icecream import install, ic
+
+install()
+ic.configureOutput(includeContext=True)
+
 CRI_GUILD_ID = int(getVar("GUILD_ID"))
 PANCHO_ID = getVar("PANCHO_ID")
 BOT_TOKEN = getVar("TOKEN")
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.WARNING)
 bot = commands.Bot()
 
 
 @bot.event
 async def on_ready() -> None:
-    print(f"We have logged in as {bot.user}")
+    ic(f"We have logged in as {bot.user}")
 
 
 @bot.slash_command(
@@ -129,6 +136,7 @@ moneyCommands.setup(bot)
 earn_incomeCommands.setup(bot)
 languagesCommands.setup(bot)
 skillCommands.setup(bot)
+recipesCommands.setup(bot)
 
 sh.update_level_global()
 
