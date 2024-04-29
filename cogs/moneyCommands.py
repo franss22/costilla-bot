@@ -126,7 +126,7 @@ class Money(commands.Cog):
         if amount < 0:
             return await interaction.send("Debes ganar una cantidad positiva de dinero")
 
-        pp, gp, sp, cp, new_total = self.add_money_helper(amount, pj_row)
+        pp, gp, sp, cp, new_total = add_money_helper(amount, pj_row)
 
         return await interaction.send(
             (
