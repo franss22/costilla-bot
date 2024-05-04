@@ -149,7 +149,7 @@ async def downtime(
     sh.update_pj_data_cell(pj_row, PJ_COL.Downtime, [[new_total]])
 
     return await interaction.send(
-        f"{pj_name} {'gana' if amount > 0 else 'gasta'} {abs(amount):.1f} semanas de downtime. Ahora tiene {new_total:.1f}"
+        f"{pj_name} {'gana' if amount > 0 else 'gasta'} {abs(amount):.1f} semanas de downtime. Tenía {pj_dt:.1f}. Ahora tiene {new_total:.1f}"
     )
 
 
