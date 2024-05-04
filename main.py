@@ -47,7 +47,7 @@ async def registrar(
     values = [nombre_pj, str(user_id), nombre_jugador]
     pj_row = sh.first_empty_PJ_row()
     sh.update_range_PJ(pj_row, PJ_COL.Personaje, PJ_COL.Jugadores, [values])
-    await interaction.send(f"Registrado {nombre_pj} en la fila {pj_row+1}")
+    await interaction.send(f"Registrado {nombre_pj} en la fila {pj_row + 1}")
 
 
 @bot.slash_command(
@@ -104,7 +104,7 @@ async def resumen(
 - Deidad: {deidad}, {piedad} de piedad
 - Renombre: {renombre}
 - Dinero: {pp}pp, {gp}gp, {ep}ep, {sp}sp, {cp}cp, **Total: {total}gp**
-- Downtime: {Dt//1} semanas y {round(Dt%1*10)} dias
+- Downtime: {Dt // 1} semanas y {round(Dt % 1 * 10)} dias
 """
     if full_data:
         message += f"""
@@ -138,7 +138,6 @@ async def downtime(
         )
 
     pj_dt = float(sh.get_pj_data(pj_row, PJ_COL.Downtime))
-    
 
     if pj_dt + amount < 0:
         return await interaction.send(
@@ -150,7 +149,7 @@ async def downtime(
     sh.update_pj_data_cell(pj_row, PJ_COL.Downtime, [[new_total]])
 
     return await interaction.send(
-        f"{pj_name} {'gana' if amount>0 else 'gasta'} {amount:.2f} semanas de downtime. Ahora tiene {new_total:.2f}"
+        f"{pj_name} {'gana' if amount > 0 else 'gasta'} {amount:.2f} semanas de downtime. Ahora tiene {new_total:.2f}"
     )
 
 
@@ -252,6 +251,7 @@ async def añadirdinero(
         f" **Total: {new_total:.2f}gp**"
     )
 
+
 def add_money(amount, pj_row):
     pj_coins = sh.get_pj_coins(pj_row)
     pp, gp, ep, sp, cp, total = pj_coins
@@ -260,7 +260,7 @@ def add_money(amount, pj_row):
     new_coins = [pj_coins[x] + added_coins[x] for x in range(5)]
     pp, gp, ep, sp, cp = new_coins
     sh.update_pj_coins(pj_row, [new_coins])
-    return pp,gp,ep,sp,cp,new_total
+    return pp, gp, ep, sp, cp, new_total
 
 
 def simple_value_update_command(value_row: str, value_name: str) -> Any:
@@ -286,10 +286,21 @@ def simple_value_update_command(value_row: str, value_name: str) -> Any:
             sh.update_pj_data_cell(pj_row, value_row, [[new_value]])
 
             return await interaction.send(
-                f"{pj_name} {'gana' if amount>0 else 'pierde'} {abs(amount)} de {value_name}. Ahora tiene {new_value}."
+                f"{pj_name} {'gana' if amount > 0 else 'pierde'} {abs(amount)} de {value_name}. Ahora tiene {new_value}."
             )
 
     return command
+
+
+@bot.slash_command(
+    description="Revisa o actualiza tu devoción", guild_ids=[CRI_GUILD_ID]
+)
+@gets_pj_data
+async def devocion(
+    interaction: nextcord.Interaction, amount: int, user: nextcord.Member = None
+) -> Any:
+    command = simple_value_update_command(PJ_COL.Devocion, "devoción")
+    return await command(interaction, amount, user)
 
 
 @bot.slash_command(
@@ -379,13 +390,12 @@ async def completarmision(
             return await interaction.send(
                 "No se encontró un personaje con ID de discord correspondiente"
             )
-        
+
         pp, gp, ep, sp, cp, new_total = add_money(amt, pj_row)
 
-        return await interaction.send(f'{pj_name} recibe los {amt}gp de sueldo de la misión {mision}.\n Ahora tiene {new_total}gp.')
-
-
-
+        return await interaction.send(
+            f"{pj_name} recibe los {amt}gp de sueldo de la misión {mision}.\n Ahora tiene {new_total}gp."
+        )
 
 
 bot.run(BOT_TOKEN)

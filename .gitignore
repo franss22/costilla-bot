@@ -1,5 +1,4 @@
 .env
-.vscode
 __pycache__
 local_vars.json
 secrets.json

@@ -17,6 +17,7 @@ sueldo_sheet = gc.open("Masters Dungeonmarch").get_worksheet_by_id(SUELDO_SHEET_
 PJ_DATA = None
 SUELDO_DATA = None
 
+
 def update_pj_data():
     global PJ_DATA
     PJ_DATA = pj_sheet.get_all_values(value_render_option="UNFORMATTED_VALUE")
@@ -30,6 +31,7 @@ def gets_pj_data(func):
         await func(*args, **kwargs)
 
     return wrapped_func
+
 
 def update_sueldo_data():
     global SUELDO_DATA
@@ -66,7 +68,7 @@ class PJ_COL:
     money_total = "Q"
     Renombre = "R"
     Deidad = "S"
-    Cantidad = "T"
+    Devocion = "T"
     Downtime = "U"
     DivineFavor = "V"
     Reputacion = "W"
@@ -132,24 +134,25 @@ def get_pj_coins(row: int) -> list[float]:
 
 
 def update_range_PJ(pj_row: int, start_column: str, end_column: str, values: list):
-    pj_sheet.update(values, f"{start_column}{pj_row+1}:{end_column}{pj_row+1}")
+    pj_sheet.update(values, f"{start_column}{pj_row + 1}:{end_column}{pj_row + 1}")
 
 
 def update_pj_data_cell(pj_row: int, col: str, value):
-    pj_sheet.update(value, f"{col}{pj_row+1}")
+    pj_sheet.update(value, f"{col}{pj_row + 1}")
 
 
 def update_pj_coins(row: int, values):
-    pj_sheet.update(values, f"{PJ_COL.money_pp}{row+1}:{PJ_COL.money_total}{row+1}")
+    pj_sheet.update(values, f"{PJ_COL.money_pp}{row + 1}:{PJ_COL.money_total}{row + 1}")
 
 
-def sueldo_info(mission: int): 
+def sueldo_info(mission: int):
     tiers = [row for row in SUELDO_DATA[1:]]
     for tier in tiers:
         start, end, gp = tier
         if mission >= int(start) and mission <= int(end):
             return int(gp)
     return None
+
 
 if __name__ == "__main__":
     # print(COL.name)
