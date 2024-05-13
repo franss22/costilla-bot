@@ -42,7 +42,7 @@ class Downtime(commands.Cog):
 
         return await interaction.send(
             (
-                f"{pj_name} {'gana' if amount > 0 else 'gasta'} {amount} dias de downtime."
+                f"{pj_name} {'gana' if amount > 0 else 'gasta'} {abs(amount)} dias de downtime."
                 f" Ahora tiene {new_total // 7} semanas y {new_total % 7} dias ({new_total} dias)"
             )
         )
