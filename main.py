@@ -41,7 +41,8 @@ async def registrar(
         already_has_character = False
     if already_has_character:
         return await interaction.send(
-            f"Ya tienes un personaje en la fila {pj_row}, muevelo al cementario para registrar uno nuevo."
+            f"Ya tienes un personaje en la fila {
+                pj_row}, muevelo al cementario para registrar uno nuevo."
         )
 
     values = [nombre_pj, str(user_id), nombre_jugador]
@@ -147,7 +148,7 @@ async def downtime(
     dt_cap = 4.5
 
     new_total = min(pj_dt + amount, dt_cap)
-    if j_dt + amount > dt_cap:
+    if pj_dt + amount > dt_cap:
         capped_msg = (
             "Llegaste al cap de downtime, por lo que no se añadió el valor completo"
         )
@@ -157,7 +158,8 @@ async def downtime(
     sh.update_pj_data_cell(pj_row, PJ_COL.Downtime, [[new_total]])
 
     return await interaction.send(
-        f"{pj_name} {'gana' if amount > 0 else 'gasta'} {abs(amount):.1f} semanas de downtime. Tenía {pj_dt:.1f}. Ahora tiene {new_total:.1f}. {capped_msg}"
+        f"{pj_name} {'gana' if amount > 0 else 'gasta'} {abs(amount):.1f} semanas de downtime. Tenía {
+            pj_dt:.1f}. Ahora tiene {new_total:.1f}. {capped_msg}"
     )
 
 
@@ -180,7 +182,8 @@ async def pagar(
     try:
         pj_row = sh.get_pj_row(user_id)
         pj_name = sh.get_pj_data(pj_row, PJ_COL.Personaje)
-        target_pj_row = sh.get_pj_row(target_id) if transfertarget is not None else None
+        target_pj_row = sh.get_pj_row(
+            target_id) if transfertarget is not None else None
         target_pj_name = (
             sh.get_pj_data(target_pj_row, PJ_COL.Personaje)
             if transfertarget is not None
@@ -218,13 +221,16 @@ async def pagar(
         sh.update_pj_coins(target_pj_row, [new_coins])
         return await interaction.send(
             (
-                f"{pj_name} le transfiere {amount}gp ({ppp}pp, {pgp}gp, {pep}ep, {psp}sp, {pcp}cp)"
-                f" a {target_pj_name}. \n{pj_name} queda con {new_total:.2f}gp,"
+                f"{pj_name} le transfiere {amount}gp ({ppp}pp, {pgp}gp, {
+                    pep}ep, {psp}sp, {pcp}cp)"
+                f" a {target_pj_name}. \n{
+                    pj_name} queda con {new_total:.2f}gp,"
                 f" y {target_pj_name} queda con {new_total_target:.2f}gp."
             )
         )
     return await interaction.send(
-        f"{pj_name} paga {amount}gp ({ppp}pp, {pgp}gp, {pep}ep, {psp}sp, {pcp}cp)."
+        f"{pj_name} paga {amount}gp ({ppp}pp, {pgp}gp, {
+            pep}ep, {psp}sp, {pcp}cp)."
         f"\nAhora tiene {pp}pp, {gp}gp, {ep}ep, {sp}sp, {cp}cp,"
         f" **Total: {new_total:.2f}gp**"
     )
@@ -294,7 +300,8 @@ def simple_value_update_command(value_row: str, value_name: str) -> Any:
             sh.update_pj_data_cell(pj_row, value_row, [[new_value]])
 
             return await interaction.send(
-                f"{pj_name} {'gana' if amount > 0 else 'pierde'} {abs(amount)} de {value_name}. Ahora tiene {new_value}."
+                f"{pj_name} {'gana' if amount > 0 else 'pierde'} {
+                    abs(amount)} de {value_name}. Ahora tiene {new_value}."
             )
 
     return command
@@ -402,7 +409,8 @@ async def completarmision(
         pp, gp, ep, sp, cp, new_total = add_money(amt, pj_row)
 
         return await interaction.send(
-            f"{pj_name} recibe los {amt}gp de sueldo de la misión {mision}.\n Ahora tiene {new_total}gp."
+            f"{pj_name} recibe los {amt}gp de sueldo de la misión {
+                mision}.\n Ahora tiene {new_total}gp."
         )
 
 
