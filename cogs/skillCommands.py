@@ -30,12 +30,13 @@ class Skills(commands.Cog):
     async def all_skills(
         self: Self, interaction: nextcord.Interaction, extra_info: bool = False
     ) -> Any:
+        await interaction.response.defer()
         user_id: int = interaction.user.id
         pj_mods: dict[Ability, int]
         name_mods, row, pj_mods = sh_skills.get_pj_abilities(user_id)
 
         if name_mods is None:
-            return await interaction.send(
+            return await interaction.followup.send(
                 "Tu personaje no tiene modificadores de habilidad definidos. Definelos con /set_modifiers."
             )
         pj_skills: dict[str, dict[str, str | int]]
@@ -73,7 +74,7 @@ class Skills(commands.Cog):
                 lore,
                 extra_info,
             )
-        return await interaction.send(message)
+        return await interaction.followup.send(message)
 
     @nextcord.slash_command(
         description="Muestra la información de todas las lore skills de tu personaje",
@@ -83,12 +84,13 @@ class Skills(commands.Cog):
     async def all_lores(
         self: Self, interaction: nextcord.Interaction, extra_info: bool = False
     ) -> Any:
+        await interaction.response.defer()
         user_id: int = interaction.user.id
         pj_mods: dict[Ability, int]
         name_mods, row, pj_mods = sh_skills.get_pj_abilities(user_id)
 
         if name_mods is None:
-            return await interaction.send(
+            return await interaction.followup.send(
                 "Tu personaje no tiene modificadores de habilidad definidos. Definelos con /set_modifiers."
             )
         pj_skills: dict[str, dict[str, str | int]]
@@ -114,7 +116,7 @@ class Skills(commands.Cog):
                 lore,
                 extra_info,
             )
-        return await interaction.send(message)
+        return await interaction.followup.send(message)
 
     @nextcord.slash_command(
         description="Muestra la información de una skill de tu personaje",
@@ -132,12 +134,13 @@ class Skills(commands.Cog):
         ),
         extra_info: bool = False,
     ) -> Any:
+        await interaction.response.defer()
         user_id: int = interaction.user.id
         pj_mods: dict[Ability, int]
         name_mods, row, pj_mods = sh_skills.get_pj_abilities(user_id)
 
         if name_mods is None:
-            return await interaction.send(
+            return await interaction.followup.send(
                 "Tu personaje no tiene modificadores de habilidad definidos. Definelos con /set_modifiers."
             )
         pj_skills: dict[str, dict[str, str | int]]
@@ -158,7 +161,7 @@ class Skills(commands.Cog):
             extra_info,
         )
 
-        return await interaction.send(message)
+        return await interaction.followup.send(message)
 
     @nextcord.slash_command(
         description="Muestra la información de una skill de lore de tu personaje",
@@ -175,12 +178,13 @@ class Skills(commands.Cog):
         ),
         extra_info: bool = False,
     ) -> Any:
+        await interaction.response.defer()
         user_id: int = interaction.user.id
         pj_mods: dict[Ability, int]
         name_mods, row, pj_mods = sh_skills.get_pj_abilities(user_id)
 
         if name_mods is None:
-            return await interaction.send(
+            return await interaction.followup.send(
                 "Tu personaje no tiene modificadores de habilidad definidos. Definelos con /set_modifiers."
             )
         pj_skills: dict[str, dict[str, str | int]]
@@ -203,7 +207,7 @@ class Skills(commands.Cog):
             extra_info,
         )
 
-        return await interaction.send(message)
+        return await interaction.followup.send(message)
 
     @nextcord.slash_command(
         description="Define la proficiencia de una skill de tu personaje",
@@ -239,6 +243,7 @@ class Skills(commands.Cog):
             default="",
         ),
     ) -> Any:
+        await interaction.response.defer()
         user_id: int = interaction.user.id
 
         pj_skills: dict[str, dict[str, str | int]]
@@ -251,7 +256,7 @@ class Skills(commands.Cog):
             try:
                 pj_name = sh_pj.get_pj_data(sh_pj.get_pj_row(user_id), PJ_COL.Name)
             except CharacterNotFoundError as e:
-                return await interaction.send(e)
+                return await interaction.followup.send(e)
             row: int = sh_skills.first_empty_skill_row()
             msg = f"Se definió la proficiencia de {pj_name} en {skill}"
         else:
@@ -268,7 +273,7 @@ class Skills(commands.Cog):
             other_bonuses_description,
         )
         sh_skills.update_skill_row(row, data)
-        return await interaction.send(msg)
+        return await interaction.followup.send(msg)
 
     @nextcord.slash_command(
         description="Define las proficiencias de todas las skills de tu personaje",
@@ -297,6 +302,7 @@ class Skills(commands.Cog):
         survival: str = ability_param("survival"),
         thievery: str = ability_param("thievery"),
     ) -> Any:
+        await interaction.response.defer()
         user_id: int = interaction.user.id
 
         pj_skills: dict[str, dict[str, str | int]]
@@ -305,7 +311,7 @@ class Skills(commands.Cog):
         try:
             pj_name = sh_pj.get_pj_data(sh_pj.get_pj_row(user_id), PJ_COL.Name)
         except CharacterNotFoundError as e:
-            return await interaction.send(e)
+            return await interaction.followup.send(e)
 
         better_args = [
             ("Perception", perception),
@@ -354,7 +360,7 @@ class Skills(commands.Cog):
             )
             rows_and_data.append((row, data))
         sh_skills.multi_update_skill_row(rows_and_data)
-        return await interaction.send(msg)
+        return await interaction.followup.send(msg)
 
     @nextcord.slash_command(
         description="Define la proficiencia de una skill de lore de tu personaje",
@@ -389,6 +395,7 @@ class Skills(commands.Cog):
             default="",
         ),
     ) -> Any:
+        await interaction.response.defer()
         user_id: int = interaction.user.id
 
         pj_skills: dict[str, dict[str, str | int]]
@@ -403,7 +410,7 @@ class Skills(commands.Cog):
             try:
                 pj_name = sh_pj.get_pj_data(sh_pj.get_pj_row(user_id), PJ_COL.Name)
             except CharacterNotFoundError as e:
-                return await interaction.send(e)
+                return await interaction.followup.send(e)
             row: int = sh_skills.first_empty_skill_row()
             msg = f"Se definió la proficiencia de {pj_name} en {skill}"
         else:
@@ -420,7 +427,7 @@ class Skills(commands.Cog):
             other_bonuses_description,
         )
         sh_skills.update_skill_row(row, data)
-        return await interaction.send(msg)
+        return await interaction.followup.send(msg)
 
     @nextcord.slash_command(
         description="Define los modificadores de habilidad de tu personaje",
@@ -438,6 +445,7 @@ class Skills(commands.Cog):
         wisdom: int,
         charisma: int,
     ) -> Any:
+        await interaction.response.defer()
         user_id: int = interaction.user.id
 
         pj_name, row, _ = sh_skills.get_pj_abilities(user_id)
@@ -448,7 +456,7 @@ class Skills(commands.Cog):
             try:
                 pj_name = sh_pj.get_pj_data(sh_pj.get_pj_row(user_id), PJ_COL.Name)
             except CharacterNotFoundError as e:
-                return await interaction.send(e)
+                return await interaction.followup.send(e)
         data = (
             pj_name,
             str(user_id),
@@ -460,7 +468,7 @@ class Skills(commands.Cog):
             charisma,
         )
         sh_skills.update_ability_row(row, data)
-        return await interaction.send(
+        return await interaction.followup.send(
             f"Actualizados los modificadores de habilidad de {pj_name}"
         )
 
@@ -486,13 +494,14 @@ class Skills(commands.Cog):
         ),
         extra_info: bool = False,
     ) -> Any:
+        await interaction.response.defer()
         user_id: int = interaction.user.id
 
         pj_mods: dict[Ability, int]
         name_mods, row, pj_mods = sh_skills.get_pj_abilities(user_id)
 
         if name_mods is None:
-            return await interaction.send(
+            return await interaction.followup.send(
                 "Tu personaje no tiene modificadores de habilidad definidos. Definelos con /set_modifiers."
             )
 
@@ -541,7 +550,7 @@ class Skills(commands.Cog):
         result = dice + ability_bonus + prof_bonus + other_bonus + extra_modifiers
 
         message = f"{name_mods} {skill} roll: `{result}` {nat_20_1}\n[Dice: {dice}]{ability_msg}{prof_msg}{other_msg}{extra_msg}"
-        return await interaction.send(message)
+        return await interaction.followup.send(message)
 
     @nextcord.slash_command(
         description="Tira un lore skill check con el lore skill seleccionado",
@@ -564,13 +573,14 @@ class Skills(commands.Cog):
         ),
         extra_info: bool = False,
     ) -> Any:
+        await interaction.response.defer()
         user_id: int = interaction.user.id
 
         pj_mods: dict[Ability, int]
         name_mods, row, pj_mods = sh_skills.get_pj_abilities(user_id)
 
         if name_mods is None:
-            return await interaction.send(
+            return await interaction.followup.send(
                 "Tu personaje no tiene modificadores de habilidad definidos. Definelos con /set_modifiers."
             )
 
@@ -620,7 +630,7 @@ class Skills(commands.Cog):
         result = dice + ability_bonus + prof_bonus + other_bonus + extra_modifiers
 
         message = f"{name_mods} {lore_full_name} roll: `{result}` {nat_20_1}\n[Dice: {dice}]{ability_msg}{prof_msg}{other_msg}{extra_msg}"
-        return await interaction.send(message)
+        return await interaction.followup.send(message)
 
     @set_lore.on_autocomplete("lore_subname")
     async def autocomplete_set_lore_subname(

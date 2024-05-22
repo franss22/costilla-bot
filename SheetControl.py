@@ -68,7 +68,7 @@ def whole_column_pj(column: Column) -> list[str]:
 def get_pj_row(discord_id: int) -> int:
     try:
         column = whole_column_pj(PJ_COL.Discord_id)
-        ic(column)
+        # ic(column)
         id_row = column.index(str(discord_id))
         # index del primer valor con [discord_id] de todos los ids (+1 por 0 indexed)
         return id_row
@@ -106,7 +106,7 @@ def get_pj_coins(row: int) -> list[float]:
     pp = PJ_COL.Money_pp.excel_index()
     total = PJ_COL.Money_total.excel_index()
     # pj_sheet.get(f"{PJ_COL.Money_pp}{row}:{PJ_COL.Money_total}{row}", value_render_option = "UNFORMATTED_VALUE")[0]
-    coins = PJ_DATA[row][pp : total + 1]  # noqa: E203
+    coins = PJ_DATA[row][pp: total + 1]  # noqa: E203
     return [float(x) for x in coins]
 
 

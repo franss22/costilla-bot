@@ -25,17 +25,18 @@ class Languages(commands.Cog):
         interaction: nextcord.Interaction,
         target: nextcord.Member = default_user_option,
     ) -> Any:
+        await interaction.response.defer()
         try:
             assert interaction.user is not None
         except AssertionError:
-            return await interaction.send("Error: Null user")
+            return await interaction.followup.send("Error: Null user")
         user_id: int = target.id if target is not None else interaction.user.id
         try:
             pj_row: int = sh.get_pj_row(user_id)
             pj_name: str = sh.get_pj_data(pj_row, PJ_COL.Name)
             pj_languages: str = sh.get_pj_data(pj_row, PJ_COL.Languages)
         except CharacterNotFoundError:
-            return await interaction.send(
+            return await interaction.followup.send(
                 "No se encontró un personaje con ID de discord correspondiente"
             )
         if pj_languages is not None:
@@ -45,7 +46,7 @@ class Languages(commands.Cog):
     - {language_list}"""
         else:
             message = f"{pj_name} no sabe ningún lenguaje."
-        return await interaction.send(message)
+        return await interaction.followup.send(message)
 
     @nextcord.slash_command(
         description="Añade un lenguaje a la lista de tu PJ", guild_ids=[CRI_GUILD_ID]
@@ -59,28 +60,29 @@ class Languages(commands.Cog):
         ),
         target: nextcord.Member = default_user_option,
     ) -> Any:
+        await interaction.response.defer()
         try:
             assert interaction.user is not None
         except AssertionError:
-            return await interaction.send("Error: Null user")
+            return await interaction.followup.send("Error: Null user")
         user_id: int = target.id if target is not None else interaction.user.id
         try:
             pj_row: int = sh.get_pj_row(user_id)
             pj_name: str = sh.get_pj_data(pj_row, PJ_COL.Name)
             pj_languages: str = sh.get_pj_data(pj_row, PJ_COL.Languages)
         except CharacterNotFoundError:
-            return await interaction.send(
+            return await interaction.followup.send(
                 "No se encontró un personaje con ID de discord correspondiente"
             )
         languages = [] if pj_languages in [None, ""] else pj_languages.split(", ")
         if addedlanguage not in languages:
             languages.append(addedlanguage)
             sh.update_pj_data_cell(pj_row, PJ_COL.Languages, [[", ".join(languages)]])
-            return await interaction.send(
+            return await interaction.followup.send(
                 f"{addedlanguage} ha sido añadido a la lista de {pj_name}."
             )
         else:
-            return await interaction.send(
+            return await interaction.followup.send(
                 f"{addedlanguage} ya está en la lista de {pj_name}."
             )
 

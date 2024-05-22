@@ -83,11 +83,12 @@ class Register(commands.Cog):
             choices=RELIGIONS,
         ),
     ) -> Any:
+        await interaction.response.defer()
         # Conseguir el ID del usuario
         try:
             assert interaction.user is not None
         except AssertionError:
-            return await interaction.send("Error: Null user")
+            return await interaction.followup.send("Error: Null user")
 
         user_id: int = interaction.user.id
         # Revisar que no tenga otro PJ
@@ -97,7 +98,7 @@ class Register(commands.Cog):
         except CharacterNotFoundError:
             already_has_character = False
         if already_has_character:
-            return await interaction.send(
+            return await interaction.followup.send(
                 (
                     f"Ya tienes un personaje en la fila {pj_row}"
                     f", muevelo al cementerio para registrar uno nuevo."
@@ -105,7 +106,7 @@ class Register(commands.Cog):
             )
         ascendencia = ascendencia.capitalize()
         if ascendencia not in ANCESTRIES:
-            return await interaction.send(
+            return await interaction.followup.send(
                 f"'{ascendencia}' no es una ascendencia válida."
             )
 
@@ -133,12 +134,12 @@ class Register(commands.Cog):
                 [values], f"{PJ_COL.Name}{pj_row}:{PJ_COL.Money_cp}{pj_row}"
             )
             sh.update_range_PJ([[religion]], f"{PJ_COL.Religion}{pj_row}")
-            await interaction.send(f"Registrado {nombre_pj} en la fila {pj_row}")
+            await interaction.followup.send(f"Registrado {nombre_pj} en la fila {pj_row}")
 
         heritage_dropdown = HeritageDropdown(ascendencia, update_func)
 
         view = RegisterDropdownView(heritage_dropdown)
-        await interaction.send("Selecciona un heritage para tu personaje", view=view)
+        await interaction.followup.send("Selecciona un heritage para tu personaje", view=view)
 
     @register.on_autocomplete("ascendencia")
     async def autocomplete_ancestry(

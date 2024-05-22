@@ -44,6 +44,7 @@ class EarnIncome(commands.Cog):
             "dc-adjustment", "Cambios al DC impuestos por el DM", False, default=0
         ),
     ) -> Any:
+        await interaction.response.defer()
         dice = dndice.basic("1d20")
         check_value = dice + checkBonus
         DC = EARN_INCOME[taskLevel][0] + dcChange
@@ -72,7 +73,7 @@ class EarnIncome(commands.Cog):
     Trabajas {final_dt_usage} dias y obtienes {income:.2f} gp al día, por un total de {income * final_dt_usage:.2f} gp.
     (Por ahora, debes updatearlos manualmente)
     """  # noqa: E501
-        await interaction.send(message)
+        await interaction.followup.send(message)
 
 
 def setup(client: commands.Bot) -> None:

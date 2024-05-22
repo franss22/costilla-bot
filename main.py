@@ -47,11 +47,12 @@ async def on_ready() -> None:
 async def status(
     interaction: nextcord.Interaction, user: nextcord.Member = default_user_option
 ) -> Any:
+    await interaction.response.defer()
     user_id: int = interaction.user.id if user is None else user.id
     try:
         pj_row = sh.get_pj_row(user_id)
     except CharacterNotFoundError:
-        return await interaction.send(
+        return await interaction.followup.send(
             "No se encontró un personaje con ID de discord correspondiente"
         )
     data = sh.get_pj_full(pj_row)
@@ -80,7 +81,7 @@ async def status(
 - Dinero: {pp}pp, {gp}gp, {sp}sp, {cp}cp, **Total: {total:.2f}gp**
 - Downtime: {Dt_int // 7} semanas y {Dt % 7} dias ({Dt_int} dias)
 """
-    return await interaction.send(message)
+    return await interaction.followup.send(message)
 
 
 @bot.slash_command(
@@ -93,16 +94,18 @@ async def salary(
     overwrite_level: int = None,
     target: nextcord.Member = default_user_option,
 ) -> Any:
+    await interaction.response.defer()
+
     try:
         assert interaction.user is not None
     except AssertionError:
-        return await interaction.send("Error: Null user")
+        return await interaction.followup.send("Error: Null user")
     user_id: int = target.id if target is not None else interaction.user.id
     try:
         pj_row = sh.get_pj_row(user_id)
         pj_name = sh.get_pj_data(pj_row, PJ_COL.Name)
     except CharacterNotFoundError:
-        return await interaction.send(
+        return await interaction.followup.send(
             "No se encontró un personaje con ID de discord correspondiente"
         )
     overwrite_level = (
@@ -118,7 +121,7 @@ async def salary(
 
     sh.update_pj_data_cell(pj_row, PJ_COL.Downtime, [[new_total_dt, pp, gp, sp, cp]])
 
-    return await interaction.send(
+    return await interaction.followup.send(
         (
             f"{pj_name}: Misión nivel {overwrite_level} completada!"
             f"\n Se te suma el sueldo de la misión:"
@@ -147,8 +150,10 @@ sh.update_level_global()
 async def update_global_level(
     interaction: nextcord.Interaction, level: int = None
 ) -> Any:
+    await interaction.response.defer()
+
     sh.update_level_global(level)
-    return await interaction.send("Nivel global actualizado")
+    return await interaction.followup.send("Nivel global actualizado")
 
 
 bot.run(BOT_TOKEN)

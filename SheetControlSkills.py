@@ -80,9 +80,6 @@ def _first_empty_row(DATA: list[list[str]], col: utils.Column) -> int:
 def _get_id_row(DATA: list[list[str]], col: Column, id: int) -> int | None:
     """Retorna la row (index 0) de la primera fila de DATA con el id indicado."""
     id_column: list[str] = _column(DATA, col)
-    ic("id int:", id)
-    ic("id str:", str(id))
-    ic("column:", id_column)
 
     try:
         return id_column.index(str(id))
@@ -212,10 +209,8 @@ def get_all_existing_lore_subnames(id: int | None = None) -> list[str]:
     global SKILL_DATA
 
     data = SKILL_DATA if id is None else [row for index, row in _get_pj_skills_raw(id)]
-    ic("id", id)
-    ic("data", data)
+
     skill_names = _column(data, SKILL_COL.Skill)
-    ic("skill_names column", skill_names)
 
     # Se asume que todos los lores están en formato "Lore (subname)"
     lore_subnames = [skill[6:-1] for skill in skill_names if skill.startswith("Lore")]

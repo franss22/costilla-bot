@@ -27,18 +27,17 @@ class Reputation(commands.Cog):
         interaction: nextcord.Interaction,
         target: nextcord.Member = default_user_option,
     ) -> Any:
+        await interaction.response.defer()
         try:
             assert interaction.user is not None
         except AssertionError:
-            return await interaction.send("Error: Null user")
+            return await interaction.followup.send("Error: Null user")
         user_id: int = target.id if target is not None else interaction.user.id
         reps: list[tuple[str, str, str, str, int]] = shr.get_pj_reps(user_id)
         message = ""
-        ic(reps)
         if len(reps) > 0:
             message = f"# Reputación de {reps[0][REP_COL.Name.excel_index()]}"
             reps.sort(reverse=True, key=lambda r: r[REP_COL.Reputation.excel_index()])
-            ic(reps)
 
             for rep in reps:
                 row_pj_name, row_discord_id, row_faction, row_reputation, row_index = (
@@ -47,7 +46,7 @@ class Reputation(commands.Cog):
                 message += f"\n- {row_faction}: {row_reputation}"
         else:
             message = "Tu personaje no tiene reputación con ningún NPC ni facción."
-        return await interaction.send(message)
+        return await interaction.followup.send(message)
 
     @nextcord.slash_command(
         description="Actualiza tu reputación con una facción o NPC",
@@ -62,6 +61,7 @@ class Reputation(commands.Cog):
         faction: str,
         target: nextcord.Member = default_user_option,
     ) -> Any:
+        await interaction.response.defer()
 
         user_id: int = target.id if target is not None else interaction.user.id
 
@@ -78,7 +78,7 @@ class Reputation(commands.Cog):
             new_rep = int(row_reputation) + amount
             new_row = [row_pj_name, row_discord_id, row_faction, new_rep]
             shr.update_rep_row(row_index, new_row)
-            await interaction.send(
+            await interaction.followup.send(
                 (
                     f"Actualizada la reputación de {row_pj_name} con"
                     f" {faction}: {row_reputation} -> {new_rep}"
@@ -91,14 +91,14 @@ class Reputation(commands.Cog):
                 pj_row = shpj.get_pj_row(user_id)
                 pj_name = shpj.get_pj_data(pj_row, PJ_COL.Name)
             except CharacterNotFoundError:
-                return await interaction.send(
+                return await interaction.followup.send(
                     "No se encontró un personaje con ID de discord correspondiente"
                 )
             row_index = ic(shr.first_empty_rep_row())
             new_row = [pj_name, str(user_id), faction, amount]
             ic(new_row)
             shr.update_rep_row(row_index, new_row)
-            await interaction.send(
+            await interaction.followup.send(
                 f"Creada la reputación de {pj_name} con {faction}: {amount}"
             )
 
