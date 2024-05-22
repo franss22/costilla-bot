@@ -30,6 +30,7 @@ async def on_ready() -> None:
 async def registrar(
     interaction: nextcord.Interaction, nombre_pj: str, nombre_jugador: str
 ) -> Any:
+    await interaction.response.defer()
     # Conseguir el ID del usuario
     user_id: int = interaction.user.id
     print(user_id)
@@ -40,7 +41,7 @@ async def registrar(
     except sh.CharacterNotFoundError:
         already_has_character = False
     if already_has_character:
-        return await interaction.send(
+        return await interaction.followup.send(
             f"Ya tienes un personaje en la fila {
                 pj_row}, muevelo al cementario para registrar uno nuevo."
         )
@@ -48,7 +49,7 @@ async def registrar(
     values = [nombre_pj, str(user_id), nombre_jugador]
     pj_row = sh.first_empty_PJ_row()
     sh.update_range_PJ(pj_row, PJ_COL.Personaje, PJ_COL.Jugadores, [values])
-    await interaction.send(f"Registrado {nombre_pj} en la fila {pj_row + 1}")
+    await interaction.followup.send(f"Registrado {nombre_pj} en la fila {pj_row + 1}")
 
 
 @bot.slash_command(
@@ -60,11 +61,12 @@ async def resumen(
     full_data: bool = False,
     user: nextcord.Member = None,
 ) -> Any:
+    await interaction.response.defer()
     user_id: int = interaction.user.id if user is None else user.id
     try:
         pj_row = sh.get_pj_row(user_id)
     except sh.CharacterNotFoundError:
-        return await interaction.send(
+        return await interaction.followup.send(
             "No se encontró un personaje con ID de discord correspondiente"
         )
     data = sh.get_pj_full(pj_row)
@@ -115,7 +117,7 @@ async def resumen(
 - Expresión: {expresion}
 - Infamia: {infamia}
 """
-    return await interaction.send(message)
+    return await interaction.followup.send(message)
 
 
 @bot.slash_command(
@@ -125,23 +127,24 @@ async def resumen(
 async def downtime(
     interaction: nextcord.Interaction, amount_dt: str, user: nextcord.Member = None
 ) -> Any:
+    await interaction.response.defer()
     user_id: int = interaction.user.id if user is None else user.id
     try:
         amount: float = utils.parse_float_arg(amount_dt)
     except ValueError as e:
-        return await interaction.send(f"Error: {e}")
+        return await interaction.followup.send(f"Error: {e}")
     try:
         pj_row = sh.get_pj_row(user_id)
         pj_name = sh.get_pj_data(pj_row, PJ_COL.Personaje)
     except sh.CharacterNotFoundError:
-        return await interaction.send(
+        return await interaction.followup.send(
             "No se encontró un personaje con ID de discord correspondiente"
         )
 
     pj_dt = float(sh.get_pj_data(pj_row, PJ_COL.Downtime))
 
     if pj_dt + amount < 0:
-        return await interaction.send(
+        return await interaction.followup.send(
             "No tienes suficiente downtime para esta transacción"
         )
 
@@ -157,7 +160,7 @@ async def downtime(
 
     sh.update_pj_data_cell(pj_row, PJ_COL.Downtime, [[new_total]])
 
-    return await interaction.send(
+    return await interaction.followup.send(
         f"{pj_name} {'gana' if amount > 0 else 'gasta'} {abs(amount):.1f} semanas de downtime. Tenía {
             pj_dt:.1f}. Ahora tiene {new_total:.1f}. {capped_msg}"
     )
@@ -173,10 +176,11 @@ async def pagar(
     amount_str: str,
     transfertarget: nextcord.Member = None,
 ) -> Any:
+    await interaction.response.defer()
     try:
         amount: float = utils.parse_float_arg(amount_str)
     except ValueError as e:
-        return await interaction.send(f"Error: {e}")
+        return await interaction.followup.send(f"Error: {e}")
     user_id: int = interaction.user.id
     target_id: int = transfertarget.id if transfertarget is not None else None
     try:
@@ -190,17 +194,17 @@ async def pagar(
             else None
         )
     except sh.CharacterNotFoundError:
-        return await interaction.send(
+        return await interaction.followup.send(
             "No se encontró un personaje con ID de discord correspondiente"
         )
     if amount < 0:
-        return await interaction.send("Debes pagar una cantidad positiva de dinero")
+        return await interaction.followup.send("Debes pagar una cantidad positiva de dinero")
 
     pj_coins = sh.get_pj_coins(pj_row)
     pp, gp, ep, sp, cp, total = pj_coins
 
     if total - amount < 0:
-        return await interaction.send(
+        return await interaction.followup.send(
             "No tienes suficiente dinero para esta transacción"
         )
 
@@ -219,7 +223,7 @@ async def pagar(
         new_total_target = total + amount
         new_coins = [target_coins[x] - paid_coins[x] for x in range(5)]
         sh.update_pj_coins(target_pj_row, [new_coins])
-        return await interaction.send(
+        return await interaction.followup.send(
             (
                 f"{pj_name} le transfiere {amount}gp ({ppp}pp, {pgp}gp, {
                     pep}ep, {psp}sp, {pcp}cp)"
@@ -228,12 +232,13 @@ async def pagar(
                 f" y {target_pj_name} queda con {new_total_target:.2f}gp."
             )
         )
-    return await interaction.send(
-        f"{pj_name} paga {amount}gp ({ppp}pp, {pgp}gp, {
-            pep}ep, {psp}sp, {pcp}cp)."
-        f"\nAhora tiene {pp}pp, {gp}gp, {ep}ep, {sp}sp, {cp}cp,"
-        f" **Total: {new_total:.2f}gp**"
-    )
+    else:
+        return await interaction.followup.send(
+            f"{pj_name} paga {amount}gp ({ppp}pp, {pgp}gp, {
+                pep}ep, {psp}sp, {pcp}cp)."
+            f"\nAhora tiene {pp}pp, {gp}gp, {ep}ep, {sp}sp, {cp}cp,"
+            f" **Total: {new_total:.2f}gp**"
+        )
 
 
 @bot.slash_command(description="Suma dinero a tu cuenta.", guild_ids=[CRI_GUILD_ID])
@@ -241,25 +246,26 @@ async def pagar(
 async def añadirdinero(
     interaction: nextcord.Interaction, amount_str: str, user: nextcord.Member = None
 ) -> Any:
+    await interaction.response.defer()
     try:
         amount: float = utils.parse_float_arg(amount_str)
     except ValueError as e:
-        return await interaction.send(f"Error: {e}")
+        return await interaction.followup.send(f"Error: {e}")
     user_id: int = interaction.user.id if user is None else user.id
 
     try:
         pj_row = sh.get_pj_row(user_id)
         pj_name = sh.get_pj_data(pj_row, PJ_COL.Personaje)
     except sh.CharacterNotFoundError:
-        return await interaction.send(
+        return await interaction.followup.send(
             "No se encontró un personaje con ID de discord correspondiente"
         )
     if amount < 0:
-        return await interaction.send("Debes ganar una cantidad positiva de dinero")
+        return await interaction.followup.send("Debes ganar una cantidad positiva de dinero")
 
     pp, gp, ep, sp, cp, new_total = add_money(amount, pj_row)
 
-    return await interaction.send(
+    return await interaction.followup.send(
         f"{pj_name} obtiene {amount}gp."
         f" Ahora tiene {pp}pp, {gp}gp, {ep}ep, {sp}sp, {cp}cp,"
         f" **Total: {new_total:.2f}gp**"
@@ -281,25 +287,26 @@ def simple_value_update_command(value_row: str, value_name: str) -> Any:
     async def command(
         interaction: nextcord.Interaction, amount: int = 0, user: nextcord.Member = None
     ) -> Any:
+        await interaction.response.defer()
         user_id: int = interaction.user.id if user is None else user.id
 
         try:
             pj_row = sh.get_pj_row(user_id)
             pj_name = sh.get_pj_data(pj_row, PJ_COL.Personaje)
         except sh.CharacterNotFoundError:
-            return await interaction.send(
+            return await interaction.followup.send(
                 "No se encontró un personaje con ID de discord correspondiente"
             )
 
         pj_value = sh.get_pj_data(pj_row, value_row)
         pj_value = 0 if pj_value == "" else int(pj_value)
         if amount == 0:
-            return await interaction.send(f"{pj_name} tiene {amount} de {value_name}.")
+            return await interaction.followup.send(f"{pj_name} tiene {amount} de {value_name}.")
         else:
             new_value = pj_value + amount
             sh.update_pj_data_cell(pj_row, value_row, [[new_value]])
 
-            return await interaction.send(
+            return await interaction.followup.send(
                 f"{pj_name} {'gana' if amount > 0 else 'pierde'} {
                     abs(amount)} de {value_name}. Ahora tiene {new_value}."
             )
@@ -393,22 +400,23 @@ async def infamia(
 async def completarmision(
     interaction: nextcord.Interaction, mision: int, user: nextcord.Member = None
 ) -> Any:
+    await interaction.response.defer()
     user_id: int = interaction.user.id if user is None else user.id
     amt = sueldo_info(mision)
     if amt is None:
-        return await interaction.send(f"{mision} no es un numero de misión válido")
+        return await interaction.followup.send(f"{mision} no es un numero de misión válido")
     else:
         try:
             pj_row = sh.get_pj_row(user_id)
             pj_name = sh.get_pj_data(pj_row, PJ_COL.Personaje)
         except sh.CharacterNotFoundError:
-            return await interaction.send(
+            return await interaction.followup.send(
                 "No se encontró un personaje con ID de discord correspondiente"
             )
 
         pp, gp, ep, sp, cp, new_total = add_money(amt, pj_row)
 
-        return await interaction.send(
+        return await interaction.followup.send(
             f"{pj_name} recibe los {amt}gp de sueldo de la misión {
                 mision}.\n Ahora tiene {new_total}gp."
         )
