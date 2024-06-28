@@ -44,14 +44,14 @@ def skill_description(
         extra_msg = (
             ""
             if (extra_bonus == 0 and extra_descripcion == "")
-            else f"[Other: {signed_bonus(extra_bonus)}{f' ({extra_descripcion})' if extra_info else ''}])*"
+            else f"[Other: {signed_bonus(extra_bonus)}{f' ({extra_descripcion})' if extra_info else ''}]"
         )
         submsg: str = (
             f"\n- {skill_title.ljust(35)} "
             f'{f"{signed_bonus(prof_bonus + pj_mod_bonus + extra_bonus + level_bonus)} ".ljust(4)}'
             f"*([{mod_type.name}: {signed_bonus(pj_mod_bonus)}]"
             f"[{prof_level}: {signed_bonus(prof_bonus + level_bonus)}]"
-            f"{extra_msg}"
+            f"{extra_msg})*"
         )
     return submsg
 
