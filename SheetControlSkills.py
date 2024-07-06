@@ -6,9 +6,10 @@ from icecream import ic
 import gspread  # type: ignore
 
 import utils
-from PF2eData import ABILITIES
+from PF2eData import ABILITIES, SKILLS, PROF_BONUSES
 from utils import Column
 from varenv import getVar
+from SheetControl import get_level_global
 
 SKILLS_SHEET_ID = 738258837
 ABILITIES_SHEET_ID = 41455486
@@ -142,6 +143,26 @@ def get_pj_skills(discord_id: int) -> Tuple[str, dict[str, dict[str, str | int]]
             "row": row,
         }
     return (name, skills)
+
+
+def get_pj_skill_bonus(discord_id: int, skill_name: str) -> Tuple[int, str, str] | Tuple[None, None, None]:
+    """Returns (bonus, prof, message) or (None, None, None)"""
+    name, skills = get_pj_skills(discord_id)
+    if name is None:
+        return None, None, None
+    name, row, stats = get_pj_abilities(discord_id)
+    if name is None:
+        return None, None, None
+    skill_ab = [ab for sk, ab in SKILLS if sk == skill_name][0]
+    skill_values = skills[skill_name]
+    prof = skill_values["prof_level"]
+    prof_bonus = PROF_BONUSES[prof]
+    prof_bonus += 0 if prof_bonus == 0 else get_level_global()
+    extra_bonus = skill_values["extra_bonus"]
+    stat_bonus = stats[skill_ab]
+    extra_msg = f"[Extra: {extra_bonus}]" if extra_bonus != 0 else ""
+    msg = f"[{skill_ab.name}: {stat_bonus}][{prof}: {prof_bonus:+}]{extra_msg}"
+    return (stat_bonus + prof_bonus + extra_bonus), prof, msg
 
 
 def get_pj_abilities(

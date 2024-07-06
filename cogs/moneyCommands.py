@@ -138,7 +138,7 @@ class Money(commands.Cog):
         )
 
 
-def add_money_helper(amount, pj_row) -> Tuple[int, int, int, int, int]:
+def add_money_helper(amount: float, pj_row: int) -> Tuple[int, int, int, int, int]:
     """
     return pp, gp, sp, cp, new_total
     """

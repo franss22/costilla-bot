@@ -55,7 +55,7 @@ CLASSES: list[str] = [
 ]
 
 EARN_INCOME: dict[int, tuple[int, tuple[float, float, float, float, float]]] = {
-    #   lvl, dc,   fail, trnd, exprt, mstr, lgdry
+    # lvl: (dc, ( fail, trnd, exprt, mstr, lgdry))
     0: (14, (0.01, 0.05, 0.05, 0.05, 0.05)),
     1: (15, (0.02, 0.2, 0.2, 0.2, 0.2)),
     2: (16, (0.04, 0.3, 0.3, 0.3, 0.3)),
@@ -158,6 +158,7 @@ SKILLS: list[Tuple[str, Ability]] = [
     ("Survival", ABILITIES.Wis),
     ("Thievery", ABILITIES.Dex),
 ]
+LORELESS_SKILLS: list[Tuple[str, Ability]] = list(filter(lambda x: x[0] != "Lore", SKILLS))
 
 
 class PROF:
