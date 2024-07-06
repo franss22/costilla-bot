@@ -20,6 +20,7 @@ CRI_GUILD_ID = int(getVar("GUILD_ID"))
 class EarnIncome(commands.Cog):
     def __init__(self: Self, client: commands.Bot) -> None:
         self.client = client
+    # =====================================================================================================================
 
     @nextcord.slash_command(
         description="Calcula las ganancias de Earn Income", guild_ids=[CRI_GUILD_ID]
@@ -65,6 +66,7 @@ class EarnIncome(commands.Cog):
     (Por ahora, debes updatearlos manualmente)
     """  # noqa: E501
         await interaction.followup.send(message)
+    # =====================================================================================================================
 
     @nextcord.slash_command(
         description="Calcula las ganancias de Earn Income, usando tus bonos de forma automática. El DC se calcula solo.", guild_ids=[CRI_GUILD_ID]
@@ -161,12 +163,14 @@ class EarnIncome(commands.Cog):
 
         crit_fail_message = "" if check_result != 0 else "\nDebido a tu crit failure, tu proximo trabajo tiene un -1 al nivel."
 
-        message = f"""Con un {check_value} ({dice}{(bonus + checkBonus):+} {skill_msg}) vs DC {DC}, obtienes un {utils.result_name(check_result)}.
+        message = f"""## {pj_name}: Earn income de {skill}
+Con un {check_value} ({dice}{(bonus + checkBonus):+} {skill_msg}) vs DC {DC}, obtienes un {utils.result_name(check_result)}.
     Trabajas {final_dt_usage} dias y obtienes {income:.2f} gp al día, por un total de {income * final_dt_usage:.2f} gp.
     Cambio de DT: {pj_dt} -> {new_dt_total}
     Cambio de Dinero: {old_gp_total} -> {new_gp_total}{crit_fail_message}
     """  # noqa: E501
         await interaction.followup.send(message)
+    # =====================================================================================================================
 
     @nextcord.slash_command(
         description="Genera trabajos especiales.", guild_ids=[CRI_GUILD_ID]
