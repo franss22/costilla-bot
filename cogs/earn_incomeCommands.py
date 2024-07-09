@@ -41,8 +41,8 @@ class EarnIncome(commands.Cog):
             "downtime-used",
             "Dias de downtime usados en trabajar",
             True,
-            min_value=1,
-            default=1,
+            min_value=7,
+            default=7,
         ),
         checkBonus: int = nextcord.SlashOption(
             "check-bonus", "Bono al check utilizado", True
@@ -90,7 +90,7 @@ class EarnIncome(commands.Cog):
             "Dias de downtime usados en trabajar",
             True,
             min_value=7,
-            default=1,
+            default=7,
         ),
         altSkill: str = nextcord.SlashOption(
             "alt-skill-profi",
@@ -121,6 +121,8 @@ class EarnIncome(commands.Cog):
         if skill == "Lore/Otro":
             if altSkill is None:
                 return await interaction.followup.send("Debes seleccionar el nivel de proficiencia en alt-skill-profi si usas la skill 'Otro'.")
+            if checkBonus == 0:
+                return await interaction.followup.send("Debes especificar tu bono a la skill en additional-check-bonus si usas la skill 'Otro'.")
             bonus = 0
             profLevel = altSkill
             skill_msg = ""
@@ -221,11 +223,11 @@ def calc_job_income_and_dt(taskLevel: int, downtimeUsed: int, check_result: int,
     if check_result == 0:
         # crit failure
         income = 0
-        final_dt_usage = 1
+        final_dt_usage = 7
     if check_result == 1:
         # failure
         income = EARN_INCOME[taskLevel][1][0]
-        final_dt_usage = min(7, downtimeUsed)
+        final_dt_usage = 7
     if check_result == 2:
         # success
         income = EARN_INCOME[taskLevel][1][prof_column]
