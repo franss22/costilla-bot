@@ -1,4 +1,5 @@
 .env
+.venv
 dmarchvenv
 __pycache__
 local_vars.json

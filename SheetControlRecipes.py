@@ -39,7 +39,9 @@ def gets_recipe_data(func: Callable[..., Any]) -> Callable[..., Any]:
 
 class REC_COL:
     ItemName: Column = Column("A")
-    ItemLevel: Column = Column("B")
+    ItemRarity: Column = Column("B")
+    ItemType: Column = Column("C")
+    ItemLevel: Column = Column("D")
 
 
 def first_empty_recipe_row() -> int:
@@ -64,6 +66,8 @@ def update_rep_row(row_index: int, data: Iterable[Any]) -> None:
 def row_to_Recipe(row: list[str]) -> Recipe:
     recipe: Recipe = {
         "name": row[REC_COL.ItemName.excel_index()],
+        "rarity": row[REC_COL.ItemRarity.excel_index()],
+        "type": row[REC_COL.ItemType.excel_index()],
         "level": row[REC_COL.ItemLevel.excel_index()],
     }
     return recipe
