@@ -184,7 +184,7 @@ class Register(commands.Cog):
 
         await interaction.followup.send(message)
 
-    @register_archetype.on_autocomplete("ascendencia")
+    @register.on_autocomplete("ascendencia")
     async def autocomplete_ancestry(
         interaction: nextcord.Interaction, ancestry: str
     ) -> Any:
@@ -195,7 +195,7 @@ class Register(commands.Cog):
             ]
         await interaction.response.send_autocomplete(filtered_ancestries)
 
-    @register.on_autocomplete("archetype")
+    @register_archetype.on_autocomplete("archetype")
     async def autocomplete_archetype(
         interaction: nextcord.Interaction, archetype: str
     ) -> Any:
