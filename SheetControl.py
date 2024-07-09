@@ -131,7 +131,7 @@ def get_sueldo(level: int) -> tuple[float, int]:
     return (float(sueldo_gp), int(sueldo_dt))
 
 
-LEVEL_GLOBAL = 1
+LEVEL_GLOBAL = 4
 
 
 def update_level_global(new_value: int = None) -> None:

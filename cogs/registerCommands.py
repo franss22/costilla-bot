@@ -4,7 +4,7 @@ import nextcord  # type: ignore
 from nextcord.ext import commands
 
 import SheetControl as sh
-from PF2eData import ANCESTRIES, CLASSES, HERITAGES, RELIGIONS
+from PF2eData import ANCESTRIES, CLASSES, HERITAGES, RELIGIONS, ARCHETYPES
 from SheetControl import PJ_COL, gets_pj_data
 from utils import CharacterNotFoundError
 from varenv import getVar
@@ -52,7 +52,7 @@ class RegisterDropdownView(nextcord.ui.View):
 
 
 class Register(commands.Cog):
-    def __init__(self: Self, client: commands.Bot) -> None:
+    def __init__(self: Self, client: commands.Bot) -> None:  # type: ignore
         self.client = client
 
     @nextcord.slash_command(
@@ -141,7 +141,50 @@ class Register(commands.Cog):
         view = RegisterDropdownView(heritage_dropdown)
         await interaction.followup.send("Selecciona un heritage para tu personaje", view=view)
 
-    @register.on_autocomplete("ascendencia")
+    @nextcord.slash_command(
+        description="Registra un nuevo arquetipo para tu personaje. Si seleccionas uno que ya tienes se elimina.",
+        guild_ids=[CRI_GUILD_ID],
+    )
+    @gets_pj_data
+    async def register_archetype(
+        self: Self,
+        interaction: nextcord.Interaction,
+        archetype: str = nextcord.SlashOption(
+            name="archetype",
+            description="El nuevo arquetipo de tu personaje, o uno que ya tuviera para eliminarlo.",
+            required=True,
+            choices=CLASSES,
+        )
+    ) -> Any:
+        await interaction.response.defer()
+        # Conseguir el ID del usuario
+        try:
+            assert interaction.user is not None
+        except AssertionError:
+            return await interaction.followup.send("Error: Null user")
+
+        user_id: int = interaction.user.id
+        # Revisar que no tenga otro PJ
+        try:
+            pj_row = sh.get_pj_row(user_id)
+        except CharacterNotFoundError:
+            return await interaction.followup.send(
+                "No se encontró un personaje con ID de discord correspondiente"
+            )
+        archs = sh.get_pj_data(pj_row, PJ_COL.Arquetypes)
+        archs_list = archs.split(", ")
+        if archetype in archs_list:
+            archs_list.remove(archetype)
+            message = f"Eliminado {archetype} de tu lista de arquetipos"
+        else:
+            archs_list.append(archetype)
+            message = f"Añadido {archetype} a tu lista de arquetipos"
+        new_archetypes = ", ".join(archs_list)
+        sh.update_pj_data_cell(pj_row, PJ_COL.Arquetypes, [[new_archetypes]])
+
+        await interaction.followup.send(message)
+
+    @register_archetype.on_autocomplete("ascendencia")
     async def autocomplete_ancestry(
         interaction: nextcord.Interaction, ancestry: str
     ) -> Any:
@@ -151,6 +194,17 @@ class Register(commands.Cog):
                 a for a in ANCESTRIES if a.lower().startswith(ancestry.lower())
             ]
         await interaction.response.send_autocomplete(filtered_ancestries)
+
+    @register.on_autocomplete("archetype")
+    async def autocomplete_archetype(
+        interaction: nextcord.Interaction, archetype: str
+    ) -> Any:
+        filtered_archetypes = []
+        if archetype:
+            filtered_archetypes = [
+                a for a in ARCHETYPES if a.lower().startswith(archetype.lower())
+            ]
+        await interaction.response.send_autocomplete(filtered_archetypes)
 
 
 def setup(client: commands.Bot) -> None:

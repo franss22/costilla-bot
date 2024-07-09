@@ -4,5 +4,6 @@
     "--select=E,W",
     "--exclude=migrations, __pycache__, settings.py, .venv, .env"
   ],
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "python.analysis.typeCheckingMode": "basic"
 }
