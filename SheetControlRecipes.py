@@ -68,7 +68,7 @@ def row_to_Recipe(row: list[str]) -> Recipe:
         "name": row[REC_COL.ItemName.excel_index()],
         "rarity": row[REC_COL.ItemRarity.excel_index()],
         "type": row[REC_COL.ItemType.excel_index()],
-        "level": row[REC_COL.ItemLevel.excel_index()],
+        "level": int(row[REC_COL.ItemLevel.excel_index()]),
     }
     return recipe
 
