@@ -148,21 +148,13 @@ async def downtime(
             "No tienes suficiente downtime para esta transacción"
         )
 
-    dt_cap = 4.5
-
-    new_total = min(pj_dt + amount, dt_cap)
-    if pj_dt + amount > dt_cap:
-        capped_msg = (
-            "Llegaste al cap de downtime, por lo que no se añadió el valor completo"
-        )
-    else:
-        capped_msg = ""
+    new_total = pj_dt + amount
 
     sh.update_pj_data_cell(pj_row, PJ_COL.Downtime, [[new_total]])
 
     return await interaction.followup.send(
         f"{pj_name} {'gana' if amount > 0 else 'gasta'} {abs(amount):.1f} semanas de downtime. Tenía {
-            pj_dt:.1f}. Ahora tiene {new_total:.1f}. {capped_msg}"
+            pj_dt:.1f}. Ahora tiene {new_total:.1f}."
     )
 
 
