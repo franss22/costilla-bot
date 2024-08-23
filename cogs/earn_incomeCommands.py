@@ -61,9 +61,9 @@ class EarnIncome(commands.Cog):
 
         income, final_dt_usage = calc_job_income_and_dt(taskLevel, downtimeUsed, check_result, prof_column)
 
-        message = f"""Con un {check_value} ({dice}+{checkBonus}) vs DC {DC} , obtienes un {utils.result_name(check_result)}.
+        message = f"""Con un {check_value} ({dice}+{checkBonus}) vs DC {DC} (lvl {taskLevel}), obtienes un {utils.result_name(check_result)}.
     Trabajas {final_dt_usage} dias y obtienes {income:.2f} gp al día, por un total de {income * final_dt_usage:.2f} gp.
-    (Por ahora, debes updatearlos manualmente)
+    (debes updatearlos manualmente)
     """  # noqa: E501
         await interaction.followup.send(message)
     # =====================================================================================================================
@@ -165,7 +165,7 @@ class EarnIncome(commands.Cog):
 
         crit_fail_message = "" if check_result != 0 else "\nDebido a tu crit failure, tu proximo trabajo tiene un -1 al nivel."
 
-        message = f"""## {pj_name}: Earn income de {skill}
+        message = f"""## {pj_name}: Earn income de {skill} lvl {taskLevel}
 Con un {check_value} ({dice}{(bonus + checkBonus):+} {skill_msg}) vs DC {DC}, obtienes un {utils.result_name(check_result)}.
     Trabajas {final_dt_usage} dias y obtienes {income:.2f} gp al día, por un total de {income * final_dt_usage:.2f} gp.
     Cambio de DT: {pj_dt} -> {new_dt_total}
