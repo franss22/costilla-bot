@@ -6,7 +6,7 @@ import gspread
 from varenv import getVar
 
 PJ_SHEET_ID = 1542430594
-SUELDO_SHEET_ID = 258151197
+SUELDO_SHEET_ID = 714695747
 credentials = json.loads(getVar("GOOGLE"), strict=False)
 
 gc = gspread.service_account_from_dict(credentials)
