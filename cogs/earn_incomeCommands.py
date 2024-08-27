@@ -168,8 +168,8 @@ class EarnIncome(commands.Cog):
         message = f"""## {pj_name}: Earn income de {skill} lvl {taskLevel}
 Con un {check_value} ({dice}{(bonus + checkBonus):+} {skill_msg}) vs DC {DC}, obtienes un {utils.result_name(check_result)}.
     Trabajas {final_dt_usage} dias y obtienes {income:.2f} gp al día, por un total de {income * final_dt_usage:.2f} gp.
-    Cambio de DT: {pj_dt} -> {new_dt_total}
-    Cambio de Dinero: {old_gp_total} -> {new_gp_total}{crit_fail_message}
+    Cambio de DT: {pj_dt:.2f} -> {new_dt_total:.2f}
+    Cambio de Dinero: {old_gp_total:.2f} -> {new_gp_total:.2f}{crit_fail_message}
     """  # noqa: E501
         await interaction.followup.send(message)
     # =====================================================================================================================
