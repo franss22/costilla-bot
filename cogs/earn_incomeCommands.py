@@ -52,7 +52,7 @@ class EarnIncome(commands.Cog):
         ),
     ) -> Any:
         await interaction.response.defer()
-        dice = dndice.basic("1d20")
+        dice = int(dndice.basic("1d20"))
         check_value = dice + checkBonus
         DC = EARN_INCOME[taskLevel][0] + dcChange
         check_result = utils.check_results(DC, check_value, dice)
@@ -132,7 +132,8 @@ class EarnIncome(commands.Cog):
             return await interaction.followup.send("Debes setear tus skills con /set_all_skills para usar este comando.")
         if profLevel == PROF.Untrained:
             return await interaction.followup.send("No puedes hacer Earn Income con una skill Untrained")
-
+        if skill_msg is None:
+            skill_msg = ""
         skill_msg += "" if checkBonus == 0 else f"[Additional: {checkBonus:+}]"
 
         pj_dt: int = int(sh.get_pj_data(pj_row, PJ_COL.Downtime))

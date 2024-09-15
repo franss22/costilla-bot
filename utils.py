@@ -114,6 +114,13 @@ def num_to_column(column_int: int) -> str:
     return letter
 
 
+def try_int(val: str) -> int:
+    try:
+        return int(val)
+    except ValueError:
+        return 0
+
+
 def column_to_num(column: str) -> int:
     """
     Entrega el indice (indexado a 0 de la letra de la columna)

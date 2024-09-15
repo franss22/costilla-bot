@@ -305,7 +305,7 @@ class Skills(commands.Cog):
         await interaction.response.defer()
         user_id: int = interaction.user.id
 
-        pj_skills: dict[str, dict[str, str | int]]
+        # pj_skills: dict[str, dict[str, str | int]]
         pj_name, pj_skills = sh_skills.get_pj_skills(user_id)
 
         try:
@@ -344,19 +344,23 @@ class Skills(commands.Cog):
                 row: int = first_empty_row
                 msg += f"\nSe definió la proficiencia de {pj_name} en {skill_name}"
                 first_empty_row += 1
+                extra_bonus = 0
+                extra_description = ""
 
             else:
                 # update existing skill entry
                 row = pj_skill["row"]
                 msg += f"\nSe actualizó la proficiencia de {pj_name} en {skill_name}"
+                extra_bonus = pj_skill["extra_bonus"]
+                extra_description = pj_skill["extra_descripcion"]
 
             data = (
                 pj_name,
                 str(user_id),
                 skill_name,
                 prof_value,
-                0,
-                "",
+                extra_bonus,
+                extra_description,
             )
             rows_and_data.append((row, data))
         sh_skills.multi_update_skill_row(rows_and_data)

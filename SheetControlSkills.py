@@ -1,6 +1,6 @@
 import json
 from functools import wraps
-from typing import Any, Callable, Tuple
+from typing import Any, Callable, Tuple, TypedDict
 from icecream import ic
 
 import gspread  # type: ignore
@@ -116,7 +116,14 @@ def _get_pj_skills_raw(id: int) -> list[Tuple[int, list[str]]]:
     return data
 
 
-def get_pj_skills(discord_id: int) -> Tuple[str, dict[str, dict[str, str | int]]]:
+class SkillRow(TypedDict):
+    prof_level: str
+    extra_bonus: int
+    extra_descripcion: str
+    row: int
+
+
+def get_pj_skills(discord_id: int) -> Tuple[str | None, dict[str, SkillRow]]:
     """
     Retorna el nombre del PJ y un diccionario con las sills del pj tal que:
     {skill_name: {prof_level: str, extra_bonus: int, extra_descripcion: str, row (index 1): int}}
@@ -128,11 +135,11 @@ def get_pj_skills(discord_id: int) -> Tuple[str, dict[str, dict[str, str | int]]
         return (None, {})
 
     name = skills_raw[0][1][SKILL_COL.Name.excel_index()]
-    skills: dict[str, dict[str, str | int]] = {}
+    skills: dict[str, SkillRow] = {}
     for index_i1, row in skills_raw:
         skill_name = row[SKILL_COL.Skill.excel_index()]
         prof_level = row[SKILL_COL.Proficiency.excel_index()]
-        extra_bonus = row[SKILL_COL.ExtraBonuses.excel_index()]
+        extra_bonus = utils.try_int(row[SKILL_COL.ExtraBonuses.excel_index()])
         extra_descripcion = row[SKILL_COL.ExtraDescription.excel_index()]
         row = index_i1
 
