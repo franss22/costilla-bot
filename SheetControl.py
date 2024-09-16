@@ -141,6 +141,7 @@ def update_level_global(new_value: int = None) -> None:
         LEVEL_GLOBAL = int(data[6][3])
     else:
         sueldo_sheet.update([[new_value]], "D7")
+        LEVEL_GLOBAL = new_value
 
 
 def get_level_global() -> int:
