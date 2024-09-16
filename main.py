@@ -91,7 +91,7 @@ async def status(
 @gets_pj_data
 async def salary(
     interaction: nextcord.Interaction,
-    overwrite_level: int = None,
+    level: int,
     target: nextcord.Member = default_user_option,
 ) -> Any:
     await interaction.response.defer()
@@ -108,11 +108,11 @@ async def salary(
         return await interaction.followup.send(
             "No se encontró un personaje con ID de discord correspondiente"
         )
-    overwrite_level = (
-        sh.get_level_global() if overwrite_level is None else overwrite_level
-    )
+    # level = (
+    #     sh.get_level_global() if level is None else level
+    # )
 
-    sueldo_gp, sueldo_dt = sh.get_sueldo(overwrite_level)
+    sueldo_gp, sueldo_dt = sh.get_sueldo(level)
 
     pp, gp, sp, cp, new_total_gp = add_money_helper(sueldo_gp, pj_row)
 
@@ -123,7 +123,7 @@ async def salary(
 
     return await interaction.followup.send(
         (
-            f"{pj_name}: Misión nivel {overwrite_level} completada!"
+            f"{pj_name}: Misión nivel {level} completada!"
             f"\n Se te suma el sueldo de la misión:"
             f" {sueldo_gp: .2f}gp (ahora tienes {new_total_gp: .2f}gp)"
             f"\n Se te suman {sueldo_dt} días de dt "
