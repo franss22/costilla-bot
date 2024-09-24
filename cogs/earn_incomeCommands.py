@@ -83,7 +83,7 @@ class EarnIncome(commands.Cog):
             "skill",
             "Skill utilizada. Trained Only.",
             True,
-            choices=[sk_name for sk_name, _ in LORELESS_SKILLS] + ["Lore/Otro"],
+            choices=[sk_name for sk_name, _ in LORELESS_SKILLS] + ["Lore", "Otro"],
         ),
         downtimeUsed: int = nextcord.SlashOption(
             "downtime-used",
@@ -118,11 +118,11 @@ class EarnIncome(commands.Cog):
             return await interaction.followup.send(
                 "No se encontró un personaje con ID de discord correspondiente"
             )
-        if skill == "Lore/Otro":
+        if skill == "Otro" or skill == "Lore":
             if altSkill is None:
-                return await interaction.followup.send("Debes seleccionar el nivel de proficiencia en alt-skill-profi si usas la skill 'Otro'.")
+                return await interaction.followup.send("Debes seleccionar el nivel de proficiencia en alt-skill-profi si usas la skill 'Lore' u 'Otro'.")
             if checkBonus == 0:
-                return await interaction.followup.send("Debes especificar tu bono a la skill en additional-check-bonus si usas la skill 'Otro'.")
+                return await interaction.followup.send("Debes especificar tu bono a la skill en additional-check-bonus si usas la skill 'Lore' u 'Otro'.")
             bonus = 0
             profLevel = altSkill
             skill_msg = ""
@@ -142,10 +142,12 @@ class EarnIncome(commands.Cog):
             return await interaction.followup.send(
                 "No tienes suficiente downtime para esta transacción"
             )
-
+        harder_dc = skill not in ["Lore", "Crafting", "Performance", "Otro"]
+        harder_dc_adjustment = 3 if harder_dc else 0
         dice = dndice.basic("1d20")
         check_value = dice + bonus + checkBonus
-        DC = EARN_INCOME[taskLevel][0] + dcChange
+        harder_dc_message = f" (con +3 al DC por usar {skill})" if harder_dc else "s"
+        DC = EARN_INCOME[taskLevel][0] + dcChange + harder_dc_adjustment
         check_result = utils.check_results(DC, check_value, dice)
         double = False
         if experiencedProf:  # https://2e.aonprd.com/Feats.aspx?ID=5144
@@ -167,7 +169,7 @@ class EarnIncome(commands.Cog):
         crit_fail_message = "" if check_result != 0 else "\nDebido a tu crit failure, tu proximo trabajo tiene un -1 al nivel."
 
         message = f"""## {pj_name}: Earn income de {skill} lvl {taskLevel}
-Con un {check_value} ({dice}{(bonus + checkBonus):+} {skill_msg}) vs DC {DC}, obtienes un {utils.result_name(check_result)}.
+Con un {check_value} ({dice}{(bonus + checkBonus):+} {skill_msg}) vs DC {DC}{harder_dc_message}, obtienes un {utils.result_name(check_result)}.
     Trabajas {final_dt_usage} dias y obtienes {income:.2f} gp al día, por un total de {income * final_dt_usage:.2f} gp.
     Cambio de DT: {pj_dt:.2f} -> {new_dt_total:.2f}
     Cambio de Dinero: {old_gp_total:.2f} -> {new_gp_total:.2f}{crit_fail_message}

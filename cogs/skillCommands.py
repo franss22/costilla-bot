@@ -43,7 +43,7 @@ class Skills(commands.Cog):
         # {skill_name: {prof_level: str, extra_bonus: int, extra_descripcion: str}}
         name, pj_skills = sh_skills.get_pj_skills(user_id)
 
-        message: str = f"# Skills de {name_mods if name is None else name}:"
+        message: str = f"# Skills de {name_mods if name is None else name}:\n```\n"
 
         pj_level = sh_pj.get_level_global()
 
@@ -74,6 +74,7 @@ class Skills(commands.Cog):
                 lore,
                 extra_info,
             )
+        message += "\n```"
         return await interaction.followup.send(message)
 
     @nextcord.slash_command(

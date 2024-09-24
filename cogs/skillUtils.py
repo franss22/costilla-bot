@@ -3,6 +3,7 @@ from PF2eData import PROF, PROF_BONUSES, Ability
 import SheetControlSkills as sh_skills
 from icecream import ic
 
+ALTERNATE = True
 
 def nat_20_1_message(dice_result: int):
     if dice_result == 20:
@@ -13,10 +14,6 @@ def nat_20_1_message(dice_result: int):
         return ""
 
 
-def signed_bonus(bonus: int) -> str:
-    return f"+{bonus}" if bonus >= 0 else str(bonus)
-
-
 def skill_description(
     pj_mod_bonus: int,
     pj_level: int,
@@ -25,13 +22,15 @@ def skill_description(
     pj_skill: None | dict[str, str | int],
     extra_info: bool,
 ) -> str:
+    global ALTERNATE
+    ALTERNATE = not ALTERNATE
+    just_char = "·" if ALTERNATE else " "
     if pj_skill is None:
-        bonus_str: str = signed_bonus(pj_mod_bonus)
-        skill_title = f"**{skill_name}** *(Untrained?)*:"
+        skill_title = f"{skill_name} (Untrained?):"
         submsg: str = (
-            f"\n- {skill_title.ljust(35)} "
-            f"{bonus_str} "
-            f"([{mod_type.name}: {bonus_str}])"
+            f"\n- {skill_title.ljust(28, just_char)} "
+            f"{pj_mod_bonus:+} "
+            f"([{mod_type.name}: {pj_mod_bonus:+}])"
         )
     else:
         prof_level: str = pj_skill["prof_level"]
@@ -39,19 +38,19 @@ def skill_description(
         prof_bonus: int = PROF_BONUSES[prof_level]
         extra_bonus: int = pj_skill["extra_bonus"]
         extra_descripcion: str = pj_skill["extra_descripcion"]
-        skill_title = f"**{skill_name}** *({prof_level})*"
+        skill_title = f"{skill_name} ({prof_level})"
 
         extra_msg = (
             ""
             if (extra_bonus == 0 and extra_descripcion == "")
-            else f"[Other: {signed_bonus(extra_bonus)}{f' ({extra_descripcion})' if extra_info else ''}]"
+            else f"[Other: {extra_bonus:+}{f' ({extra_descripcion})' if extra_info else ''}]"
         )
         submsg: str = (
-            f"\n- {skill_title.ljust(35)} "
-            f'{f"{signed_bonus(prof_bonus + pj_mod_bonus + extra_bonus + level_bonus)} ".ljust(4)}'
-            f"*([{mod_type.name}: {signed_bonus(pj_mod_bonus)}]"
-            f"[{prof_level}: {signed_bonus(prof_bonus + level_bonus)}]"
-            f"{extra_msg})*"
+            f"\n- {skill_title.ljust(28, just_char)} "
+            f'{f"{(prof_bonus + pj_mod_bonus + extra_bonus + level_bonus):+} ".ljust(4)}'
+            f"([{mod_type.name}: {pj_mod_bonus:+}]"
+            f"[{f'{prof_level}:'.ljust(10)} {f'{(prof_bonus + level_bonus):+}]'.rjust(4)}"
+            f"{extra_msg})"
         )
     return submsg
 

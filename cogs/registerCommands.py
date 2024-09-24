@@ -14,6 +14,7 @@ CRI_GUILD_ID = int(getVar("GUILD_ID"))
 
 class HeritageDropdown(nextcord.ui.Select):  # type: ignore
     Update_func: Callable[[nextcord.Interaction, str], Any]
+    
 
     def __init__(
         self: Self,
@@ -186,7 +187,7 @@ class Register(commands.Cog):
 
     @register.on_autocomplete("ascendencia")
     async def autocomplete_ancestry(
-        interaction: nextcord.Interaction, ancestry: str
+        self, interaction: nextcord.Interaction, ancestry: str
     ) -> Any:
         filtered_ancestries = []
         if ancestry:
@@ -197,7 +198,7 @@ class Register(commands.Cog):
 
     @register_archetype.on_autocomplete("archetype")
     async def autocomplete_archetype(
-        interaction: nextcord.Interaction, archetype: str
+        self, interaction: nextcord.Interaction, archetype: str
     ) -> Any:
         filtered_archetypes = []
         if archetype:
