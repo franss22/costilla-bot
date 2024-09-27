@@ -206,20 +206,18 @@ def job_message(skill: str, base_lvl: int) -> str:
     """"""
     lvl = min(21, base_lvl + random.choices([0, 1, 2], [0.6, 0.3, 0.1])[0])
     if skill_is_standard(skill):
-        dc_adjustment = -random.choice([0, 1, 2])
+        dc_adjustment = random.choice([-0, -1, -2])
         dc_message = f"{dc_adjustment:+} al DC"
-        non_standard_penalty = 0
 
     else:
-        dc_adjustment = -random.choice([1, 2, 3])
+        dc_adjustment = random.choice([-1, -2, -3])
         dc_message = f"{dc_adjustment:+} al DC (+3 por skill no estandar)"
-        non_standard_penalty = 3
 
-    dc = EARN_INCOME[lvl][0] + dc_adjustment + non_standard_penalty
+    dc = EARN_INCOME[lvl][0] + dc_adjustment
 
     return (f"### Trabajo de **{skill}**:\n"
             f"Trabajo de Nivel {lvl}. {dc_message} (DC total {dc})"
-            f"```/earn_income_automatic task-level:{lvl} skill:{skill} downtime-used:14 dc-adjustment:{dc_adjustment + non_standard_penalty}```")
+            f"```/earn_income_automatic task-level:{lvl} skill:{skill} downtime-used:14 dc-adjustment:{dc_adjustment}```")
 
 
 def calc_job_income_and_dt(taskLevel: int, downtimeUsed: int, check_result: int, prof_column: int) -> tuple[float, int]:
