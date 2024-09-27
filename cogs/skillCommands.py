@@ -520,11 +520,11 @@ class Skills(commands.Cog):
         # ABILITY
         mod_type: Ability = [ab for skill_nm, ab in SKILLS if skill_nm == skill][0]
         ability_bonus = pj_mods[mod_type]
-        ability_msg = f"[{mod_type.name}: {signed_bonus(ability_bonus)}]"
+        ability_msg = f"[{mod_type.name}: {ability_bonus:+}]"
 
         # EXTRA
         extra_msg = (
-            "" if extra_modifiers == 0 else f"[Extra: {signed_bonus(extra_modifiers)}]"
+            "" if extra_modifiers == 0 else f"[Extra: {extra_modifiers:+}]"
         )
 
         # PROFICIENCY
@@ -549,7 +549,7 @@ class Skills(commands.Cog):
             other_msg = (
                 ""
                 if (other_bonus == 0 and other_descripcion == "")
-                else f"[Other: {signed_bonus(other_bonus)}{f' ({other_descripcion})' if extra_info else ''}])*"
+                else f"[Other: {other_bonus:+}{f' ({other_descripcion})' if extra_info else ''}])*"
             )
 
         result = dice + ability_bonus + prof_bonus + other_bonus + extra_modifiers
@@ -599,11 +599,11 @@ class Skills(commands.Cog):
         # ABILITY
         mod_type: Ability = ABILITIES.Int
         ability_bonus = pj_mods[mod_type]
-        ability_msg = f"[{mod_type.name}: {signed_bonus(ability_bonus)}]"
+        ability_msg = f"[{mod_type.name}: {ability_bonus:+}]"
 
         # EXTRA
         extra_msg = (
-            "" if extra_modifiers == 0 else f"[Extra: {signed_bonus(extra_modifiers)}]"
+            "" if extra_modifiers == 0 else f"[Extra: {extra_modifiers:+}]"
         )
 
         lore_full_name = f"Lore ({lore_subname})"
@@ -629,7 +629,7 @@ class Skills(commands.Cog):
             other_msg = (
                 ""
                 if (other_bonus == 0 and other_descripcion == "")
-                else f"[Other: {signed_bonus(other_bonus)}{f' ({other_descripcion})' if extra_info else ''}])*"
+                else f"[Other: {other_bonus:+}{f' ({other_descripcion})' if extra_info else ''}])*"
             )
 
         result = dice + ability_bonus + prof_bonus + other_bonus + extra_modifiers

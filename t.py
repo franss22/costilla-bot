@@ -2,10 +2,6 @@ from icecream import ic
 from PF2eData import ABILITIES, PROF, PROF_BONUSES, SKILLS, Ability
 
 
-def signed_bonus(bonus: int) -> str:
-    return f"+{bonus}" if bonus >= 0 else str(bonus)
-
-
 def skill_description(
     pj_mod_bonus: int,
     pj_level: int,
@@ -16,7 +12,7 @@ def skill_description(
     justify: int,
 ) -> str:
     if pj_skill is None:
-        bonus_str: str = signed_bonus(pj_mod_bonus)
+        bonus_str: str = f"{pj_mod_bonus:+}"
         skill_title = f"**{skill_name}** *(untrained?)*:"
         submsg: str = (
             f"\n- {skill_title.ljust(justify)} "
@@ -32,10 +28,10 @@ def skill_description(
         skill_title = f"**{skill_name}** *({prof_level})*:"
         submsg: str = (
             f"\n- {skill_title.ljust(justify)} "
-            f'{f"{signed_bonus(prof_bonus + pj_mod_bonus + extra_bonus + level_bonus)} ".ljust(4)}'
-            f"*([{mod_type.name}: {signed_bonus(pj_mod_bonus)}]"
+            f'{f"{(prof_bonus + pj_mod_bonus + extra_bonus + level_bonus):+} ".ljust(4)}'
+            f"*([{mod_type.name}: {pj_mod_bonus:+}]"
             f"[{prof_level}: {prof_bonus + level_bonus}]"
-            f"[Other: {signed_bonus(extra_bonus)}{f' ({extra_descripcion})' if extra_info else ''}])*"
+            f"[Other: {extra_bonus:+}{f' ({extra_descripcion})' if extra_info else ''}])*"
         )
     return submsg
 
