@@ -137,7 +137,7 @@ class Register(commands.Cog):
             sh.update_range_PJ([[religion]], f"{PJ_COL.Religion}{pj_row}")
             await interaction.followup.send(f"Registrado {nombre_pj} en la fila {pj_row}")
 
-        heritage_dropdown = HeritageDropdown(ascendencia, update_func)
+        heritage_dropdown = HeritageDropdown(ascendencia, self.update_func)
 
         view = RegisterDropdownView(heritage_dropdown)
         await interaction.followup.send("Selecciona un heritage para tu personaje", view=view)
