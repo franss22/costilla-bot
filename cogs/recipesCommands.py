@@ -17,9 +17,7 @@ class Recipes(commands.Cog):
     def __init__(self: Self, client: commands.Bot) -> None:
         self.client = client
 
-    @nextcord.slash_command(
-        description="Muestra la lista de recipes disponibles", guild_ids=[CRI_GUILD_ID]
-    )
+    @nextcord.slash_command(description="Muestra la lista de recipes disponibles", guild_ids=[CRI_GUILD_ID])
     @gets_recipe_data
     async def global_recipes(
         self: Self,
@@ -35,24 +33,19 @@ class Recipes(commands.Cog):
         message = f"**Todas las recetas públicas{f" de nivel {level}" if level is not None else ""}:**"
         if level is not None:
             recipes = [r for r in recipes if r["level"] == level]
-        recipes - recipes.sort(key=(lambda r: r["name"])).sort(key=(lambda r: r["level"]))
+        recipes.sort(key=(lambda r: r["name"]))
+        recipes.sort(key=(lambda r: r["level"]))
         for r in recipes:
             message += f'\n- (Lvl {r["level"]}) {r["name"]}'
         return await interaction.followup.send(message)
 
-    @nextcord.slash_command(
-        description="Añade una recipe a la lista de recipes globales", guild_ids=[CRI_GUILD_ID]
-    )
+    @nextcord.slash_command(description="Añade una recipe a la lista de recipes globales", guild_ids=[CRI_GUILD_ID])
     @gets_recipe_data
     async def add_recipe(
         self: Self,
         interaction: nextcord.Interaction,
-        item_name: str = nextcord.SlashOption(
-            "item", "Nombre del item de la recipe", True
-        ),
-        item_level: int = nextcord.SlashOption(
-            "level", "Nivel del item de la recipe", True, min_value=0, max_value=25
-        ),
+        item_name: str = nextcord.SlashOption("item", "Nombre del item de la recipe", True),
+        item_level: int = nextcord.SlashOption("level", "Nivel del item de la recipe", True, min_value=0, max_value=25),
     ) -> Any:
         await interaction.response.defer()
         recipes: list[Recipe] = get_all_existing_recipes()
