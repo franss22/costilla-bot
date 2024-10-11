@@ -52,10 +52,12 @@ class HeritageDropdown(nextcord.ui.Select):
             assert self.view is not None
         except AssertionError:
             return
+        await interaction.response.defer()
         self.view.stop()
         # Generar stats base (0 de dt, 15 de gp)
         # [nombre, id, jugador, clase, Arquetipos, ascendencia, heritage, dt, pp, gp, sp, cp, total, lenguajes, religión] # noqa: E501
 
+        pj_row = sh.first_empty_PJ_row()
         values = [
             self.nombre_pj,
             str(self.user_id),
@@ -70,7 +72,6 @@ class HeritageDropdown(nextcord.ui.Select):
             0,
             0,
         ]
-        pj_row = sh.first_empty_PJ_row()
         sh.update_range_PJ([values], f"{PJ_COL.Name}{pj_row}:{PJ_COL.Money_cp}{pj_row}")
         sh.update_range_PJ([[self.religion]], f"{PJ_COL.Religion}{pj_row}")
         await interaction.followup.send(f"Registrado {self.nombre_pj} en la fila {pj_row}")
