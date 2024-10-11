@@ -12,23 +12,33 @@ from varenv import getVar
 CRI_GUILD_ID = int(getVar("GUILD_ID"))
 
 
-class HeritageDropdown(nextcord.ui.Select):  # type: ignore
-    Update_func: Callable[[nextcord.Interaction, str], Any]
-    
+class HeritageDropdown(nextcord.ui.Select):
+    nombre_pj: str
+    user_id: str
+    nombre_jugador: str
+    clase: str
+    ascendencia: str
 
     def __init__(
         self: Self,
         ancestry: str,
-        update_func: Callable[[nextcord.Interaction, str], Any],
+        nombre_pj: str,
+        user_id: str,
+        nombre_jugador: str,
+        clase: str,
+        ascendencia: str,
+        religion: str,
     ) -> None:
         heritages: list[str] = HERITAGES[ancestry]
-        self.Update_func: Callable[[nextcord.Interaction, str], Any] = update_func
+        self.nombre_pj = nombre_pj
+        self.user_id = user_id
+        self.nombre_jugador = nombre_jugador
+        self.clase = clase
+        self.ascendencia = ascendencia
+        self.religion = religion
 
         options = [nextcord.SelectOption(label=h) for h in heritages]
-        options += [
-            nextcord.SelectOption(label=h, description="(Heritage versátil)")
-            for h in HERITAGES["Versatile"]
-        ]
+        options += [nextcord.SelectOption(label=h, description="(Heritage versátil)") for h in HERITAGES["Versatile"]]
         super().__init__(
             placeholder="Opciones de heritage",
             min_values=1,
@@ -37,13 +47,33 @@ class HeritageDropdown(nextcord.ui.Select):  # type: ignore
         )
 
     async def callback(self: Self, interaction: nextcord.Interaction) -> None:
-        selected: str = self.values[0]
+        selected_heritage: str = self.values[0]
         try:
             assert self.view is not None
         except AssertionError:
             return
         self.view.stop()
-        await self.Update_func(interaction, selected)
+        # Generar stats base (0 de dt, 15 de gp)
+        # [nombre, id, jugador, clase, Arquetipos, ascendencia, heritage, dt, pp, gp, sp, cp, total, lenguajes, religión] # noqa: E501
+
+        values = [
+            self.nombre_pj,
+            str(self.user_id),
+            self.nombre_jugador,
+            self.clase,
+            "",
+            self.ascendencia,
+            selected_heritage,
+            0,
+            0,
+            15,
+            0,
+            0,
+        ]
+        pj_row = sh.first_empty_PJ_row()
+        sh.update_range_PJ([values], f"{PJ_COL.Name}{pj_row}:{PJ_COL.Money_cp}{pj_row}")
+        sh.update_range_PJ([[self.religion]], f"{PJ_COL.Religion}{pj_row}")
+        await interaction.followup.send(f"Registrado {self.nombre_pj} en la fila {pj_row}")
 
 
 class RegisterDropdownView(nextcord.ui.View):
@@ -100,44 +130,15 @@ class Register(commands.Cog):
             already_has_character = False
         if already_has_character:
             return await interaction.followup.send(
-                (
-                    f"Ya tienes un personaje en la fila {pj_row}"
-                    f", muevelo al cementerio para registrar uno nuevo."
-                )
+                (f"Ya tienes un personaje en la fila {pj_row}" f", muevelo al cementerio para registrar uno nuevo.")
             )
         ascendencia = ascendencia.capitalize()
         if ascendencia not in ANCESTRIES:
-            return await interaction.followup.send(
-                f"'{ascendencia}' no es una ascendencia válida."
-            )
+            return await interaction.followup.send(f"'{ascendencia}' no es una ascendencia válida.")
 
-        # Generar stats base (0 de dt, 15 de gp)
-        # [nombre, id, jugador, clase, Arquetipos, ascendencia, heritage, dt, pp, gp, sp, cp, total, lenguajes, religión] # noqa: E501
-        async def update_func(
-            interaction: nextcord.Interaction, selected_heritage: str
-        ) -> Any:
-            values = [
-                nombre_pj,
-                str(user_id),
-                nombre_jugador,
-                clase,
-                "",
-                ascendencia,
-                selected_heritage,
-                0,
-                0,
-                15,
-                0,
-                0,
-            ]
-            pj_row = sh.first_empty_PJ_row()
-            sh.update_range_PJ(
-                [values], f"{PJ_COL.Name}{pj_row}:{PJ_COL.Money_cp}{pj_row}"
-            )
-            sh.update_range_PJ([[religion]], f"{PJ_COL.Religion}{pj_row}")
-            await interaction.followup.send(f"Registrado {nombre_pj} en la fila {pj_row}")
-
-        heritage_dropdown = HeritageDropdown(ascendencia, self.update_func)
+        heritage_dropdown = HeritageDropdown(
+            ascendencia, nombre_pj, str(user_id), nombre_jugador, clase, ascendencia, religion
+        )
 
         view = RegisterDropdownView(heritage_dropdown)
         await interaction.followup.send("Selecciona un heritage para tu personaje", view=view)
@@ -155,7 +156,7 @@ class Register(commands.Cog):
             description="El nuevo arquetipo de tu personaje, o uno que ya tuviera para eliminarlo.",
             required=True,
             choices=CLASSES,
-        )
+        ),
     ) -> Any:
         await interaction.response.defer()
         # Conseguir el ID del usuario
@@ -169,9 +170,7 @@ class Register(commands.Cog):
         try:
             pj_row = sh.get_pj_row(user_id)
         except CharacterNotFoundError:
-            return await interaction.followup.send(
-                "No se encontró un personaje con ID de discord correspondiente"
-            )
+            return await interaction.followup.send("No se encontró un personaje con ID de discord correspondiente")
         archs = sh.get_pj_data(pj_row, PJ_COL.Arquetypes)
         archs_list = archs.split(", ")
         if archetype in archs_list:
@@ -186,25 +185,17 @@ class Register(commands.Cog):
         await interaction.followup.send(message)
 
     @register.on_autocomplete("ascendencia")
-    async def autocomplete_ancestry(
-        self, interaction: nextcord.Interaction, ancestry: str
-    ) -> Any:
+    async def autocomplete_ancestry(self, interaction: nextcord.Interaction, ancestry: str) -> Any:
         filtered_ancestries = []
         if ancestry:
-            filtered_ancestries = [
-                a for a in ANCESTRIES if a.lower().startswith(ancestry.lower())
-            ]
+            filtered_ancestries = [a for a in ANCESTRIES if a.lower().startswith(ancestry.lower())]
         await interaction.response.send_autocomplete(filtered_ancestries)
 
     @register_archetype.on_autocomplete("archetype")
-    async def autocomplete_archetype(
-        self, interaction: nextcord.Interaction, archetype: str
-    ) -> Any:
+    async def autocomplete_archetype(self, interaction: nextcord.Interaction, archetype: str) -> Any:
         filtered_archetypes = []
         if archetype:
-            filtered_archetypes = [
-                a for a in ARCHETYPES if a.lower().startswith(archetype.lower())
-            ]
+            filtered_archetypes = [a for a in ARCHETYPES if a.lower().startswith(archetype.lower())]
         await interaction.response.send_autocomplete(filtered_archetypes)
 
 
